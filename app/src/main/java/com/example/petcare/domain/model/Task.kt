@@ -1,6 +1,6 @@
 package com.example.petcare.domain.model
 
-import java.time.Instant
+import kotlinx.datetime.Instant
 import java.util.UUID
 
 data class Task(

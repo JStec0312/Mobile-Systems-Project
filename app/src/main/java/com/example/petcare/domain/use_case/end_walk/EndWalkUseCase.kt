@@ -1,4 +1,34 @@
 package com.example.petcare.domain.use_case.end_walk
+import com.example.petcare.common.Resource
+import com.example.petcare.domain.model.Walk
+import com.example.petcare.domain.providers.IPetProvider
+import com.example.petcare.domain.providers.IUserProvider
+import com.example.petcare.domain.repository.IWalkRepository
+import kotlinx.coroutines.delay
+import java.util.UUID
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.datetime.Clock
+import javax.inject.Inject
 
-class EndWalkUseCase {
+class EndWalkUseCase @Inject constructor(
+    private val userProvider: IUserProvider,
+    private val petProvider: IPetProvider,
+    private val walkRepository: IWalkRepository
+){
+    operator fun invoke(
+        walkId: UUID,
+        endTime: Long = Clock.System.now().toEpochMilliseconds(),
+        delayMs: Long = 600, //@NOTE Simulated delay
+        shouldFail : Boolean = false, //@NOTE Simulated failure
+    ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading<Unit>())
+        delay(delayMs)
+        if (shouldFail){
+            emit(Resource.Error<Unit>("Failed to end walk"))
+
+        } else{
+            emit(Resource.Success<Unit>(Unit))
+        }
+    }
 }

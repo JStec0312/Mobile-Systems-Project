@@ -15,7 +15,7 @@ import kotlinx.datetime.Clock
 import java.util.UUID
 import javax.inject.Inject
 
-class ChangeTaskStatusUseCase @Inject  constructor(
+class ChangeTaskStatusUseCase @Inject constructor(
     private val taskRepository: ITaskRepository,
     private val currentUserProvider: IUserProvider,
     private val currentPetProvider: IPetProvider
@@ -23,25 +23,15 @@ class ChangeTaskStatusUseCase @Inject  constructor(
     operator fun invoke(
         taskId: String,
         newStatus: taskStatusEnum,
-        shouldFail: Boolean = false, //@NOTE Simulated failure
-        delayMs: Long = 600, //@NOTE Simulated delay
-    ): Flow<Resource<Task>> = flow {
-        emit(Resource.Loading<Task>())
+        shouldFail: Boolean = false,
+        delayMs: Long = 600,
+    ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading<Unit>())
         delay(delayMs)
-        if (shouldFail){
-            emit(Resource.Error<Task>("Failed to change task status"))
-        } else{
-            val updatedTask = Task(
-                id = UUID.randomUUID(),
-                pet_id = currentPetProvider.getCurrentPetId(),
-                type = taskTypeEnum.grooming,
-                title = "mock title",
-                notes = "mock notes",
-                priority = taskPriorityEnum.high,
-                status = newStatus,
-                created_at = Clock.System.now()
-            )
-            emit(Resource.Success<Task>(updatedTask))
+
+        if (shouldFail) {
+            emit(Resource.Error("Failed to change task status"))
         }
+        emit(Resource.Success(Unit)) // mock: sygnał sukcesu bez danych
     }
 }

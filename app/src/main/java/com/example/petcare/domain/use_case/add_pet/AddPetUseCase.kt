@@ -27,29 +27,18 @@ class AddPetUseCase @Inject constructor(
         birthDate: Instant,
         breedId: UUID,
         sex: sexEnum,
-        delayms: Long = 500, //@NOTE Simulated delay
-        shouldFail: Boolean = false, //@NOTE Simulated failure
+        delayms: Long = 500,
+        shouldFail: Boolean = false,
         byteArrayImage: ByteArray?
-    ): Flow<Resource<Pet>> = flow {
-        emit(Resource.Loading<Pet>());
+    ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading<Unit>())
         delay(delayms)
+
         if (shouldFail) {
-            emit(Resource.Error<Pet>("Failed to add pet"))
-        } else {
-            val pet = Pet(
-                id = UUID.randomUUID(),
-                ownerUserId = userProvider.getUserId(),
-                name = name,
-                species = species,
-                breedId = breedId,
-                sex = sex,
-                birthDate = birthDate,
-                avatarThumb_url = null,
-                createdAt = Clock.System.now()
-            );
-            emit(Resource.Success<Pet>(pet))
+            emit(Resource.Error<Unit>("Failed to add pet"))
+            return@flow
         }
-    }
 
-
+        emit(Resource.Success(Unit))
     }
+}

@@ -25,25 +25,27 @@ class AddTaskUseCase @Inject constructor(
         title: String,
         description: String?,
         priority: taskPriorityEnum,
-        delayMs: Long = 600, //@NOTE Simulated delay
-        shouldFail: Boolean = false //@NOTE Simulated failure
-    ): Flow<Resource<Task>> = flow {
-        emit(Resource.Loading<Task>());
-        delay(delayMs);
-        if (shouldFail){
-            emit(Resource.Error("Failed to add task"))
-        } else{
-            val task = Task(
-                id = UUID.randomUUID(),
-                pet_id = petProvider.getCurrentPetId(),
-                type = type,
-                title = title,
-                notes = description,
-                priority = priority,
-                status = taskStatusEnum.planned,
-                created_at = Clock.System.now()
-            )
-        }
-    }
+        delayMs: Long = 600, // symulacja opóźnienia
+        shouldFail: Boolean = false // symulacja błędu
+    ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        delay(delayMs)
 
+        if (shouldFail) {
+            emit(Resource.Error("Failed to add task"))
+            return@flow
+        }
+
+        val task = Task(
+            id = UUID.randomUUID(),
+            pet_id = petProvider.getCurrentPetId(),
+            type = type,
+            title = title,
+            notes = description,
+            priority = priority,
+            status = taskStatusEnum.planned,
+            created_at = Clock.System.now()
+        )
+        emit(Resource.Success(Unit))
+    }
 }

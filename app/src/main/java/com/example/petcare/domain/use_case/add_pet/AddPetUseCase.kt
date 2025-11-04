@@ -25,7 +25,6 @@ class AddPetUseCase @Inject constructor(
         species: speciesEnum,
         breed: String,
         birthDate: Instant,
-        breedId: UUID,
         sex: sexEnum,
         delayms: Long = 500,
         shouldFail: Boolean = false,

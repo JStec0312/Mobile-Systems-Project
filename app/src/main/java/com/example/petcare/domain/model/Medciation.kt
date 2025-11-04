@@ -10,5 +10,7 @@ data class Medication(
     val dose: String?,
     val notes: String?,
     val active: Boolean = true,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val from: Instant,
+    val to: Instant?
 )

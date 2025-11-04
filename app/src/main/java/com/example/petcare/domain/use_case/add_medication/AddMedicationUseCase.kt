@@ -39,8 +39,8 @@ class AddMedicationUseCase @Inject constructor(
                 form = "Mock",
                 dose = "Mock dose",
                 notes = "Mock notes",
-                active = true,
-                createdAt = Clock.System.now()
+                createdAt = Clock.System.now(),
+                form1 = Instant.parse("2023-11-01T10:00:00Z")
             )
             emit(Resource.Success<Medication>(medication))
         }

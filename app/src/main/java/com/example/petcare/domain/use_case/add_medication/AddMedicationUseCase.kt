@@ -9,6 +9,7 @@ import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import javax.inject.Inject
 
 
@@ -40,7 +41,9 @@ class AddMedicationUseCase @Inject constructor(
                 dose = "Mock dose",
                 notes = "Mock notes",
                 createdAt = Clock.System.now(),
-                form1 = Instant.parse("2023-11-01T10:00:00Z")
+                active = true,
+                from = Instant.parse("2023-01-01T00:00:00Z"),
+                to = Instant.parse("2023-01-02T00:00:00Z"),
             )
             emit(Resource.Success<Medication>(medication))
         }

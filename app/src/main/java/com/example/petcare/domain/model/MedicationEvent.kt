@@ -1,5 +1,6 @@
 package com.example.petcare.domain.model
 
+import com.example.petcare.common.taskStatusEnum
 import java.time.Instant
 import java.util.UUID
 

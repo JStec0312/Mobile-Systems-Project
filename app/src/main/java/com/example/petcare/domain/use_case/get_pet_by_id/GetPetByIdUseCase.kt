@@ -1,12 +1,11 @@
 package com.example.petcare.domain.use_case.get_pet_by_id
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.model.Pet
-import com.example.petcare.domain.model.sexEnum
-import com.example.petcare.domain.model.speciesEnum
+import com.example.petcare.common.sexEnum
+import com.example.petcare.common.speciesEnum
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IPetRepository
-import kotlinx.coroutines.Delay
 import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow

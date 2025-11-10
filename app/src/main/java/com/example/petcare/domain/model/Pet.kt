@@ -1,4 +1,6 @@
 package com.example.petcare.domain.model
+import com.example.petcare.common.sexEnum
+import com.example.petcare.common.speciesEnum
 import java.util.UUID
 
 data class Pet(

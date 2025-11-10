@@ -1,5 +1,8 @@
 package com.example.petcare.domain.model
 
+import com.example.petcare.common.taskPriorityEnum
+import com.example.petcare.common.taskStatusEnum
+import com.example.petcare.common.taskTypeEnum
 import kotlinx.datetime.Instant
 import java.util.UUID
 

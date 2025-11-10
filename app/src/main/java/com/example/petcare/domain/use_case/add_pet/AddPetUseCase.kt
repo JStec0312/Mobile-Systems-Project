@@ -1,9 +1,8 @@
 package com.example.petcare.domain.use_case.add_pet
 
 import com.example.petcare.common.Resource
-import com.example.petcare.domain.model.Pet
-import com.example.petcare.domain.model.sexEnum
-import com.example.petcare.domain.model.speciesEnum
+import com.example.petcare.common.sexEnum
+import com.example.petcare.common.speciesEnum
 import com.example.petcare.domain.providers.implementation.PetProvider
 import com.example.petcare.domain.providers.implementation.UserProvider
 import com.example.petcare.domain.repository.IPetRepository
@@ -11,8 +10,6 @@ import kotlinx.datetime.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
-import java.util.UUID
 import javax.inject.Inject
 
 class AddPetUseCase @Inject constructor(

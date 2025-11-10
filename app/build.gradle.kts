@@ -55,6 +55,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     testImplementation(libs.androidx.room.compiler.processing.testing)
 

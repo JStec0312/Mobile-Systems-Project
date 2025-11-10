@@ -6,7 +6,7 @@ data class Pet(
     val ownerUserId: UUID,
     val name: String,
     val species: speciesEnum,
-    val breedId: UUID?,
+    val breed: String,
     val sex: sexEnum = sexEnum.unknown,
     val birthDate: kotlinx.datetime.Instant,
     val avatarThumb_url: String?,

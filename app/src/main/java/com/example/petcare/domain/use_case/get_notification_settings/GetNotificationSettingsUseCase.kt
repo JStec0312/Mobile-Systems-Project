@@ -1,7 +1,7 @@
 package com.example.petcare.domain.use_case.get_notification_settings
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.model.NotificationSettings
-import com.example.petcare.domain.model.notificationChannelEnum
+import com.example.petcare.common.notificationChannelEnum
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.INotificationSettingsRepository

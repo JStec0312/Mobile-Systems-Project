@@ -1,17 +1,12 @@
 package com.example.petcare.domain.use_case.add_pet_by_key
 
 import com.example.petcare.common.Resource
-import com.example.petcare.domain.model.Pet
-import com.example.petcare.domain.model.sexEnum
-import com.example.petcare.domain.model.speciesEnum
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IPetShareCodeRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Clock
-import java.util.UUID
 import javax.inject.Inject
 
 class AddPetByKeyUseCase @Inject constructor(

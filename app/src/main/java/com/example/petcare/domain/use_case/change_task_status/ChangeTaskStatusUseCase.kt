@@ -1,18 +1,13 @@
 package com.example.petcare.domain.use_case.change_task_status
 
 import com.example.petcare.common.Resource
-import com.example.petcare.domain.model.Task
-import com.example.petcare.domain.model.taskPriorityEnum
-import com.example.petcare.domain.model.taskStatusEnum
-import com.example.petcare.domain.model.taskTypeEnum
+import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.ITaskRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Clock
-import java.util.UUID
 import javax.inject.Inject
 
 class ChangeTaskStatusUseCase @Inject constructor(

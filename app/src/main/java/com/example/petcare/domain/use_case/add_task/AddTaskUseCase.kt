@@ -2,9 +2,9 @@ package com.example.petcare.domain.use_case.add_task
 
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.model.Task
-import com.example.petcare.domain.model.taskPriorityEnum
-import com.example.petcare.domain.model.taskStatusEnum
-import com.example.petcare.domain.model.taskTypeEnum
+import com.example.petcare.common.taskPriorityEnum
+import com.example.petcare.common.taskStatusEnum
+import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.ITaskRepository

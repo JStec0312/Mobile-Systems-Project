@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
+import com.example.petcare.common.Resource
 import com.example.petcare.domain.use_case.sign_in.SignInUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -30,16 +33,23 @@ class SignInViewModel @Inject constructor(
         viewModelScope.launch { signIn() }
     }
     private suspend fun signIn() {
-        _state.update { it.copy(isLoading = true, error = null) }
-        val result = signInUseCase(
-            email = _state.value.email,
-            password = _state.value.password,
-        )
-        val newState = if (result.isSuccess) {
-            _state.value.copy(isLoading = false, error = null)
-        } else {
-            _state.value.copy(isLoading = false, error = result.exceptionOrNull()?.message)
-        }
-        _state.value = newState
+        signInUseCase(
+            email = state.value.email,
+            password = state.value.password
+        ).onEach { result ->
+            when (result) {
+                is Resource.Loading -> {
+                    _state.update { it.copy(isLoading = true, error = null) }
+                }
+
+                is Resource.Success -> {
+                    _state.update { it.copy(isLoading = false, error = null) }
+                }
+
+                is Resource.Error -> {
+                    _state.update { it.copy(isLoading = false, error = result.message) }
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 }

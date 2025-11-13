@@ -40,6 +40,6 @@ class SignInViewModel @Inject constructor(
         } else {
             _state.value.copy(isLoading = false, error = result.exceptionOrNull()?.message)
         }
-        _state.value = newState
+        _state.value = newStategit
     }
 }

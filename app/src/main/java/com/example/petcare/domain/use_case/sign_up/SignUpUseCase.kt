@@ -1,29 +1,37 @@
 package com.example.petcare.domain.use_case.sign_up
 
 import com.example.petcare.common.Resource
+import com.example.petcare.common.utils.EmailValidator
+import com.example.petcare.config.Settings
+import com.example.petcare.data.dto.UserDto
+import com.example.petcare.domain.model.User
+import com.example.petcare.domain.providers.IPetProvider
+import com.example.petcare.domain.repository.IUserRepository
+import com.example.petcare.exceptions.AuthFailure
+import com.example.petcare.exceptions.Failure
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(
-    private val shouldFail: Boolean = false,
-    private val delayMs: Long = 600
+    private val petProvider: IPetProvider,
+    private val userRepository: IUserRepository
 ) {
 
     operator fun invoke(
         name: String,
         email: String,
         password: String,
-        confirmPassword: String
+        confirmPassword: String,
 
     ): Flow<Resource<Unit>> = flow {
-        // Prosta walidacja danych
+        emit(Resource.Loading<Unit>())
         if (name.isBlank()) {
             emit(Resource.Error<Unit>("Name cannot be blank"))
             return@flow
         };
-        if (email.isBlank()) {
+        if (email.isBlank() || !EmailValidator.isValidEmail(email)) {
             emit(Resource.Error<Unit>("Email cannot be blank"))
             return@flow
         };
@@ -32,13 +40,30 @@ class SignUpUseCase @Inject constructor(
             return@flow
 
         };
-        emit(Resource.Loading<Unit>())
-        delay(delayMs)
-        if (shouldFail) {
-            emit(Resource.Error<Unit>("Something went wrong"))
+        if (password != confirmPassword) {
+            emit(Resource.Error<Unit>("Passwords do not match"))
             return@flow
         }
-        // Udana rejestracja (na razie bez repo)
+        if (password.length < Settings.MIN_PASSWORD_LENGTH){
+            emit(Resource.Error<Unit>("Password must be at least ${Settings.MIN_PASSWORD_LENGTH} characters"))
+            return@flow
+        }
+        try {
+            userRepository.createUser(name, email, password)
+        } catch(e: AuthFailure.EmailAlreadyInUse ){
+            emit(Resource.Error<Unit>(e.message))
+            return@flow
+        } catch(e: Failure.NetworkError) {
+            emit(Resource.Error<Unit>(e.message))
+            return@flow
+        } catch (e: Failure.ServerError){
+            emit(Resource.Error<Unit>(e.message))
+            return@flow
+        } catch (e: Failure.UnknownError){
+            emit(Resource.Error<Unit>(e.message))
+            return@flow
+
+        }
         emit(Resource.Success(Unit))
         return@flow
     }

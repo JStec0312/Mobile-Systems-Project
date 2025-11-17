@@ -39,17 +39,17 @@ class SignUpViewModel @Inject constructor(
     }
     private suspend fun signUp() {
         _state.update { it.copy(isLoading = true, error = null) }
-        val result = signUpUseCase(
-            name = _state.value.name,
-            email = _state.value.email,
-            password = _state.value.password,
-            confirmPassword = _state.value.confirmPassword
-        )
-        val newState = if (result.isSuccess) {
-            _state.value.copy(isLoading = false, error = null)
-        } else {
-            _state.value.copy(isLoading = false, error = result.exceptionOrNull()?.message)
-        }
-        _state.value = newState
+//        val result = signUpUseCase(
+//            name = _state.value.name,
+//            email = _state.value.email,
+//            password = _state.value.password,
+//            confirmPassword = _state.value.confirmPassword
+//        )
+//        val newState = if (result.isSuccess) {
+//            _state.value.copy(isLoading = false, error = null)
+//        } else {
+//            _state.value.copy(isLoading = false, error = result.exceptionOrNull()?.message)
+//        }
+//        _state.value = newState
     }
 }

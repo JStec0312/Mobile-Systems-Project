@@ -8,6 +8,8 @@ import com.google.firebase.firestore.FieldValue
 import javax.inject.Inject
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import android.util.Log
+
 
 class UserRepository  @Inject constructor(
     private val auth: FirebaseAuth,
@@ -25,6 +27,8 @@ class UserRepository  @Inject constructor(
                 val req = userProfileChangeRequest { this.displayName = displayName }
                 u.updateProfile(req).await()
             }
+            val id = u.uid
+
             val docref = users().document(u.uid)
             val profile = mapOf(
                 "display_name" to u.displayName,
@@ -32,11 +36,12 @@ class UserRepository  @Inject constructor(
                 "created_at" to FieldValue.serverTimestamp()
             )
             docref.set(profile).await();
-            return UserDto(u.email!!, u.displayName!!)
+            Log.d("UserRepository add user", "User created successfully")
+            return UserDto(u.email!!, u.displayName!!, id = u.uid)
 
 
         } catch (e: Exception) {
-            throw e
+            error("Error creating user: ${e.message}")
         }
     }
 

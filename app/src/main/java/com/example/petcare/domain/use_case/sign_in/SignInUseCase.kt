@@ -1,9 +1,12 @@
 package com.example.petcare.domain.use_case.sign_in
 import com.example.petcare.common.Resource
+import com.example.petcare.data.dto.UserDto
 import com.example.petcare.domain.model.User
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IUserRepository
+import com.example.petcare.exceptions.AuthFailure
+import com.example.petcare.exceptions.Failure
 import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -18,24 +21,33 @@ class SignInUseCase  @Inject constructor(
     operator fun invoke(
         email: String,
         password: String,
-        delayMs: Long = 600,
-        shouldFail: Boolean = false,
     ): Flow<Resource<User>> = flow {
         emit(Resource.Loading<User>())
-        delay(delayMs)
-        if (shouldFail) {
-            emit(Resource.Error<User>("Failed to sign in"))
-
-        } else {
-            val user = User(
-                id = UUID.randomUUID(),
-                email = email,
-                display_name = "John Doe",
-            )
-
-            // Simulate saving user session
-            userProvider.setUserId(user.id)
-            emit(Resource.Success<User>(user))
+        if (email.isBlank() || password.isBlank()) {
+            emit(Resource.Error<User>("Email and password cannot be empty"))
+            return@flow
         }
+        try{
+            val userDto: UserDto = userRepository.signInWithEmailAndPassword(email, password)
+            val user = userDto.toModel();
+            emit(Resource.Success<User>(user))
+            return@flow
+        }  catch(e: AuthFailure.InvalidCredentials){
+            emit(Resource.Error<User>(e.message))
+            return@flow
+        } catch (e: AuthFailure.UserNotFound){
+            emit(Resource.Error<User>(e.message))
+            return@flow
+        } catch (e: Failure.NetworkError){
+            emit(Resource.Error<User>(e.message))
+            return@flow
+        } catch(e: Failure.ServerError){
+            emit(Resource.Error<User>(e.message))
+            return@flow
+        } catch(e: Failure.UnknownError){
+            emit(Resource.Error<User>(e.message))
+            return@flow
+        }
+
     }
 }

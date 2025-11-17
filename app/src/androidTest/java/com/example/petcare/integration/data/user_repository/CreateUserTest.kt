@@ -13,6 +13,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
+import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
+
 
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
@@ -23,17 +27,28 @@ class CreateUserTest {
     @Inject
     lateinit var userRepository: IUserRepository
     @Inject
-    lateinit var fireStore: FirebaseStorage
+    lateinit var fireStorage: FirebaseStorage
+
+    @Inject
+    lateinit var db: FirebaseFirestore
+
     @Before
     fun init(){
         hiltRule.inject()
     }
     @Test
      fun test() = runTest{
+         Log.d("test","Firestore integration test")
+        Log.d("Storage", fireStorage.toString())
         val email = "test@gmail.com"
         val password = "123456"
         val displayName = "testUser123"
-        userRepository.createUser(email, password, displayName)
+        val user = userRepository.createUser(email, password, displayName)
+        val docRef = db.collection("users").document(user.id)
+        val result = docRef.get().await()
+        assert(result.exists())
+        Log.d("test_result", result.toString())
+
     }
 
 }

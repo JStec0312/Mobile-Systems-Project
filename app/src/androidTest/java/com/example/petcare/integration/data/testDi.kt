@@ -11,6 +11,7 @@ import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import com.example.petcare.di.FirebaseModule
+import com.google.firebase.firestore.firestoreSettings
 import dagger.hilt.testing.TestInstallIn
 import javax.inject.Singleton
 
@@ -31,24 +32,29 @@ object EmulatorFirebaseModule  {
     @Provides
     @Singleton
     fun provideFirebaseApp(@ApplicationContext ctx: Context): FirebaseApp {
-        FirebaseApp.getApps(ctx).firstOrNull()?.let { return it }
+            FirebaseApp.getApps(ctx).firstOrNull()?.let { return it }
 
-        val options = FirebaseOptions.Builder()
-            .setProjectId("demo-petcare")
-            .setApplicationId("1:123:android:demo")
-            .setStorageBucket("demo-petcare.appspot.com")
-            .build()
+            val options = FirebaseOptions.Builder()
+                .setProjectId("demo-petcare")                  // dowolny string
+                .setApplicationId("1:123:android:demo")        // dowolny string
+                .setStorageBucket("demo-petcare.appspot.com")  // dowolny string
+                .setApiKey("fake-api-key")                     // KLUCZ: musi być jakikolwiek niepusty
+                .build()
 
-        return FirebaseApp.initializeApp(ctx, options)
-            ?: error("FirebaseApp.initializeApp returned null")
+            return FirebaseApp.initializeApp(ctx, options)
+                ?: error("FirebaseApp.initializeApp returned null even with explicit options")
     }
 
     @Provides
     @Singleton
     fun provideFirestore(app: FirebaseApp): FirebaseFirestore {
-        val db = FirebaseFirestore.getInstance(app)
+        val db: FirebaseFirestore = FirebaseFirestore.getInstance(app)
         if (USE_EMULATOR) {
             db.useEmulator(host(), FIRESTORE_PORT)
+        }
+        db.firestoreSettings = firestoreSettings {
+            isPersistenceEnabled = false
+
         }
         return db
     }
@@ -57,6 +63,7 @@ object EmulatorFirebaseModule  {
     @Singleton
     fun provideFirebaseStorage(app: FirebaseApp): FirebaseStorage {
         val storage = FirebaseStorage.getInstance(app)
+
         if (USE_EMULATOR) {
             storage.useEmulator(host(), STORAGE_PORT)
         }

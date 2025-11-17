@@ -36,7 +36,7 @@ class GetWalkUseCase @Inject constructor(
                 duration_sec = 1800,
                 distance_meters = 1500,
                 steps = 2000,
-                created_at = Clock.System.now(),
+                createdAt = Clock.System.now(),
             )
             val walk2 = Walk(
                 id = UUID.randomUUID(),
@@ -46,7 +46,7 @@ class GetWalkUseCase @Inject constructor(
                 duration_sec = 2700,
                 distance_meters = 2500,
                 steps = 3500,
-                created_at = Clock.System.now(),
+                createdAt = Clock.System.now(),
             )
             val walks = listOf(walk1, walk2)
             emit(Resource.Success<List<Walk>>(walks))

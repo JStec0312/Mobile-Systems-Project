@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 data class PetMember(
-    val pet_id: UUID,
-    val user_id: UUID,
-    val created_at: Instant
+    val petId: UUID,
+    val userId: UUID,
+    val createdAt: Instant
 )

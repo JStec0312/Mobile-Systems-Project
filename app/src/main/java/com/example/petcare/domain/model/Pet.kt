@@ -11,6 +11,6 @@ data class Pet(
     val breed: String,
     val sex: sexEnum = sexEnum.unknown,
     val birthDate: kotlinx.datetime.Instant,
-    val avatarThumb_url: String?,
+    val avatarThumbUrl: String?,
     val createdAt: kotlinx.datetime.Instant
 )

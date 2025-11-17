@@ -5,7 +5,7 @@ import java.util.UUID
 
 data class PetShareCode(
     val id: UUID,
-    val pet_id: UUID,
+    val petId: UUID,
     val code: String,
-    val created_at: Instant
+    val createdAt: Instant
 )

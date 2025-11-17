@@ -30,6 +30,7 @@ class SignInUseCase  @Inject constructor(
         try{
             val userDto: UserDto = userRepository.signInWithEmailAndPassword(email, password)
             val user = userDto.toModel();
+            userProvider.setUserId(user.id);
             emit(Resource.Success<User>(user))
             return@flow
         }  catch(e: AuthFailure.InvalidCredentials){

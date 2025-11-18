@@ -52,4 +52,8 @@ class UserRepository  @Inject constructor(
         TODO("Not yet implemented")
     }
 
+    override suspend fun getUserById(userId: String) {
+        TODO("Not yet implemented")
+    }
+
 }

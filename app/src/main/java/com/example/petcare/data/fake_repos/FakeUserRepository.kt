@@ -66,4 +66,8 @@ class FakeUserRepository : IUserRepository {
         }
         return user.first
         }
+
+    override suspend fun getUserById(userId: String) {
+        TODO("Not yet implemented")
+    }
 }

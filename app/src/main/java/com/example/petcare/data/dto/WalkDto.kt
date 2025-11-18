@@ -10,7 +10,7 @@ data class WalkDto(
     val durationSec: Int? = null,
     val distanceMeters: Int? = null,
     val steps: Int? = null,
-    val createdAt: String
+    val createdAt: String,
 ){
     fun toModel(): Walk{
         return Walk(
@@ -18,7 +18,7 @@ data class WalkDto(
             petId = this.petId,
             startedAt = DateConverter.stringToLocalDate(this.startedAt),
             endedAt = DateConverter.stringToLocalDate(this.endedAt),
-            durationSec = DateConverter.stringToLocalDate(this.endedAt),
+            durationSec = durationSec,
             distanceMeters = this.distanceMeters,
             steps = this.steps,
             createdAt = DateConverter.stringToLocalDate(this.createdAt),

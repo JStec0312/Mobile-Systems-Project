@@ -39,7 +39,7 @@ class  GetTasksUseCase @Inject constructor(
                     notes = "Practice basic commands",
                     priority = taskPriorityEnum.low,
                     status = taskStatusEnum.planned,
-                    createdAt = Instant.parse("2023-10-01T10:00:00Z")
+                    createdAt = LocalDate(1023, 10, 1)
                 ),
                 Task(
                     id = UUID.randomUUID().toString(),
@@ -49,7 +49,7 @@ class  GetTasksUseCase @Inject constructor(
                     notes = "30-minute walk in the park",
                     priority = taskPriorityEnum.normal,
                     status = taskStatusEnum.planned,
-                    createdAt = Instant.parse("2023-10-02T08:00:00Z")
+                    createdAt = LocalDate(2023, 10, 1)
                 )
             )
             emit(Resource.Success<List<Task>>(tasks))

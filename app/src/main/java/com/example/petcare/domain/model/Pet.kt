@@ -1,7 +1,7 @@
 package com.example.petcare.domain.model
 import com.example.petcare.common.sexEnum
 import com.example.petcare.common.speciesEnum
-import com.google.firebase.Timestamp
+import kotlinx.datetime.LocalDate
 
 data class Pet(
     val id: String,
@@ -10,7 +10,7 @@ data class Pet(
     val species: speciesEnum,
     val breed: String?,
     val sex: sexEnum = sexEnum.unknown,
-    val birthDate: Timestamp?,
+    val birthDate: LocalDate,
     val avatarThumbUrl: String?,
-    val createdAt: Timestamp?
+    val createdAt: LocalDate
 )

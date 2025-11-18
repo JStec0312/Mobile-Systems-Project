@@ -2,6 +2,7 @@ package com.example.petcare.data.dto
 
 import com.example.petcare.common.sexEnum
 import com.example.petcare.common.speciesEnum
+import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.domain.model.Pet
 import com.google.firebase.Timestamp
 
@@ -12,9 +13,9 @@ data class PetDto (
     val species: speciesEnum,
     val breed: String?,
     val sex : sexEnum = sexEnum.unknown,
-    val birthDate: Timestamp? = null,
+    val birthDate: String? = null,
     val avatarThumbUrl : String? = null,
-    val createdAt: Timestamp? = null
+    val createdAt: String? = null
 
 ){
     public fun toModel(): Pet {
@@ -25,9 +26,9 @@ data class PetDto (
             species = this.species,
             breed = this.breed,
             sex = this.sex,
-            birthDate = this.birthDate,
+            birthDate = DateConverter.stringToLocalDate(this.birthDate),
             avatarThumbUrl = this.avatarThumbUrl,
-            createdAt = this.createdAt,
+            createdAt = DateConverter.stringToLocalDate(this.createdAt),
         )
     }
 }

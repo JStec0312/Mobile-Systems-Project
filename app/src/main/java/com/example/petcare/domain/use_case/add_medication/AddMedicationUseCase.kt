@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 
@@ -40,10 +41,10 @@ class AddMedicationUseCase @Inject constructor(
                 form = "Mock",
                 dose = "Mock dose",
                 notes = "Mock notes",
-                createdAt = Clock.System.now(),
+                createdAt = LocalDate(2023,1,1),
                 active = true,
-                from = Instant.parse("2023-01-01T00:00:00Z"),
-                to = Instant.parse("2023-01-02T00:00:00Z"),
+                from = LocalDate(2023,1,1),
+                to = LocalDate(2023, 12, 31),
             )
             emit(Resource.Success<Medication>(medication))
         }

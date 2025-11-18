@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 
@@ -31,22 +32,22 @@ class GetWalkUseCase @Inject constructor(
             val walk1 = Walk(
                 id = UUID.randomUUID().toString(),
                 petId = petProvider.getCurrentPetId(),
-                startedAt = Instant.parse("2024-01-01T10:00:00Z"),
-                endedAt = Instant.parse("2024-01-01T10:30:00Z"),
+                startedAt = LocalDate(2024, 1,1),
+                endedAt = LocalDate(2024, 1,1),
                 durationSec = 1800,
                 distanceMeters = 1500,
                 steps = 2000,
-                createdAt = Clock.System.now(),
+                createdAt = LocalDate(2024,1,1),
             )
             val walk2 = Walk(
                 id = UUID.randomUUID().toString(),
                 petId = petProvider.getCurrentPetId(),
-                startedAt = Instant.parse("2024-01-02T11:00:00Z"),
-                endedAt = Instant.parse("2024-01-02T11:45:00Z"),
+                startedAt = LocalDate(2024, 1,2),
+                endedAt = LocalDate(2024, 1,2),
                 durationSec = 2700,
                 distanceMeters = 2500,
                 steps = 3500,
-                createdAt = Clock.System.now(),
+                createdAt = LocalDate(2024,1,2),
             )
             val walks = listOf(walk1, walk2)
             emit(Resource.Success<List<Walk>>(walks))

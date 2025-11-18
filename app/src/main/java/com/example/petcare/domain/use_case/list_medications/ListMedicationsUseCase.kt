@@ -36,9 +36,9 @@ class ListMedicationsUseCase @Inject constructor(
                     form = "Topical",
                     dose = "10ml",
                     active = true,
-                    createdAt = Clock.System.now(),
-                    from = Instant.parse("2023-10-01T10:00:00Z"),
-                    to = Instant.parse("2024-10-01T10:00:00Z")
+                    createdAt = LocalDate(12023, 9, 1),
+                    from = LocalDate(2023, 9, 1),
+                    to = LocalDate(2024, 9, 1)
                 ),
                 Medication(
                     id = UUID.randomUUID().toString(),
@@ -48,9 +48,9 @@ class ListMedicationsUseCase @Inject constructor(
                     form = "Oral",
                     dose = "1 tablet",
                     active = true,
-                    createdAt = Clock.System.now(),
-                    from = Instant.parse("2023-11-01T10:00:00Z"),
-                    to = Instant.parse("2024-11-01T10:00:00Z")
+                    createdAt = LocalDate(2023, 11, 1),
+                    from = LocalDate(2023, 11, 1),
+                    to = LocalDate(2024, 11, 1)
                 )
             )
             emit(Resource.Success<List<Medication>>(medications))

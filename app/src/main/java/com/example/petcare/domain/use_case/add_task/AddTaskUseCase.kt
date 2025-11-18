@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flow
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 
 class AddTaskUseCase @Inject constructor(
     private val taskRepository: ITaskRepository,
@@ -44,7 +45,7 @@ class AddTaskUseCase @Inject constructor(
             notes = description,
             priority = priority,
             status = taskStatusEnum.planned,
-            createdAt = Clock.System.now()
+            createdAt = LocalDate(11,12,2023)
         )
         emit(Resource.Success(Unit))
     }

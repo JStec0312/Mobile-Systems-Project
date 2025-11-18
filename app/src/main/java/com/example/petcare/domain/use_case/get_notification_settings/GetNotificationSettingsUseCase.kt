@@ -10,6 +10,7 @@ import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 
@@ -32,17 +33,17 @@ class GetNotificationSettingsUseCase @Inject constructor(
             val example_settings = ArrayList<NotificationSettings>()
             val setting1 = NotificationSettings(
                 id = UUID.randomUUID().toString(),
-                petId = petProvider.getCurrentPetId(),
                 userId = userProvider.getUserId(),
                 channel = notificationChannelEnum.meds,
-                createdAt = Clock.System.now(),
+                createdAt = LocalDate(1970, 1, 1),
+                enabled = true,
             )
             val setting2 = NotificationSettings(
                 id = UUID.randomUUID().toString(),
-                petId = petProvider.getCurrentPetId(),
                 userId = userProvider.getUserId(),
                 channel = notificationChannelEnum.tasks,
-                createdAt = Clock.System.now(),
+                createdAt = LocalDate(1970, 1, 1),
+                enabled = false,
             )
             example_settings.add(setting1)
             example_settings.add(setting2)

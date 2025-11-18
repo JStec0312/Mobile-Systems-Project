@@ -9,10 +9,9 @@ import com.example.petcare.domain.providers.implementation.UserProvider
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.exceptions.Failure
-import kotlinx.datetime.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import java.util.UUID
 import javax.inject.Inject
 
@@ -26,7 +25,7 @@ class AddPetUseCase @Inject constructor(
         name: String,
         species: speciesEnum,
         breed: String,
-        birthDate: Instant,
+        birthDate: LocalDate,
         sex: sexEnum,
         byteArrayImage: ByteArray?
     ): Flow<Resource<Unit>> = flow {
@@ -46,7 +45,7 @@ class AddPetUseCase @Inject constructor(
             sex = sex,
             birthDate = birthDate,
             avatarThumbUrl = null,
-            createdAt = Clock.System.now()
+            createdAt = LocalDate(11, 12, 2003)
         )
         try{
             petRepository.createPet(userId, newPet, byteArrayImage)

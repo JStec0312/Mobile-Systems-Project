@@ -36,7 +36,7 @@ class GetTaskByIdUseCase @Inject constructor(
                 notes = "Remember to brush the fur thoroughly",
                 priority = taskPriorityEnum.high,
                 status = taskStatusEnum.skipped,
-                createdAt = Instant.parse("2023-10-01T10:00:00Z")
+                createdAt = LocalDate(11, 12, 2003),
             )
             emit(Resource.Success<Task>(task))
         }

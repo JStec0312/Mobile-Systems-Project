@@ -7,6 +7,6 @@ data class NotificationSettings(
     val id: String?,
     val userId: String?,
     val channel: notificationChannelEnum,
-    val createdAt: LocalDate
+    val createdAt: LocalDate,
     val enabled: Boolean,
 )

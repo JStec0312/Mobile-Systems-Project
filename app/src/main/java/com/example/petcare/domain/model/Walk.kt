@@ -7,7 +7,7 @@ data class Walk(
     val petId: String,
     val startedAt: LocalDate,
     val endedAt: LocalDate,
-    val durationSec: LocalDate,
+    val durationSec: Int?,
     val distanceMeters: Int?,
     val steps: Int?,
     val createdAt: LocalDate

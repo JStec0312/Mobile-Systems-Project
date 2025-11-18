@@ -5,8 +5,8 @@ import com.example.petcare.common.taskStatusEnum
 import com.google.firebase.Timestamp
 
 data class TaskOccurenceDto(
-    val task_id: String,
+    val taskId: String,
     val status: taskStatusEnum,
-    val completed_at: Timestamp? = null,
+    val completedAt: Timestamp? = null,
     val notes : String? = null,
 )

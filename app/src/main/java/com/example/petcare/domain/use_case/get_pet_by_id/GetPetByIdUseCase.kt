@@ -3,9 +3,12 @@ import com.example.petcare.common.Resource
 import com.example.petcare.domain.model.Pet
 import com.example.petcare.common.sexEnum
 import com.example.petcare.common.speciesEnum
+import com.example.petcare.data.dto.PetDto
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IPetRepository
+import com.example.petcare.exceptions.AuthFailure
+import com.example.petcare.exceptions.Failure
 import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -21,27 +24,22 @@ class GetPetByIdUseCase @Inject constructor(
 ) {
     operator fun invoke(
         petId: String,
-        delayMs: Long = 600, //@NOTE Simulated delay
-        shouldFail: Boolean = false, //@NOTE Simulated failure
     ): Flow<Resource<Pet>> = flow {
         emit(Resource.Loading<Pet>())
-        delay(delayMs)
-        if (shouldFail) {
-            emit(Resource.Error("Failed to get pet"))
-        } else {
-            val example_pet = Pet(
-                id = petId,
-                ownerUserId = userProvider.getUserId().toString(),
-                name = "Fido",
-                species = speciesEnum.dog,
-                breed = "Golden Retriever",
-                sex = sexEnum.male,
-                birthDate = Clock.System.now(),
-                avatarThumbUrl = null,
-                createdAt = Clock.System.now()
-            );
-
-            emit(Resource.Success<Pet>(example_pet))
+        try{
+            var petDto: PetDto = petRepository.getPetById(petId)
+            var pet = petDto.toModel();
+            if (pet.ownerUserId != userProvider.getUserId()){
+                emit(Resource.Error<Pet>("You are not the owner of this pet"))
+            }
+            petProvider.setCurrentPet(pet)
+            emit(Resource.Success<Pet>(pet))
+        } catch(e: Failure.NetworkError){
+            emit(Resource.Error<Pet>(e.message))
+        } catch (e: Failure.ServerError){
+            emit(Resource.Error<Pet>(e.message))
+        } catch (e: Failure.UnknownError){
+            emit(Resource.Error<Pet>(e.message))
         }
     }
 }

@@ -1,11 +1,28 @@
 package com.example.petcare.data.dto
-import com.google.firebase.Timestamp
+import com.example.petcare.common.utils.DateConverter
+import com.example.petcare.domain.model.Walk
+
 data class WalkDto(
-    val pet_id: String,                  // subkolekcja pod pets/{petId}/walks => pole opcjonalne
-    val started_at: Timestamp,
-    val ended_at: Timestamp? = null,
-    val duration_sec: Int? = null,
-    val distance_meters: Int? = null,
+    val id: String,
+    val petId: String,                  // subkolekcja pod pets/{petId}/walks => pole opcjonalne
+    val startedAt: String,
+    val endedAt: String? = null,
+    val durationSec: Int? = null,
+    val distanceMeters: Int? = null,
     val steps: Int? = null,
-    val created_at: Timestamp? = null
-)
+    val createdAt: String
+){
+    fun toModel(): Walk{
+        return Walk(
+            id = this.id,
+            petId = this.petId,
+            startedAt = DateConverter.stringToLocalDate(this.startedAt),
+            endedAt = DateConverter.stringToLocalDate(this.endedAt),
+            durationSec = DateConverter.stringToLocalDate(this.endedAt),
+            distanceMeters = this.distanceMeters,
+            steps = this.steps,
+            createdAt = DateConverter.stringToLocalDate(this.createdAt),
+        )
+    }
+}
+

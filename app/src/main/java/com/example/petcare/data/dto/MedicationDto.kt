@@ -1,4 +1,5 @@
 package com.example.petcare.data.dto
+import com.example.petcare.common.utils.DateConverter
 import com.google.firebase.Timestamp
 data class MedicationDto(
     val pet_id: String,                 // subkolekcja pod pets/{petId}/medications => pole opcjonalne
@@ -7,5 +8,5 @@ data class MedicationDto(
     val dose: String? = null,           // np. "1 tab", "5 ml", "10 mg/kg"
     val notes: String? = null,
     val active: Boolean = true,
-    val created_at: Timestamp? = null
+    val created_at: String
 )

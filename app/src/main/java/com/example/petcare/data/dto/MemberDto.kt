@@ -5,5 +5,5 @@ import com.google.firebase.Timestamp
 // @NOTE The data classes were ai generated basing on the database schema
 
 data class MemberDto (
-    val created_at: Timestamp? = null,
+    val created_at: String? = null,
 )

@@ -8,7 +8,6 @@ import com.example.petcare.domain.providers.implementation.PetProvider
 import com.example.petcare.domain.providers.implementation.UserProvider
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.domain.repository.IUserRepository
-import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
 import kotlinx.datetime.Instant
 import kotlinx.coroutines.flow.Flow

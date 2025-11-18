@@ -10,3 +10,4 @@ data class MedicationScheduleDto(
     val byMonthDay: String? = null,
     val rruleText: String? = null
 )
+

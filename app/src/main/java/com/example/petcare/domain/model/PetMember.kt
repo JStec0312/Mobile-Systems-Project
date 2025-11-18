@@ -1,10 +1,10 @@
 package com.example.petcare.domain.model
 
-import java.time.Instant
-import java.util.UUID
+import kotlinx.datetime.LocalDate
 
 data class PetMember(
+    val id: String,
     val petId: String,
     val userId: String,
-    val createdAt: Instant
+    val createdAt: LocalDate
 )

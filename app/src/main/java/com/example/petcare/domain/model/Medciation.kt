@@ -1,6 +1,5 @@
 package com.example.petcare.domain.model
-import kotlinx.datetime.Instant
-import java.util.UUID
+import kotlinx.datetime.LocalDate
 
 data class Medication(
     val id: String,
@@ -10,7 +9,7 @@ data class Medication(
     val dose: String?,
     val notes: String?,
     val active: Boolean = true,
-    val createdAt: Instant,
-    val from: Instant,
-    val to: Instant?
+    val createdAt: LocalDate,
+    val from: LocalDate,
+    val to: LocalDate
 )

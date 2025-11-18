@@ -24,7 +24,7 @@ data class TaskDto(
             petId = this.petId,
             type = this.type,
             title = this.title,
-            notes = this.notes,,
+            notes = this.notes,
             priority = this.priority,
             status = this.status,
             createdAt = DateConverter.stringToLocalDate(this.createdAt)

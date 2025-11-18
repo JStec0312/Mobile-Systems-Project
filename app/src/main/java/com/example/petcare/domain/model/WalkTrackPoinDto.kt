@@ -4,8 +4,8 @@ import java.time.Instant
 import java.util.UUID
 
 data class WalkTrackPointDto(
-    val id: UUID,
-    val walkId: UUID,
+    val id: String,
+    val walkId: String,
     val timestamp: Instant,
     val lat: Float,
     val lon: Float,

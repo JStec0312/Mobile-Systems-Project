@@ -37,14 +37,14 @@ class AddTaskUseCase @Inject constructor(
         }
 
         val task = Task(
-            id = UUID.randomUUID(),
-            pet_id = petProvider.getCurrentPetId(),
+            id = UUID.randomUUID().toString(),
+            petId = petProvider.getCurrentPetId(),
             type = type,
             title = title,
             notes = description,
             priority = priority,
             status = taskStatusEnum.planned,
-            created_at = Clock.System.now()
+            createdAt = Clock.System.now()
         )
         emit(Resource.Success(Unit))
     }

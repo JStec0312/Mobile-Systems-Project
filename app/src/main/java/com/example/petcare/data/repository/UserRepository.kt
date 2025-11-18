@@ -45,4 +45,11 @@ class UserRepository  @Inject constructor(
         }
     }
 
+    override suspend fun signInWithEmailAndPassword(
+        email: String,
+        password: String
+    ): UserDto {
+        TODO("Not yet implemented")
+    }
+
 }

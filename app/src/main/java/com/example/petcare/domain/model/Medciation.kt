@@ -3,8 +3,8 @@ import kotlinx.datetime.Instant
 import java.util.UUID
 
 data class Medication(
-    val id: UUID,
-    val petId: UUID,
+    val id: String,
+    val petId: String,
     val name: String,
     val form: String?,
     val dose: String?,

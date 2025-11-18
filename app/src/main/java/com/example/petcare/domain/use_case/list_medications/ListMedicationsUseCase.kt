@@ -29,7 +29,7 @@ class ListMedicationsUseCase @Inject constructor(
         } else{
             val medications = listOf(
                 Medication(
-                    id = UUID.randomUUID(),
+                    id = UUID.randomUUID().toString(),
                     name = "Flea Treatment",
                     notes = "Ensure full coverage on the back",
                     petId = petProvider.getCurrentPetId(),
@@ -41,7 +41,7 @@ class ListMedicationsUseCase @Inject constructor(
                     to = Instant.parse("2024-10-01T10:00:00Z")
                 ),
                 Medication(
-                    id = UUID.randomUUID(),
+                    id = UUID.randomUUID().toString(),
                     name = "Heartworm Prevention",
                     notes = "Administer monthly",
                     petId = petProvider.getCurrentPetId(),

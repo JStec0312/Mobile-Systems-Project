@@ -3,8 +3,8 @@ package com.example.petcare.domain.model
 import java.util.UUID
 
 data class Walk(
-    val id: UUID,
-    val petId: UUID,
+    val id: String,
+    val petId: String,
     val startedAt: kotlinx.datetime.Instant,
     val endedAt: kotlinx.datetime.Instant,
     val durationSec: Int?,

@@ -32,24 +32,24 @@ class  GetTasksUseCase @Inject constructor(
         } else{
             val tasks = listOf(
                 Task(
-                    id = UUID.randomUUID(),
-                    pet_id = petProvider.getCurrentPetId(),
+                    id = UUID.randomUUID().toString(),
+                    petId = petProvider.getCurrentPetId(),
                     type = taskTypeEnum.training,
                     title = "Training Session",
                     notes = "Practice basic commands",
                     priority = taskPriorityEnum.low,
                     status = taskStatusEnum.planned,
-                    created_at = Instant.parse("2023-10-01T10:00:00Z")
+                    createdAt = Instant.parse("2023-10-01T10:00:00Z")
                 ),
                 Task(
-                    id = UUID.randomUUID(),
-                    pet_id = petProvider.getCurrentPetId(),
+                    id = UUID.randomUUID().toString(),
+                    petId = petProvider.getCurrentPetId(),
                     type = taskTypeEnum.walk,
                     title = "Morning Walk",
                     notes = "30-minute walk in the park",
                     priority = taskPriorityEnum.normal,
                     status = taskStatusEnum.planned,
-                    created_at = Instant.parse("2023-10-02T08:00:00Z")
+                    createdAt = Instant.parse("2023-10-02T08:00:00Z")
                 )
             )
             emit(Resource.Success<List<Task>>(tasks))

@@ -1,9 +1,9 @@
 package com.example.petcare.exceptions
 
 sealed class AuthFailure(override val message: String): Failure(message) {
-    object EmailAlreadyInUse: AuthFailure("Email already in use")
-    object InvalidCredentials: AuthFailure("Invalid credentials")
-    object UserNotFound: AuthFailure("User not found")
+     class EmailAlreadyInUse: AuthFailure(message = "Email already in use")
+    class InvalidCredentials: AuthFailure("Invalid credentials")
+    class UserNotFound: AuthFailure("User not found")
 
 
 }

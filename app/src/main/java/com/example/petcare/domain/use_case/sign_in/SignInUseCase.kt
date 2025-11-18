@@ -7,8 +7,6 @@ import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
-import kotlinx.coroutines.delay
-import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

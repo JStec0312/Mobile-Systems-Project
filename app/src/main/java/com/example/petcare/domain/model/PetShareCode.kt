@@ -4,8 +4,8 @@ import java.time.Instant
 import java.util.UUID
 
 data class PetShareCode(
-    val id: UUID,
-    val petId: UUID,
+    val id: String,
+    val petId: String,
     val code: String,
     val createdAt: Instant
 )

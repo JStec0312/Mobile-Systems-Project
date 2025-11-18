@@ -20,7 +20,7 @@ class GetPetByIdUseCase @Inject constructor(
     private val petRepository: IPetRepository
 ) {
     operator fun invoke(
-        petId: UUID,
+        petId: String,
         delayMs: Long = 600, //@NOTE Simulated delay
         shouldFail: Boolean = false, //@NOTE Simulated failure
     ): Flow<Resource<Pet>> = flow {
@@ -31,13 +31,13 @@ class GetPetByIdUseCase @Inject constructor(
         } else {
             val example_pet = Pet(
                 id = petId,
-                ownerUserId = userProvider.getUserId(),
+                ownerUserId = userProvider.getUserId().toString(),
                 name = "Fido",
                 species = speciesEnum.dog,
                 breed = "Golden Retriever",
                 sex = sexEnum.male,
                 birthDate = Clock.System.now(),
-                avatarThumb_url = null,
+                avatarThumbUrl = null,
                 createdAt = Clock.System.now()
             );
 

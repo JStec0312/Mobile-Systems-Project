@@ -5,8 +5,8 @@ import java.time.Instant
 import java.util.UUID
 
 data class MedicationEvent(
-    val id: UUID,
-    val medicationId: UUID,
+    val id: String,
+    val medicationId: String,
     val takenAt: Instant?,
     val status: taskStatusEnum = taskStatusEnum.planned, // planned|done|skipped
     val notes: String?

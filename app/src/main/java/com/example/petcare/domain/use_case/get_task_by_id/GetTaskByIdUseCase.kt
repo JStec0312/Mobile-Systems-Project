@@ -19,7 +19,7 @@ class GetTaskByIdUseCase @Inject constructor(
     private val petRepository: IPetRepository
 ) {
     operator fun invoke(
-        taskId: UUID,
+        taskId: String,
         delayMs: Long = 600, //@NOTE Simulated delay
         shouldFail : Boolean = false, //@NOTE Simulated failure
     ): Flow<Resource<Task>> = flow {
@@ -31,13 +31,13 @@ class GetTaskByIdUseCase @Inject constructor(
         } else{
             val task = Task(
                 id = taskId,
-                pet_id = petProvider.getCurrentPetId(),
+                petId = petProvider.getCurrentPetId(),
                 type = taskTypeEnum.grooming,
                 title = "Grooming Session",
                 notes = "Remember to brush the fur thoroughly",
                 priority = taskPriorityEnum.high,
                 status = taskStatusEnum.skipped,
-                created_at = Instant.parse("2023-10-01T10:00:00Z")
+                createdAt = Instant.parse("2023-10-01T10:00:00Z")
             )
             emit(Resource.Success<Task>(task))
         }

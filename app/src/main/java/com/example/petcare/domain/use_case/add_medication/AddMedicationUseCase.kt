@@ -34,8 +34,8 @@ class AddMedicationUseCase @Inject constructor(
 
         } else{
             val medication = Medication(
-                id = UUID.randomUUID(),
-                petId = UUID.randomUUID(),
+                id = UUID.randomUUID().toString(),
+                petId = UUID.randomUUID().toString(),
                 name = "Mock",
                 form = "Mock",
                 dose = "Mock dose",

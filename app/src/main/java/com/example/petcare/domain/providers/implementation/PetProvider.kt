@@ -3,13 +3,13 @@ import  com.example.petcare.domain.providers.IPetProvider
 import java.util.UUID
 
 class PetProvider: IPetProvider {
-    private var currentPetId: UUID? = null
+    private var currentPetId: String? = null
 
-    override fun getCurrentPetId(): UUID {
+    override fun getCurrentPetId(): String {
         return currentPetId ?: throw IllegalStateException("Current pet ID is not set")
     }
 
-    override fun setCurrentPetId(id: UUID) {
+    override fun setCurrentPetId(id: String) {
         currentPetId = id
     }
 }

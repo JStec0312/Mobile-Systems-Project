@@ -7,8 +7,8 @@ import kotlinx.datetime.Instant
 import java.util.UUID
 
 data class Task(
-    val id: UUID,
-    val petId: UUID,
+    val id: String,
+    val petId: String,
     val type: taskTypeEnum,
     val title: String,
     val notes: String?,

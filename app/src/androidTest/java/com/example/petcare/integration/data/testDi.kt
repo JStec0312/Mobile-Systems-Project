@@ -1,5 +1,19 @@
 package com.example.petcare.integration.data
 import android.content.Context
+import com.example.petcare.data.fake_repos.FakeMedicationRepository
+import com.example.petcare.data.fake_repos.FakeNotificationRepository
+import com.example.petcare.data.fake_repos.FakePetRepository
+import com.example.petcare.data.fake_repos.FakePetShareCodeRepository
+import com.example.petcare.data.fake_repos.FakeTaskRepository
+import com.example.petcare.data.fake_repos.FakeUserRepository
+import com.example.petcare.data.fake_repos.FakeWalkRepository
+import com.example.petcare.data.repository.MedicationRepository
+import com.example.petcare.data.repository.NotificationSettingsRepository
+import com.example.petcare.data.repository.PetRepository
+import com.example.petcare.data.repository.PetShareCodeRepository
+import com.example.petcare.data.repository.TaskRepository
+import com.example.petcare.data.repository.UserRepository
+import com.example.petcare.data.repository.WalkRepository
 import dagger.Module
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
@@ -11,6 +25,14 @@ import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import com.example.petcare.di.FirebaseModule
+import com.example.petcare.di.RepositoryModule
+import com.example.petcare.domain.repository.IMedicationRepository
+import com.example.petcare.domain.repository.INotificationSettingsRepository
+import com.example.petcare.domain.repository.IPetRepository
+import com.example.petcare.domain.repository.IPetShareCodeRepository
+import com.example.petcare.domain.repository.ITaskRepository
+import com.example.petcare.domain.repository.IUserRepository
+import com.example.petcare.domain.repository.IWalkRepository
 import com.google.firebase.firestore.firestoreSettings
 import dagger.hilt.testing.TestInstallIn
 import javax.inject.Singleton
@@ -78,5 +100,52 @@ object EmulatorFirebaseModule  {
             auth.useEmulator(host(), AUTH_PORT)
         }
         return auth
+    }
+}
+
+@Module
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [RepositoryModule::class]
+)
+object TrueRepositoryModule{
+    @Provides
+    @Singleton
+    fun provideUserRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IUserRepository {
+        return UserRepository(auth = auth, db = db);
+    }
+
+    @Provides
+    @Singleton
+    fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetRepository {
+        return PetRepository(auth = auth, db = db);
+    }
+    @Provides
+    @Singleton
+    fun provideMedicationRepository(auth: FirebaseAuth, db: FirebaseFirestore): IMedicationRepository{
+        return MedicationRepository(auth = auth, db = db)
+    }
+    @Provides
+    @Singleton
+    fun provideNotificationSettingsRepository(auth: FirebaseAuth, db: FirebaseFirestore): INotificationSettingsRepository{
+        return NotificationSettingsRepository(auth = auth, db = db)
+    }
+
+    @Provides
+    @Singleton
+    fun providePetShareCodeRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetShareCodeRepository {
+        return PetShareCodeRepository(auth = auth, db = db)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTaskRepository(auth: FirebaseAuth, db: FirebaseFirestore): ITaskRepository{
+        return TaskRepository(auth = auth, db = db)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWalkRepository(auth: FirebaseAuth, db: FirebaseFirestore): IWalkRepository{
+        return WalkRepository(auth = auth, db = db)
     }
 }

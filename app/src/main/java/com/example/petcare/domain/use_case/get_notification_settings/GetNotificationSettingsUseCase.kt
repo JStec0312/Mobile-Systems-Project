@@ -31,18 +31,18 @@ class GetNotificationSettingsUseCase @Inject constructor(
         } else{
             val example_settings = ArrayList<NotificationSettings>()
             val setting1 = NotificationSettings(
-                id = UUID.randomUUID(),
-                pet_id = petProvider.getCurrentPetId(),
-                user_id = userProvider.getUserId(),
+                id = UUID.randomUUID().toString(),
+                petId = petProvider.getCurrentPetId(),
+                userId = userProvider.getUserId(),
                 channel = notificationChannelEnum.meds,
-                created_at = Clock.System.now(),
+                createdAt = Clock.System.now(),
             )
             val setting2 = NotificationSettings(
-                id = UUID.randomUUID(),
-                pet_id = petProvider.getCurrentPetId(),
-                user_id = userProvider.getUserId(),
+                id = UUID.randomUUID().toString(),
+                petId = petProvider.getCurrentPetId(),
+                userId = userProvider.getUserId(),
                 channel = notificationChannelEnum.tasks,
-                created_at = Clock.System.now(),
+                createdAt = Clock.System.now(),
             )
             example_settings.add(setting1)
             example_settings.add(setting2)

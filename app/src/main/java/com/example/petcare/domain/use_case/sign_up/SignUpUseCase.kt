@@ -22,6 +22,7 @@ class SignUpUseCase @Inject constructor(
     operator fun invoke(
         name: String,
         email: String,
+
         password: String,
         confirmPassword: String,
 

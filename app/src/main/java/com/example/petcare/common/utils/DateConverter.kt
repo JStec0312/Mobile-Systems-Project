@@ -4,7 +4,7 @@ import kotlinx.datetime.LocalDate
 
 object DateConverter {
 
-    fun localDateToString(date: LocalDate): String {
+    fun localDateToString(date: LocalDate?): String {
         return date.toString()
     }
 

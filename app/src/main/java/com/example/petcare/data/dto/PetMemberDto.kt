@@ -5,7 +5,7 @@ import com.example.petcare.domain.model.PetMember
 
 // @NOTE The data classes were ai generated basing on the database schema
 
-data class MemberDto (
+data class PetMemberDto (
     val id: String,
     val petId: String,
     val userId: String,

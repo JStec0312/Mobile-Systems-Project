@@ -5,6 +5,7 @@ import com.example.petcare.domain.model.Pet
 import com.example.petcare.domain.repository.IPetRepository
 
 class FakePetRepository : IPetRepository {
+    private val pets = mutableListOf<PetDto>();
     override suspend fun createPet(
         userId: String?,
         pet: Pet,
@@ -15,5 +16,9 @@ class FakePetRepository : IPetRepository {
 
     override suspend fun getPetById(petId: String): PetDto {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun getPets(userId: String): List<PetDto> {
+        return pets
     }
 }

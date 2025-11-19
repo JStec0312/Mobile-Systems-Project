@@ -26,8 +26,7 @@ fun PetTextField(
         value = value,
         onValueChange = onValueChange,
         singleLine = true,
-        modifier = Modifier
-            .height(50.dp),
+        modifier = Modifier,
         label = {Text(label)},
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.secondary,

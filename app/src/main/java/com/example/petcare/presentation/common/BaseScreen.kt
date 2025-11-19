@@ -46,6 +46,5 @@ fun BaseScreen(
 @Composable
 fun BaseScreenPreview() {
     BaseScreen {
-        // Content of the screen
     }
 }

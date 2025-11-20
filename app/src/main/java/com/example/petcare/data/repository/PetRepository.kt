@@ -7,8 +7,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class PetRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetRepository {
+
     override suspend fun createPet(
-        userId: String?,
         pet: Pet,
         avatarByteArray: ByteArray?
     ): PetDto {
@@ -18,4 +18,14 @@ class PetRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetRepository 
     override suspend fun getPetById(petId: String): PetDto {
         TODO("Not yet implemented")
     }
+
+    override suspend fun deletePetById(petId: String, userId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getPetsByUserId(userId: String): List<PetDto> {
+        TODO("Not yet implemented")
+    }
+
+
 }

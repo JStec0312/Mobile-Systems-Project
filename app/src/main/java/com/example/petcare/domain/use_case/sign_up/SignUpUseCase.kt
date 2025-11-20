@@ -3,13 +3,10 @@ package com.example.petcare.domain.use_case.sign_up
 import com.example.petcare.common.Resource
 import com.example.petcare.common.utils.EmailValidator
 import com.example.petcare.config.Settings
-import com.example.petcare.data.dto.UserDto
-import com.example.petcare.domain.model.User
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -54,16 +51,9 @@ class SignUpUseCase @Inject constructor(
         } catch(e: AuthFailure.EmailAlreadyInUse ){
             emit(Resource.Error<Unit>(e.message))
             return@flow
-        } catch(e: Failure.NetworkError) {
+        } catch(e: Failure) {
             emit(Resource.Error<Unit>(e.message))
             return@flow
-        } catch (e: Failure.ServerError){
-            emit(Resource.Error<Unit>(e.message))
-            return@flow
-        } catch (e: Failure.UnknownError){
-            emit(Resource.Error<Unit>(e.message))
-            return@flow
-
         }
         emit(Resource.Success(Unit))
         return@flow

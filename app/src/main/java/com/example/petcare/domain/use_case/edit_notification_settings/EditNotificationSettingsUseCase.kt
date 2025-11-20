@@ -5,10 +5,8 @@ import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.INotificationSettingsRepository
 import kotlinx.coroutines.delay
-import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 class EditNotificationSettingsUseCase @Inject constructor(

@@ -47,13 +47,37 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+
+
+@Composable
+fun MyPetsRoute(
+    viewModel: MyPetsViewModel = hiltViewModel(),
+    onNavigateToPetDetails: (String) -> Unit,
+    onNavigateToAddPet: () -> Unit,
+    onNavigateToEditPet: (String) -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+    MyPetsScreen(
+        state = state,
+        onPetClick = onNavigateToPetDetails,
+        onAddPetClick = onNavigateToAddPet,
+        onSearchQueryChange = { query ->
+            viewModel.onSearchQueryChange(query)
+        },
+        onEditPetClick = onNavigateToEditPet
+    )
+}
 
 @Composable
 fun MyPetsScreen(
     state: MyPetsState,
     onPetClick: (String) -> Unit,
     onAddPetClick: () -> Unit,
-    onSearchQueryChange: (String) -> Unit
+    onSearchQueryChange: (String) -> Unit,
+    onEditPetClick: (String) -> Unit
 ) {
     BaseScreen {
         Column(
@@ -102,7 +126,7 @@ fun MyPetsScreen(
                     Image(
                         painter = painterResource(id = R.drawable.plus),
                         contentDescription = "Add pet",
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(40.dp)
                     )
                 }
             }
@@ -139,7 +163,11 @@ fun MyPetsScreen(
                     contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
                     items(state.pets) { pet ->
-                        PetCard(pet = pet, onClick = { onPetClick(pet.id) })
+                        PetCard(
+                            pet = pet,
+                            onClick = { onPetClick(pet.id) },
+                            onEditClick = { onEditPetClick(pet.id) }
+                            )
                     }
                 }
             }
@@ -150,7 +178,8 @@ fun MyPetsScreen(
 @Composable
 fun PetCard(
     pet: Pet,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     val ageText = pet.birthDate.getAgeText()
     Card(
@@ -210,11 +239,13 @@ fun PetCard(
 
                     modifier = Modifier.size(24.dp)
                 )
-                Image(
-                    painter = painterResource(R.drawable.edit),
-                    contentDescription = "Edit",
-                    modifier = Modifier.size(20.dp)
-                )
+                IconButton(onClick = onEditClick) {
+                    Image(
+                        painter = painterResource(R.drawable.edit),
+                        contentDescription = "Edit",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     }
@@ -238,7 +269,8 @@ fun MyPetsScreenEmptyPreview() {
         state = MyPetsState(pets = emptyList()),
         onPetClick = {},
         onAddPetClick = {},
-        onSearchQueryChange = {}
+        onSearchQueryChange = {},
+        onEditPetClick = {}
     )
 }
 
@@ -255,6 +287,7 @@ fun MyPetsScreenPreview() {
         state = MyPetsState(pets = samplePets),
         onPetClick = {},
         onAddPetClick = {},
-        onSearchQueryChange = {}
+        onSearchQueryChange = {},
+        onEditPetClick = {}
     )
 }

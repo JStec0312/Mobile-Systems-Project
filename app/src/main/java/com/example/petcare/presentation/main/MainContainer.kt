@@ -1,6 +1,5 @@
 package com.example.petcare.presentation.main
 
-import android.R.attr.text
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,12 +32,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.petcare.R
+import com.example.petcare.presentation.my_pets.MyPetsRoute
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,11 +75,10 @@ fun MainContainer() {
                         onClick = { scope.launch { drawerState.close() }},
                         modifier = Modifier.size(48.dp)
                     ) {
-                        Icon(
+                        Image(
                             painter = painterResource(id = R.drawable.menu),
                             contentDescription = "Close Menu",
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(38.dp)
                         )
                     }
                     Spacer(modifier = Modifier.height(32.dp))
@@ -89,13 +89,16 @@ fun MainContainer() {
                             label = {
                                 Text(
                                 text = label,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.secondary,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             },
                             icon = {
-                                Icon(
+                                Image(
                                     painter = painterResource(id = icon),
-                                    contentDescription = null
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp)
                                 )
                             },
                             selected = currentRoute == route,
@@ -128,7 +131,7 @@ fun MainContainer() {
                             Image(
                                 painter = painterResource(id = R.drawable.petcare_logo_purple),
                                 contentDescription = "Logo",
-                                modifier = Modifier.size(100.dp)
+                                modifier = Modifier.size(150.dp)
                             )
                         }
                     }
@@ -140,10 +143,15 @@ fun MainContainer() {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = {Text(topBarTitle)},
+                    title = {Text(topBarTitle, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.secondary, fontSize = 36.sp, modifier = Modifier.padding(top = 16.dp))},
                     navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(
+                        IconButton(
+                            onClick = { scope.launch { drawerState.open() } },
+                            modifier = Modifier
+                                .size(58.dp)
+                                .padding(start = 14.dp, top = 20.dp)
+                        ) {
+                            Image(
                                 painter = painterResource(id = R.drawable.menu),
                                 contentDescription = "Open Menu"
                             )
@@ -152,7 +160,8 @@ fun MainContainer() {
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = Color.White,
                         titleContentColor = MaterialTheme.colorScheme.secondary
-                    )
+                    ),
+                    modifier = Modifier.height(100.dp)
                 )
             }
         ) {
@@ -163,7 +172,17 @@ fun MainContainer() {
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("my_pets") {
-                    Text("LISTA ZWIERXAKOW")
+                    MyPetsRoute(
+                        onNavigateToPetDetails = { petId ->
+                            println("Kliknieto szczegoly zwierzaka o ID: $petId")
+                        },
+                        onNavigateToAddPet = {
+                            println("Kliknięto przycisk Dodaj Zwierze")
+                        },
+                        onNavigateToEditPet = {
+                            println("Kliknięto przycisk Edytuj Zwierze")
+                        }
+                    )
                 }
                 composable("dashboard") {
                     Text("DASHBOARD")

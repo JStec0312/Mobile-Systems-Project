@@ -18,4 +18,8 @@ class PetRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetRepository 
     override suspend fun getPetById(petId: String): PetDto {
         TODO("Not yet implemented")
     }
+
+    override suspend fun getPets(userId: String): List<PetDto> {
+        TODO("Not yet implemented")
+    }
 }

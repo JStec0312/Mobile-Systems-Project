@@ -33,14 +33,14 @@ class GetNotificationSettingsUseCase @Inject constructor(
             val example_settings = ArrayList<NotificationSettings>()
             val setting1 = NotificationSettings(
                 id = UUID.randomUUID().toString(),
-                userId = userProvider.getUserId(),
+                userId = userProvider.getUserId() ?: "",
                 channel = notificationChannelEnum.meds,
                 createdAt = LocalDate(1970, 1, 1),
                 enabled = true,
             )
             val setting2 = NotificationSettings(
                 id = UUID.randomUUID().toString(),
-                userId = userProvider.getUserId(),
+                userId = userProvider.getUserId() ?: "",
                 channel = notificationChannelEnum.tasks,
                 createdAt = LocalDate(1970, 1, 1),
                 enabled = false,

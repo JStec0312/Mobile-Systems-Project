@@ -4,15 +4,20 @@ import com.example.petcare.data.dto.UserDto
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
-class FakeUserRepository : IUserRepository {
-    private val users = mutableMapOf<String, Pair<UserDto, String>>()
+import kotlinx.coroutines.delay
+import javax.inject.Inject
+
+class FakeUserRepository @Inject constructor() : IUserRepository {
+    companion object {
+        private val users = mutableMapOf<String, Pair<UserDto, String>>()
+    }
 
     override suspend fun createUser(
         email: String,
         password: String,
         displayName: String
     ): UserDto {
-
+        delay(1000)
         // --- Symulacja błędów ---
         // Używamy "magicznych" stringów, aby frontend mógł testować scenariusze błędów
         when {
@@ -46,6 +51,10 @@ class FakeUserRepository : IUserRepository {
         email: String,
         password: String
     ): UserDto {
+        delay(1000)
+        if (email == "admin@admin.com" && password == "123456") {
+            return UserDto("admin-id", "admin@admin.com", "Admin")
+        }
         val user = users[email]
         if (user==null ){
             throw AuthFailure.UserNotFound()

@@ -14,7 +14,7 @@ class GetPetsUseCase @Inject constructor(
     private val petRepository: IPetRepository,
     private val userProvider: IUserProvider,
 ) {
-    suspend operator fun invoke(): Flow<Resource<List<Pet>>> = flow {
+    operator fun invoke(): Flow<Resource<List<Pet>>> = flow {
         emit(Resource.Loading<List<Pet>>())
         val userId = userProvider.getUserId();
         if (userId == null){
@@ -22,7 +22,8 @@ class GetPetsUseCase @Inject constructor(
             return@flow
         }
         try {
-            val pets = petRepository.getPets(userId)
+            val petsDto = petRepository.getPets(userId)
+            val pets = petsDto.map { it.toModel() }
             emit(Resource.Success<List<Pet>>(pets))
         } catch (e: Exception){
             emit(Resource.Error<List<Pet>>(e.message ?: "An unexpected error occurred"))

@@ -1,5 +1,6 @@
 package com.example.petcare.presentation.sign_in
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,10 +14,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -29,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
@@ -37,9 +42,24 @@ import com.example.petcare.presentation.common.PetTextField
 @Composable
 fun SignInRoute(
     viewModel: SignInViewModel = hiltViewModel(),
-    onNavigateToSignUp: () -> Unit
+    onNavigateToSignUp: () -> Unit,
+    onNavigateToMyPets: () -> Unit
 ){
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+
+    if(state.isSuccessful) {
+        LaunchedEffect(key1 = Unit) {
+            onNavigateToMyPets()
+        }
+    }
+
+    if(state.error != null) {
+        LaunchedEffect(key1=state.error) {
+            Toast.makeText(context, state.error, Toast.LENGTH_LONG).show()
+        }
+    }
+
     SignInScreen(
         state = state,
         onEmailChange = viewModel::onEmailChange,
@@ -106,7 +126,8 @@ fun SignInScreen(
                     value = state.password,
                     onValueChange = onPasswordChange,
                     label = "Password",
-                    keyboardType = KeyboardType.Text
+                    keyboardType = KeyboardType.Text,
+                    isPassword = true
                 )
                 Spacer(modifier = Modifier.height(38.dp))
                 Button(
@@ -114,7 +135,10 @@ fun SignInScreen(
                     modifier = Modifier
                         .height(76.dp)
                         .width(300.dp),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    )
                 ) {
                     if(state.isLoading){
                         CircularProgressIndicator(

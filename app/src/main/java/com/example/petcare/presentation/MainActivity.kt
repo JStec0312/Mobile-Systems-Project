@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.petcare.presentation.loading_screen.LoadingScreen
+import com.example.petcare.presentation.main.MainContainer
 import com.example.petcare.presentation.sign_in.SignInRoute
 import com.example.petcare.presentation.sign_up.SignUpRoute
 import com.example.petcare.presentation.theme.PetCareTheme
@@ -40,6 +41,7 @@ object Routes{
     const val LOADING_SCREEN = "loading_screen"
     const val SIGN_UP_SCREEN = "sign_up_screen"
     const val SIGN_IN_SCREEN = "sign_in_screen"
+    const val MY_PETS_SCREEN = "my_pets_screen"
 }
 
 @Composable
@@ -71,8 +73,19 @@ fun AppNavigation() {
             SignInRoute(
                 onNavigateToSignUp = {
                     navController.navigate(Routes.SIGN_UP_SCREEN)
+                },
+                onNavigateToMyPets = {
+                    navController.navigate(Routes.MY_PETS_SCREEN) {
+                        popUpTo(Routes.SIGN_IN_SCREEN) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
+        }
+
+        composable(route = Routes.MY_PETS_SCREEN) {
+            MainContainer()
         }
     }
 }

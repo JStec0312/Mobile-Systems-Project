@@ -14,7 +14,7 @@ data class NotificationSettingDto(
 ){
     fun toModel(): NotificationSettings{
         return NotificationSettings(
-            id = this.id,
+            id = this.id ?: "",
             userId = this.userId,
             channel = this.channel,
             createdAt = DateConverter.stringToLocalDate(this.createdAt),

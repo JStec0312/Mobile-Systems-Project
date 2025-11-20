@@ -43,7 +43,7 @@ class SignInViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
-                    _state.update { it.copy(isLoading = false, error = null) }
+                    _state.update { it.copy(isLoading = false, error = null, isSuccessful = true) }
                 }
 
                 is Resource.Error -> {

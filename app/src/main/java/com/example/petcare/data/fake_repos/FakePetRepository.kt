@@ -25,7 +25,7 @@ class FakePetRepository : IPetRepository {
             breed = "Debugger Retriever",
             sex = sexEnum.male,
             birthDate = LocalDate(2020,1,1).toString(),
-            avatarThumbUrl = "https://previews.123rf.com/images/julos/julos1607/julos160763014/83466390-cartoon-dog-showing-thumbs-up.jpg",
+            avatarThumbUrl = DeveloperSettings.PET_1_THUMBNAIL,
             createdAt = DateConverter.localDateNow().toString()
         );
         val pet2 = PetDto(
@@ -36,7 +36,7 @@ class FakePetRepository : IPetRepository {
             breed = "Rhodesian Ridgebug",
             sex = sexEnum.male,
             birthDate = LocalDate(2021,6,15).toString(),
-            avatarThumbUrl = "https://wakacjezpsem.com/wp-content/uploads/2023/03/Rhodesian-Ridgeback-900x500.png",
+            avatarThumbUrl = DeveloperSettings.PET_2_THUMBNAIL,
             createdAt = DateConverter.localDateNow().toString()
         );
         pets.add(pet1)

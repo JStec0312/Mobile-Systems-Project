@@ -50,6 +50,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.getValue
+import coil.compose.AsyncImage
 
 
 @Composable
@@ -197,15 +198,41 @@ fun PetCard(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                //tu jest plus - placeholder potem bedzie zdjecie psa
-                painter = painterResource(id = R.drawable.plus),
-                contentDescription = pet.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-            )
+            if(pet.avatarThumbUrl != null) {
+                AsyncImage(
+                    model = pet.avatarThumbUrl,
+                    contentDescription = pet.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape),
+                    placeholder = painterResource(
+                        id = if (pet.species == speciesEnum.dog) R.drawable.dog_pp else R.drawable.cat_pp
+                    )
+                )
+            }
+            else {
+                if(pet.species == speciesEnum.dog) {
+                    Image(
+                        painter = painterResource(id = R.drawable.dog_pp),
+                        contentDescription = "dog profile picture",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                    )
+                }
+                else {
+                    Image(
+                        painter = painterResource(id = R.drawable.cat_pp),
+                        contentDescription = "cat profile picture",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier = Modifier.weight(1f),
@@ -233,12 +260,14 @@ fun PetCard(
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.heart),
-                    contentDescription = "Favourite",
+                IconButton(onClick = {}) {
+                    Image(
+                        painter = painterResource(id = R.drawable.heart),
+                        contentDescription = "Favourite",
 
-                    modifier = Modifier.size(24.dp)
-                )
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
                 IconButton(onClick = onEditClick) {
                     Image(
                         painter = painterResource(R.drawable.edit),
@@ -279,7 +308,7 @@ fun MyPetsScreenEmptyPreview() {
 fun MyPetsScreenPreview() {
     val samplePets = listOf(
         Pet("1", "u1", "Minnie", speciesEnum.dog, "French Bulldog", sexEnum.female, LocalDate(2018, 5, 12), null, LocalDate.parse("2024-01-01")),
-        Pet("2", "u1", "Aslan", speciesEnum.dog, "Rhodesian Ridgeback", sexEnum.male, LocalDate(2023, 9, 10), null, LocalDate.parse("2024-01-01")),
+        Pet("2", "u1", "Aslan", speciesEnum.cat, "Rhodesian Ridgeback", sexEnum.male, LocalDate(2023, 9, 10), null, LocalDate.parse("2024-01-01")),
         Pet("3", "u1", "Blues", speciesEnum.dog, "Cocker Spaniel", sexEnum.male, LocalDate(2013, 1, 1), null, LocalDate.parse("2024-01-01"))
     )
 

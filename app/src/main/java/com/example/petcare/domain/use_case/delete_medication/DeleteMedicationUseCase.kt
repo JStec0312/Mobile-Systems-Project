@@ -1,6 +1,5 @@
 package com.example.petcare.domain.use_case.delete_medication
 import com.example.petcare.common.Resource
-import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IMedicationRepository
@@ -8,7 +7,6 @@ import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 class DeleteMedicationUseCase @Inject constructor(

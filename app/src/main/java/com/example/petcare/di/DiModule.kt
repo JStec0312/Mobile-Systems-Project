@@ -3,11 +3,13 @@ package com.example.petcare.di
 import android.content.Context
 import com.example.petcare.data.fake_repos.FakeMedicationRepository
 import com.example.petcare.data.fake_repos.FakeNotificationRepository
+import com.example.petcare.data.fake_repos.FakePetMemberRepository
 import com.example.petcare.data.fake_repos.FakePetRepository
 import com.example.petcare.data.fake_repos.FakePetShareCodeRepository
 import com.example.petcare.data.fake_repos.FakeTaskRepository
 import com.example.petcare.data.fake_repos.FakeUserRepository
 import com.example.petcare.data.fake_repos.FakeWalkRepository
+import com.example.petcare.data.repository.PetMemberRepository
 import com.example.petcare.data.repository.WalkRepository
 import dagger.Module
 import dagger.Provides
@@ -20,6 +22,7 @@ import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.implementation.PetProvider
 import com.example.petcare.domain.repository.IMedicationRepository
 import com.example.petcare.domain.repository.INotificationSettingsRepository
+import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.domain.repository.IPetShareCodeRepository
 import com.example.petcare.domain.repository.ITaskRepository
@@ -98,6 +101,13 @@ object RepositoryModule {
     fun provideWalkRepository(auth: FirebaseAuth, db: FirebaseFirestore): IWalkRepository{
         //return WalkRepository(auth = auth, db = db)
         return FakeWalkRepository();
+    }
+
+    @Provides
+    @Singleton
+    fun providePetMemberRepository(auth: FirebaseAuth, db: FirebaseFirestore): IPetMemberRepository{
+        //return PetMemberRepository(db= db, auth= auth);
+        return FakePetMemberRepository();
     }
 }
 

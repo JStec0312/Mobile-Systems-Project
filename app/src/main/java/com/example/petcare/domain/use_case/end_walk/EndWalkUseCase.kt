@@ -1,6 +1,5 @@
 package com.example.petcare.domain.use_case.end_walk
 import com.example.petcare.common.Resource
-import com.example.petcare.domain.model.Walk
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IWalkRepository

@@ -1,14 +1,15 @@
 package com.example.petcare.domain.use_case.delete_pet
 import com.example.petcare.common.Resource
-import com.example.petcare.domain.model.Pet
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IPetRepository
+import com.example.petcare.exceptions.AuthFailure
+import com.example.petcare.exceptions.Failure
+import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 class DeletePetUseCase  @Inject constructor(
@@ -17,18 +18,34 @@ class DeletePetUseCase  @Inject constructor(
     private val petRepository: IPetRepository
 ){
     operator fun invoke(
-        petId: UUID,
-        delayMs: Long = 600, //@NOTE Simulated delay
-        shouldFail : Boolean = false, //@NOTE Simulated failure
+        petId: String,
     ): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading<Unit>())
-        delay(delayMs)
-        if (shouldFail){
-            emit(Resource.Error<Unit>("Failed to delete pet"))
-
-        } else{
+        try{
+            val userId: String = userProvider.getUserId();
+            petRepository.deletePetById(
+                petId = petId,
+                userId = userId
+            );
             emit(Resource.Success<Unit>(Unit))
+            return@flow
+        } catch(e: Failure.NetworkError){
+            emit(Resource.Error<Unit>("Network error occurred"))
+            return@flow
+        } catch (e: Failure.ServerError){
+            emit(Resource.Error<Unit>("Server error occurred"))
+            return@flow
+        } catch (e: Failure.UnknownError){
+            emit(Resource.Error<Unit>("Unknown error occurred"))
+            return@flow
+        } catch (e: AuthFailure.PermissionDenied){
+            emit(Resource.Error<Unit>("You are not an owner of this pet"))
+            return@flow
+        } catch(e: GeneralFailure.PetNotFound){
+            emit(Resource.Error<Unit>("Pet not found"))
+            return@flow
         }
+
     }
 
 }

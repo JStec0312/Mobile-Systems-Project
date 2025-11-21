@@ -56,6 +56,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
 
 
+
+    //logger
+    implementation(libs.timber)
     //
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

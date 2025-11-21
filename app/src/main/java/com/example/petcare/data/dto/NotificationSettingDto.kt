@@ -5,7 +5,7 @@ import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.domain.model.NotificationSettings
 
 data class NotificationSettingDto(
-    val id: String? = null,
+    val id: String,
     val userId: String,                          // /users/{uid}/notificationSettings/{channel} => opcjonalne w subkolekcji
     val channel: notificationChannelEnum = notificationChannelEnum.general,
     val enabled: Boolean,

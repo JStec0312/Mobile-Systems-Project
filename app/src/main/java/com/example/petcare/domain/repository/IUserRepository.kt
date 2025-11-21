@@ -3,6 +3,7 @@ package com.example.petcare.domain.repository
 import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
 import com.example.petcare.data.dto.UserDto
+import com.example.petcare.domain.model.User
 
 interface IUserRepository {
 
@@ -14,7 +15,7 @@ interface IUserRepository {
      * @throws Failure.UnknownError
      */
     @Throws(AuthFailure.EmailAlreadyInUse::class, Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
-    suspend fun createUser(email: String, password: String,  displayName: String): UserDto
+    suspend fun createUser(user: User, password: String): UserDto
 
     /**
      * Sign in with email and password

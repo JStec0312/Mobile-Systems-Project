@@ -13,7 +13,7 @@ class GetPetsUseCase @Inject constructor(
     private val petRepository: IPetRepository,
     private val userProvider: IUserProvider,
 ) {
-    suspend operator fun invoke(): Flow<Resource<List<Pet>>> = flow {
+    operator fun invoke(): Flow<Resource<List<Pet>>> = flow {
         emit(Resource.Loading<List<Pet>>())
         try {
             val userId = userProvider.getUserId();

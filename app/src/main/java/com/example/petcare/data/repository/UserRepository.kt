@@ -9,6 +9,7 @@ import javax.inject.Inject
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import android.util.Log
+import com.example.petcare.domain.model.User
 
 
 class UserRepository  @Inject constructor(
@@ -16,33 +17,9 @@ class UserRepository  @Inject constructor(
     private val db: FirebaseFirestore
 ) : IUserRepository {
     private fun users() = db.collection("users")
-    override suspend fun createUser(email: String, password: String, displayName : String): UserDto{
-        try {
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
-            val u = auth.currentUser
-            if (u == null) {
-                throw Exception("User not found")
-            }
-            if (displayName.isNotEmpty()) {
-                val req = userProfileChangeRequest { this.displayName = displayName }
-                u.updateProfile(req).await()
-            }
-            val id = u.uid
 
-            val docref = users().document(u.uid)
-            val profile = mapOf(
-                "display_name" to u.displayName,
-                "email" to u.email,
-                "created_at" to FieldValue.serverTimestamp()
-            )
-            docref.set(profile).await();
-            Log.d("UserRepository add user", "User created successfully")
-            return UserDto(u.email!!, u.displayName!!, id = u.uid)
-
-
-        } catch (e: Exception) {
-            error("Error creating user: ${e.message}")
-        }
+    override suspend fun createUser(user: User, password: String): UserDto {
+        TODO("Not yet implemented")
     }
 
     override suspend fun signInWithEmailAndPassword(

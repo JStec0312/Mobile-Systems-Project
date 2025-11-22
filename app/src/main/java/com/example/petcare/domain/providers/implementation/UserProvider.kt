@@ -4,8 +4,9 @@ import android.R
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.exceptions.AuthFailure
 import java.util.UUID
+import javax.inject.Inject
 
-class UserProvider: IUserProvider {
+class UserProvider @Inject constructor() : IUserProvider {
 
     private lateinit  var userId: String;
     override fun getUserId(): String {

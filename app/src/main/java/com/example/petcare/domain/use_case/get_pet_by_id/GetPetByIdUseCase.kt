@@ -23,9 +23,9 @@ class GetPetByIdUseCase @Inject constructor(
         try{
             var petDto: PetDto = petRepository.getPetById(petId)
             var pet = petDto.toModel();
-            if (pet.ownerUserId != userProvider.getUserId()){
-                emit(Resource.Error<Pet>("You are not the owner of this pet"))
-            }
+            //if (pet.ownerUserId != userProvider.getUserId()){
+            //    emit(Resource.Error<Pet>("You are not the owner of this pet"))
+            //}
             petProvider.setCurrentPet(pet)
             emit(Resource.Success<Pet>(pet))
         } catch(e: Failure){

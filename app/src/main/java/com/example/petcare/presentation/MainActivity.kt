@@ -41,7 +41,7 @@ object Routes{
     const val LOADING_SCREEN = "loading_screen"
     const val SIGN_UP_SCREEN = "sign_up_screen"
     const val SIGN_IN_SCREEN = "sign_in_screen"
-    const val MY_PETS_SCREEN = "my_pets_screen"
+    const val MAIN_APP = "main_app"
 }
 
 @Composable
@@ -75,7 +75,7 @@ fun AppNavigation() {
                     navController.navigate(Routes.SIGN_UP_SCREEN)
                 },
                 onNavigateToMyPets = {
-                    navController.navigate(Routes.MY_PETS_SCREEN) {
+                    navController.navigate(Routes.MAIN_APP) {
                         popUpTo(Routes.SIGN_IN_SCREEN) {
                             inclusive = true
                         }
@@ -84,7 +84,7 @@ fun AppNavigation() {
             )
         }
 
-        composable(route = Routes.MY_PETS_SCREEN) {
+        composable(route = Routes.MAIN_APP) {
             MainContainer()
         }
     }

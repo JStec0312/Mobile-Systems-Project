@@ -2,8 +2,9 @@ package com.example.petcare.domain.providers.implementation
 import com.example.petcare.domain.model.Pet
 import  com.example.petcare.domain.providers.IPetProvider
 import java.util.UUID
+import javax.inject.Inject
 
-class PetProvider: IPetProvider {
+class PetProvider @Inject constructor() : IPetProvider {
     private var currentPetId: String? = null
     private var pet: Pet? = null;
     override fun getCurrentPetId(): String {

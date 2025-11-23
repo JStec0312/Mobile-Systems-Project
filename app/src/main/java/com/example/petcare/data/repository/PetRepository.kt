@@ -27,5 +27,12 @@ class PetRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetRepository 
         TODO("Not yet implemented")
     }
 
+    override suspend fun editPet(
+        pet: Pet,
+        avatarByteArray: ByteArray?
+    ): PetDto {
+        TODO("Not yet implemented")
+    }
+
 
 }

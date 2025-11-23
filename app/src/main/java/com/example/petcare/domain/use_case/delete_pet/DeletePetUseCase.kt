@@ -22,7 +22,11 @@ class DeletePetUseCase  @Inject constructor(
     ): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading<Unit>())
         try{
-            val userId: String = userProvider.getUserId();
+            val userId: String? = userProvider.getUserId();
+            if (userId == null){
+                emit(Resource.Error<Unit>("User not logged in"))
+                return@flow
+            }
             petRepository.deletePetById(
                 petId = petId,
                 userId = userId

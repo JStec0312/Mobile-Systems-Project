@@ -29,6 +29,10 @@ class AddPetByKeyUseCase @Inject constructor(
         emit(Resource.Loading())
         try {
             val userId = userProvider.getUserId();
+            if (userId == null){
+                emit(Resource.Error("User not logged in"))
+                return@flow
+            }
             val petShareCodeDto: PetShareCodeDto? = petShareCodeRepository.getPetShareCodeByValue(shareCode = petKey);
             if (petShareCodeDto == null){
                 emit(Resource.Error("Invalid pet key"))

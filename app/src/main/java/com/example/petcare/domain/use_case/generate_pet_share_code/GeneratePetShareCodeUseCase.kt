@@ -23,7 +23,11 @@ class GeneratePetShareCodeUseCase @Inject constructor(
         petId: String,
     ): Flow<Resource<PetShareCode>> = flow {
         try{
-            val userId: String = userProvider.getUserId();
+            val userId: String? = userProvider.getUserId();
+            if (userId == null){
+                emit(Resource.Error<PetShareCode>("User not logged in"));
+                return@flow
+            }
             val pet = petRepository.getPetById(petId);
             if (pet.ownerUserId != userId){
                 emit(Resource.Error<PetShareCode>("You are not the owner of this pet"));

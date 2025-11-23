@@ -36,9 +36,13 @@ class AddPetUseCase @Inject constructor(
         byteArrayImage: ByteArray?
     ): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
-        val userId: String
+        val userId: String?
         try {
             userId = userProvider.getUserId();
+            if (userId == null){
+                emit(Resource.Error("User not logged in"))
+                return@flow
+            }
         } catch (e: AuthFailure.UserNotLoggedIn){
             emit(Resource.Error("User not logged in"))
             return@flow

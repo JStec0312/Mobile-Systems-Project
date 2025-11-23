@@ -1,6 +1,7 @@
 package com.example.petcare.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.example.petcare.data.fake_repos.FakeMedicationRepository
 import com.example.petcare.data.fake_repos.FakeNotificationRepository
 import com.example.petcare.data.fake_repos.FakePetMemberRepository
@@ -39,11 +40,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
     @Provides
     @Singleton
-    fun provideUserProvider(): IUserProvider{
-        return UserProvider();
+    fun provideSharedPreferences(@ApplicationContext context: Context) =
+        context.getSharedPreferences("petcare_prefs", Context.MODE_PRIVATE)
+    @Provides
+    @Singleton
+    fun provideUserProvider(sharedPreferences: SharedPreferences): IUserProvider{
+        return UserProvider(sharedPreferences);
     }
 
     @Provides

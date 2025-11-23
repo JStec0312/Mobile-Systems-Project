@@ -94,4 +94,18 @@ class FakePetRepository : IPetRepository {
         return pets.filter { it.ownerUserId == userId }
     }
 
+    override suspend fun editPet(
+        pet: Pet,
+        avatarByteArray: ByteArray?
+    ): PetDto {
+        val petDto: PetDto = pet.toDto();
+        val index = pets.indexOfFirst { it.id == petDto.id }
+        if (index == -1) {
+            throw GeneralFailure.PetNotFound()
+        } else {
+            pets[index] = petDto
+            return petDto
+        }
+    }
+
 }

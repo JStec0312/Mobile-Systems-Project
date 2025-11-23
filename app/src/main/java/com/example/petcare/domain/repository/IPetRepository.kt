@@ -21,6 +21,10 @@ interface IPetRepository {
 
     @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
     suspend fun getPetsByUserId(userId: String): List<PetDto>
+
+    @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class,  GeneralFailure.PetNotFound::class)
+    suspend fun editPet( pet: Pet, avatarByteArray: ByteArray?): PetDto
+
 }
 
 

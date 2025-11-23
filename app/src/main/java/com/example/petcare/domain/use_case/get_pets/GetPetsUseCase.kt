@@ -16,7 +16,11 @@ class GetPetsUseCase @Inject constructor(
     operator fun invoke(): Flow<Resource<List<Pet>>> = flow {
         emit(Resource.Loading<List<Pet>>())
         try {
-            val userId = userProvider.getUserId();
+            val userId: String? = userProvider.getUserId();
+            if (userId == null){
+                emit(Resource.Error<List<Pet>>("User not logged in"));
+                return@flow
+            }
             val petsDto = petRepository.getPetsByUserId(userId)
             val pets = petsDto.map { it.toModel() }
             emit(Resource.Success<List<Pet>>(pets))

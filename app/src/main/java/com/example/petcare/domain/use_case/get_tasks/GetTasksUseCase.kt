@@ -7,6 +7,7 @@ import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.ITaskRepository
+import com.example.petcare.exceptions.Failure
 import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -19,40 +20,19 @@ class  GetTasksUseCase @Inject constructor(
     private val petProvider: IPetProvider,
     private val petRepository: ITaskRepository
 ) {
-    operator fun invoke(
-        petId: UUID,
-        delayMs: Long = 600,
-        shouldFail : Boolean = false,
-    ): Flow<Resource<List<Task>>> = flow {
+    operator fun invoke(): Flow<Resource<List<Task>>> = flow {
         emit(Resource.Loading<List<Task>>())
-        delay(delayMs)
-        if (shouldFail){
-            emit(Resource.Error<List<Task>>("Failed to get tasks"))
-
-        } else{
-            val tasks = listOf(
-                Task(
-                    id = UUID.randomUUID().toString(),
-                    petId = petProvider.getCurrentPetId(),
-                    type = taskTypeEnum.training,
-                    title = "Training Session",
-                    notes = "Practice basic commands",
-                    priority = taskPriorityEnum.low,
-                    status = taskStatusEnum.planned,
-                    createdAt = LocalDate(1023, 10, 1)
-                ),
-                Task(
-                    id = UUID.randomUUID().toString(),
-                    petId = petProvider.getCurrentPetId(),
-                    type = taskTypeEnum.walk,
-                    title = "Morning Walk",
-                    notes = "30-minute walk in the park",
-                    priority = taskPriorityEnum.normal,
-                    status = taskStatusEnum.planned,
-                    createdAt = LocalDate(2023, 10, 1)
-                )
-            )
+        try{
+            val petId = petProvider.getCurrentPetId()
+            if (petId==null){
+                emit(Resource.Error<List<Task>>("No pet selected"))
+                return@flow
+            }
+            val tasksDto = petRepository.getTasksByPetId(petId)
+            val tasks = tasksDto.map{ it.toModel() }
             emit(Resource.Success<List<Task>>(tasks))
+        } catch (e: Failure){
+            emit(Resource.Error<List<Task>>("An error occurred: ${e.message}"))
         }
     }
 }

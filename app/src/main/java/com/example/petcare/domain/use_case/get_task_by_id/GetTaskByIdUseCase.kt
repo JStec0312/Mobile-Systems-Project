@@ -27,10 +27,15 @@ class GetTaskByIdUseCase @Inject constructor(
         if (shouldFail){
             emit(Resource.Error<Task>("Failed to get task by id"))
 
-        } else{
+        }
+        val petId = petProvider.getCurrentPetId()
+        if (petId==null){
+            emit(Resource.Error<Task>("No pet selected"))
+        }
+        else{
             val task = Task(
                 id = taskId,
-                petId = petProvider.getCurrentPetId(),
+                petId = petId,
                 type = taskTypeEnum.grooming,
                 title = "Grooming Session",
                 notes = "Remember to brush the fur thoroughly",

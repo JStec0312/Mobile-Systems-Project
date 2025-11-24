@@ -11,11 +11,12 @@ class PetProvider @Inject constructor() : IPetProvider {
         return currentPetId ?: throw IllegalStateException("Current pet ID is not set")
     }
 
-    override fun setCurrentPetId(id: String) {
+    override fun setCurrentPetId(id: String?) {
         currentPetId = id
     }
     override fun setCurrentPet(pet: Pet) {
         this.pet= pet
+        this.currentPetId = pet.id
     }
     override fun getCurrentPet(): Pet {
         return pet ?: throw IllegalStateException("Current pet is not set")

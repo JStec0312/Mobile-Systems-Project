@@ -27,12 +27,17 @@ class ListMedicationsUseCase @Inject constructor(
             emit(Resource.Error<List<Medication>>("Failed to get medications"))
 
         } else{
+            val petId = petProvider.getCurrentPetId()
+            if (petId==null){
+                emit(Resource.Error<List<Medication>>("No pet selected"))
+                return@flow
+            }
             val medications = listOf(
                 Medication(
                     id = UUID.randomUUID().toString(),
                     name = "Flea Treatment",
                     notes = "Ensure full coverage on the back",
-                    petId = petProvider.getCurrentPetId(),
+                    petId = petId,
                     form = "Topical",
                     dose = "10ml",
                     active = true,
@@ -44,7 +49,7 @@ class ListMedicationsUseCase @Inject constructor(
                     id = UUID.randomUUID().toString(),
                     name = "Heartworm Prevention",
                     notes = "Administer monthly",
-                    petId = petProvider.getCurrentPetId(),
+                    petId = petId,
                     form = "Oral",
                     dose = "1 tablet",
                     active = true,

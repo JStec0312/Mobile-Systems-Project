@@ -5,9 +5,12 @@ import com.example.petcare.domain.model.Task
 import com.example.petcare.common.taskPriorityEnum
 import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.common.taskTypeEnum
+import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.ITaskRepository
+import com.example.petcare.exceptions.Failure
+import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -23,29 +26,36 @@ class AddTaskUseCase @Inject constructor(
     operator fun invoke(
         type: taskTypeEnum,
         title: String,
-        description: String?,
-        priority: taskPriorityEnum,
-        delayMs: Long = 600, // symulacja opóźnienia
-        shouldFail: Boolean = false // symulacja błędu
-    ): Flow<Resource<Unit>> = flow {
+        notes: String,
+        priority: taskPriorityEnum
+    ): Flow<Resource<Task>> = flow {
         emit(Resource.Loading())
-        delay(delayMs)
-
-        if (shouldFail) {
-            emit(Resource.Error("Failed to add task"))
-            return@flow
+        try {
+            val userId = userProvider.getUserId();
+            if (userId == null) {
+                emit(Resource.Error("User not logged in"))
+                return@flow
+            }
+            val newTaskId = UUID.randomUUID().toString()
+            val petId = petProvider.getCurrentPetId()
+            if (petId == null) {
+                emit(Resource.Error("No pet selected"))
+                return@flow
+            }
+            val task = Task(
+                id = newTaskId,
+                petId = petId,
+                type = type,
+                title = title,
+                notes = notes,
+                priority = priority,
+                status = taskStatusEnum.planned,
+                createdAt = DateConverter.localDateNow()
+            )
+            taskRepository.createTask(task);
+            emit(Resource.Success(task))
+        } catch (e: Failure){
+            emit(Resource.Error("An error occurred: ${e.message}"))
         }
-
-        val task = Task(
-            id = UUID.randomUUID().toString(),
-            petId = petProvider.getCurrentPetId(),
-            type = type,
-            title = title,
-            notes = description,
-            priority = priority,
-            status = taskStatusEnum.planned,
-            createdAt = LocalDate(11,12,2023)
-        )
-        emit(Resource.Success(Unit))
     }
 }

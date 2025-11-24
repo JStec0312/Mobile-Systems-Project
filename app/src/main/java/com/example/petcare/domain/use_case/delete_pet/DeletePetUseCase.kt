@@ -31,6 +31,7 @@ class DeletePetUseCase  @Inject constructor(
                 petId = petId,
                 userId = userId
             );
+            petProvider.setCurrentPetId(null);
             emit(Resource.Success<Unit>(Unit))
             return@flow
         } catch(e: Failure.NetworkError){

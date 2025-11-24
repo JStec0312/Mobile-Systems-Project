@@ -26,7 +26,7 @@ class GetPetByIdUseCase @Inject constructor(
             //if (pet.ownerUserId != userProvider.getUserId()){
             //    emit(Resource.Error<Pet>("You are not the owner of this pet"))
             //}
-            petProvider.setCurrentPet(pet)
+            petProvider.setCurrentPet(pet);
             emit(Resource.Success<Pet>(pet))
         } catch(e: Failure){
             emit(Resource.Error<Pet>(e.message))

@@ -27,9 +27,14 @@ class GetWalkUseCase @Inject constructor(
             emit(Resource.Error<List<Walk>>("Failed to get walks"))
 
         } else {
+            val petId = petProvider.getCurrentPetId()
+            if (petId == null) {
+                emit(Resource.Error<List<Walk>>("No pet selected"))
+                return@flow
+            }
             val walk1 = Walk(
                 id = UUID.randomUUID().toString(),
-                petId = petProvider.getCurrentPetId(),
+                petId = petId,
                 startedAt = LocalDate(2024, 1,1),
                 endedAt = LocalDate(2024, 1,1),
                 durationSec = 1800,
@@ -39,7 +44,7 @@ class GetWalkUseCase @Inject constructor(
             )
             val walk2 = Walk(
                 id = UUID.randomUUID().toString(),
-                petId = petProvider.getCurrentPetId(),
+                petId = petId,
                 startedAt = LocalDate(2024, 1,2),
                 endedAt = LocalDate(2024, 1,2),
                 durationSec = 2700,

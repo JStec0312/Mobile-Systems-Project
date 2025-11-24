@@ -10,6 +10,7 @@ class AutoLoginUseCase @Inject constructor(
     private val userProvider: IUserProvider
 ) {
     operator fun invoke(): Flow<Resource<Unit>> = flow{
+        emit(Resource.Loading())
         val userId = userProvider.getUserId()
         if (userId != null) {
             emit(Resource.Success(Unit))

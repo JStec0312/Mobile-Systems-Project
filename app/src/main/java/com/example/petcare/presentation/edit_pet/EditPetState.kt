@@ -8,6 +8,9 @@ data class EditPetState(
     val petId: String = "",
     val name: String = "",
     val species: speciesEnum = speciesEnum.dog,
+    val ownerUserId: String = "",
+    val createdAt: LocalDate? = null,
+
     val breed: String = "",
     val sex: sexEnum = sexEnum.male,
     val birthDate: LocalDate? = null,

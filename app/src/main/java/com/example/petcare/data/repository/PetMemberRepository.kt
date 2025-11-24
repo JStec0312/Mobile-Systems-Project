@@ -14,4 +14,12 @@ class PetMemberRepository @Inject constructor(
 
 
     }
+
+    override fun getPetIdsByUserId(userId: String): List<String> {
+        TODO("Not yet implemented")
+    }
+
+    override fun isUserPetMember(userId: String, petId: String): Boolean {
+        TODO("Not yet implemented")
+    }
 }

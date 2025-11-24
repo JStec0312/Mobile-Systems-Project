@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
@@ -60,7 +61,6 @@ class SignInViewModel @Inject constructor(
     }
 
     private fun checkAutoLogin() {
-        _state.update { it.copy(isLoading = true) }
 
         autoLoginUseCase().onEach { resource ->
             when (resource) {
@@ -68,10 +68,11 @@ class SignInViewModel @Inject constructor(
                     _state.update { it.copy(isLoading = false, isSuccessful = true) }
                 }
                 is Resource.Error -> {
-                    _state.update { it.copy(isLoading = false) }
+                    _state.update { it.copy(isLoading = false, isSuccessful = false) }
                 }
-                is Resource.Loading -> {}
+                is Resource.Loading -> {_state.update { it.copy(isLoading = true) } }
             }
+            Timber.d("Auto-login check completed with state: ${resource::class.simpleName}")
         }.launchIn(viewModelScope)
     }
 

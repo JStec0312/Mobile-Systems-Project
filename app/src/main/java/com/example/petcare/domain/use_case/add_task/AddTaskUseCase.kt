@@ -24,6 +24,7 @@ class AddTaskUseCase @Inject constructor(
     private val petProvider: IPetProvider
 ) {
     operator fun invoke(
+        petId: String,
         type: taskTypeEnum,
         title: String,
         notes: String,
@@ -37,11 +38,7 @@ class AddTaskUseCase @Inject constructor(
                 return@flow
             }
             val newTaskId = UUID.randomUUID().toString()
-            val petId = petProvider.getCurrentPetId()
-            if (petId == null) {
-                emit(Resource.Error("No pet selected"))
-                return@flow
-            }
+
             val task = Task(
                 id = newTaskId,
                 petId = petId,

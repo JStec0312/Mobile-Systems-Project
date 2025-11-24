@@ -11,4 +11,10 @@ interface ITaskRepository {
     @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
     fun getTasksByPetId(petId: String): List<TaskDto>
 
+    @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
+    fun updateTaskStatus(taskId: String, newStatus: com.example.petcare.common.taskStatusEnum)
+
+    @Throws
+    fun getTasksByPetIds(petIds: List<String>): List<TaskDto>
+
 }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,22 +32,28 @@ class MyPetsViewModel @Inject constructor(
         getPets()
     }
     private fun getPets() {
+
         getPetsUseCase().onEach { result ->
             when (result) {
                 is Resource.Loading -> {
                     _state.update { it.copy(isLoading = true) }
+                    Timber.d("getPets: ${result}" )
+
                 }
                 is Resource.Success -> {
                 val pets = result.data ?: emptyList()
                     originalPetsList = pets
                     _state.update { it.copy(pets = pets, isLoading = false, error = null) }
-
+                    Timber.d("getPets: ${result}" )
                 }
                 is Resource.Error -> {
                     _state.update { it.copy(error = result.message ?: "An unexpected error occurred", isLoading = false) }
+                    Timber.d("getPets: ${result}" )
+
                 }
             }
         }.launchIn(viewModelScope)
+
     }
 
     fun onSearchQueryChange(query: String) {

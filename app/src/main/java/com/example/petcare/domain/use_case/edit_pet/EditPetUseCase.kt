@@ -10,6 +10,7 @@ import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import javax.inject.Inject
 
 class EditPetUseCase @Inject constructor(
@@ -29,10 +30,8 @@ class EditPetUseCase @Inject constructor(
                 emit(Resource.Error("User not logged in"))
                 return@flow
             }
-            if (petId==null){
-                emit(Resource.Error("Pet ID is null"))
-                return@flow
-            }
+
+            Timber.tag("EditPetUseCase").d("Editing pet with ID: $petId, owner id: ${pet.ownerUserId} by user: $userId")
             if (pet.ownerUserId != userId){
                 emit(Resource.Error("You are not an owner of the pet"))
                 return@flow

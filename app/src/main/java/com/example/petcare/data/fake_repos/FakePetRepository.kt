@@ -11,6 +11,7 @@ import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
 import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.datetime.LocalDate
+import timber.log.Timber
 import java.util.UUID
 
 class FakePetRepository : IPetRepository {
@@ -83,15 +84,9 @@ class FakePetRepository : IPetRepository {
         pets.removeIf { it.id == petId }
         return
     }
-    override suspend fun getPetsByUserId(userId: String): List<PetDto> {
-        if (userId=="NetworkError"){
-            throw Failure.NetworkError()
-        } else if (userId=="ServerError"){
-            throw Failure.ServerError()
-        } else if (userId=="UnknownError"){
-            throw Failure.UnknownError()
-        }
-        return pets.filter { it.ownerUserId == userId }
+
+    override suspend fun getPetsByIds(petIds: List<String>): List<PetDto> {
+        return pets.filter { petIds.contains(it.id) }
     }
 
     override suspend fun editPet(

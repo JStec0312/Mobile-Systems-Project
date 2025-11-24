@@ -22,6 +22,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,12 +32,15 @@ class EditPetViewModel @Inject constructor(
     private val deletePetUseCase: DeletePetUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val application: Application
+
 ) : ViewModel() {
     private val _state = MutableStateFlow(EditPetState())
     val state = _state.asStateFlow()
 
     init {
         val petId = savedStateHandle.get<String>("petId")
+        Timber.d("Loading pet data in edit pet view model for petId: $petId")
+
         if(petId != null) {
             loadPetData(petId)
         }
@@ -114,7 +118,7 @@ class EditPetViewModel @Inject constructor(
                     null
                 }
             }
-
+            Timber.d("Editing pet with id: ${_state.value.petId}");
             val petToUpdate = Pet(
                 id = _state.value.petId,
                 ownerUserId = "",

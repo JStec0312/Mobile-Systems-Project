@@ -13,7 +13,7 @@ data class Task(
     val title: String,
     val notes: String?,
     val priority: taskPriorityEnum? = taskPriorityEnum.normal,
-    val status: taskStatusEnum = taskStatusEnum.planned,
+    var status: taskStatusEnum = taskStatusEnum.planned,
     val createdAt: LocalDate
 ) {
     fun toDto(): TaskDto{

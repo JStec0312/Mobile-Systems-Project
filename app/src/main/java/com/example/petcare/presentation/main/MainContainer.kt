@@ -39,6 +39,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.petcare.R
+import com.example.petcare.domain.use_case.logout.LogoutUseCase
 import com.example.petcare.presentation.add_pet.AddPetRoute
 import com.example.petcare.presentation.edit_pet.EditPetRoute
 import com.example.petcare.presentation.my_pets.MyPetsRoute
@@ -50,7 +51,7 @@ fun MainContainer() {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
+    val logoutUseCase: LogoutUseCase
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 

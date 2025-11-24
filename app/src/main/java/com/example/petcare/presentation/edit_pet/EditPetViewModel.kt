@@ -58,6 +58,7 @@ class EditPetViewModel @Inject constructor(
                                 it.copy(
                                     isLoading = false,
                                     petId = pet . id,
+                                    ownerUserId = pet.ownerUserId,
                                     name = pet.name,
                                     species = pet.species,
                                     breed = pet.breed ?: "",
@@ -121,7 +122,7 @@ class EditPetViewModel @Inject constructor(
             Timber.d("Editing pet with id: ${_state.value.petId}");
             val petToUpdate = Pet(
                 id = _state.value.petId,
-                ownerUserId = "",
+                ownerUserId = _state.value.ownerUserId,
                 name = _state.value.name,
                 species = _state.value.species,
                 breed = _state.value.breed,

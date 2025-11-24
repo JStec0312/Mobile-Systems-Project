@@ -85,7 +85,13 @@ fun AppNavigation() {
         }
 
         composable(route = Routes.MAIN_APP) {
-            MainContainer()
+            MainContainer(
+                onNavigateToLogin = {
+                    navController.navigate(Routes.SIGN_IN_SCREEN) {
+                        popUpTo(0)
+                    }
+                }
+            )
         }
     }
 }

@@ -57,7 +57,7 @@ class AddPetUseCase @Inject constructor(
             sex = sex,
             birthDate = birthDate,
             avatarThumbUrl = null,
-            createdAt = LocalDate(11, 12, 2003)
+            createdAt = LocalDate(2003, 12, 11)
         )
         try{
             petRepository.createPet( newPet, byteArrayImage)

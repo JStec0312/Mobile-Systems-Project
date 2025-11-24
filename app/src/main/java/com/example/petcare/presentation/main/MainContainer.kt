@@ -22,9 +22,11 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -34,10 +36,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.petcare.R
 import com.example.petcare.domain.use_case.logout.LogoutUseCase
 import com.example.petcare.presentation.add_pet.AddPetRoute
@@ -47,18 +53,28 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainContainer() {
+fun MainContainer(
+    viewModel: MainViewModel = hiltViewModel(),
+    onNavigateToLogin: () -> Unit
+) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val logoutUseCase: LogoutUseCase
+
+    LaunchedEffect(Unit) {
+        viewModel.logoutChannel.collect {
+            drawerState.close()
+            onNavigateToLogin()
+        }
+    }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val topBarTitle = when (currentRoute) {
-        "my_pets" -> "MY PETS"
-        "add_pet" -> "NEW PET"
-        "edit_pet" -> "EDIT PET"
+    val topBarTitle = when {
+        currentRoute == "my_pets" -> "MY PETS"
+        currentRoute == "add_pet" -> "NEW PET"
+        currentRoute?.startsWith("edit_pet") == true  -> "EDIT PET"
         else -> ""
     }
 
@@ -132,6 +148,24 @@ fun MainContainer() {
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            TextButton(
+                                onClick = {viewModel.onLogout()},
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.back),
+                                    contentDescription = "Logout",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "LOGOUT",
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
                             Image(
                                 painter = painterResource(id = R.drawable.petcare_logo_purple),
                                 contentDescription = "Logo",
@@ -183,8 +217,8 @@ fun MainContainer() {
                         onNavigateToAddPet = {
                             navController.navigate("add_pet")
                         },
-                        onNavigateToEditPet = {
-                            navController.navigate("edit_pet")
+                        onNavigateToEditPet = { petId ->
+                            navController.navigate("edit_pet/$petId")
                         }
                     )
                 }
@@ -195,7 +229,12 @@ fun MainContainer() {
                         }
                     )
                 }
-                composable(route = "edit_pet") {
+                composable(
+                    route = "edit_pet/{petId}",
+                    arguments = listOf(
+                        navArgument("petId") {type = NavType.StringType}
+                    )
+                ) {
                     EditPetRoute(
                         onNavigateBack = {
                             navController.popBackStack()

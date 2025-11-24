@@ -260,14 +260,6 @@ fun PetCard(
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                IconButton(onClick = {}) {
-                    Image(
-                        painter = painterResource(id = R.drawable.heart),
-                        contentDescription = "Favourite",
-
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
                 IconButton(onClick = onEditClick) {
                     Image(
                         painter = painterResource(R.drawable.edit),

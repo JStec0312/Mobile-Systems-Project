@@ -288,7 +288,7 @@ fun PetConfirmationScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(155.dp))
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -326,55 +326,58 @@ fun PetConfirmationScreen(
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                     Text(
                         text = pet.breed ?: "Uknown mixed breed",
-                        fontSize = 22.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                }
-                Spacer(modifier = Modifier.height(40.dp))
 
-                Button(
-                    onClick = onAddClick,
-                    modifier = Modifier
-                        .height(76.dp)
-                        .width(300.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                ) {
-                    Text(
-                        text = "ADD",
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 28.sp,
-                        color = Color.White
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(80.dp))
 
-                TextButton(onClick = onBackClick) {
+                    Button(
+                        onClick = onAddClick,
+                        modifier = Modifier
+                            .height(76.dp)
+                            .width(300.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                    ) {
+                        Text(
+                            text = "ADD",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 28.sp,
+                            color = Color.White
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextButton(onClick = onBackClick) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Go back",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "BACK",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(40.dp))
                     Image(
-                        painter = painterResource(id = R.drawable.back),
-                        contentDescription = "Go back",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "BACK",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.tertiary
+                        painter = painterResource(id = R.drawable.petcare_logo_purple),
+                        contentDescription = "Logo",
+                        modifier = Modifier
+                            .width(200.dp)
+                            .padding(bottom = 16.dp),
+                        contentScale = ContentScale.Fit
                     )
                 }
             }
-            Image(
-                painter = painterResource(id = R.drawable.petcare_logo_purple),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .width(100.dp)
-                    .padding(bottom = 16.dp),
-                contentScale = ContentScale.Fit
-            )
         }
     }
 }
@@ -382,105 +385,154 @@ fun PetConfirmationScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateNewPetContent(
-    state: AddPetState,
-    onNameChange: (String) -> Unit,
-    onSpeciesChange: (speciesEnum) -> Unit,
-    onBreedChange: (String) -> Unit,
-    onDateClick: () -> Unit,
-    onSexChange: (sexEnum) -> Unit,
-    onPhotoClick: () -> Unit,
-    onSaveClick: () -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val options = listOf("Male", "Female", "Unknown")
+        state: AddPetState,
+        onNameChange: (String) -> Unit,
+        onSpeciesChange: (speciesEnum) -> Unit,
+        onBreedChange: (String) -> Unit,
+        onDateClick: () -> Unit,
+        onSexChange: (sexEnum) -> Unit,
+        onPhotoClick: () -> Unit,
+        onSaveClick: () -> Unit
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        val options = listOf("Male", "Female", "Unknown")
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(contentAlignment = Alignment.BottomEnd) {
-            if(state.avatarThumbUrl != null) {
-                AsyncImage(
-                    model = state.avatarThumbUrl,
-                    contentDescription = "Avatar",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Image(
-                    painter = painterResource(if(state.species == speciesEnum.dog) R.drawable.dog_pp else R.drawable.cat_pp),
-                    contentDescription = "Avatar placeholder",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(contentAlignment = Alignment.BottomEnd) {
+                if(state.avatarThumbUrl != null) {
+                    AsyncImage(
+                        model = state.avatarThumbUrl,
+                        contentDescription = "Avatar",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(if(state.species == speciesEnum.dog) R.drawable.dog_pp else R.drawable.cat_pp),
+                        contentDescription = "Avatar placeholder",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                IconButton(
+                    onClick = onPhotoClick,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.camera),
+                        contentDescription = "Change photo",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
             }
-            IconButton(
-                onClick = onPhotoClick,
-                modifier = Modifier.size(36.dp)
+            Spacer(modifier = Modifier.height(24.dp))
+
+            PetTextField(
+                value = state.name,
+                onValueChange = onNameChange,
+                label = "Pet name"
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy((-65).dp)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.camera),
-                    contentDescription = "Change photo",
-                    modifier = Modifier.size(30.dp)
+                    painter = painterResource(id = if (state.species == speciesEnum.dog) R.drawable.dog_clicked else R.drawable.dog_unclicked),
+                    contentDescription = "Dog",
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(140.dp)
+                        .clickable { onSpeciesChange(speciesEnum.dog) },
+                    contentScale = ContentScale.Fit
+                )
+                Image(
+                    painter = painterResource(id = if (state.species == speciesEnum.cat) R.drawable.cat_clicked else R.drawable.cat_unclicked),
+                    contentDescription = "Cat",
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(140.dp)
+                        .clickable { onSpeciesChange(speciesEnum.cat) },
+                    contentScale = ContentScale.Fit
                 )
             }
-        }
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        PetTextField(
-            value = state.name,
-            onValueChange = onNameChange,
-            label = "Pet name"
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy((-65).dp)
-        ) {
-            Image(
-                painter = painterResource(id = if (state.species == speciesEnum.dog) R.drawable.dog_clicked else R.drawable.dog_unclicked),
-                contentDescription = "Dog",
-                modifier = Modifier
-                    .weight(1f)
-                    .height(140.dp)
-                    .clickable { onSpeciesChange(speciesEnum.dog) },
-                contentScale = ContentScale.Fit
+            PetTextField(
+                value = state.breed,
+                onValueChange = onBreedChange,
+                label = "Breed"
             )
-            Image(
-                painter = painterResource(id = if (state.species == speciesEnum.cat) R.drawable.cat_clicked else R.drawable.cat_unclicked),
-                contentDescription = "Cat",
-                modifier = Modifier
-                    .weight(1f)
-                    .height(140.dp)
-                    .clickable { onSpeciesChange(speciesEnum.cat) },
-                contentScale = ContentScale.Fit
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        PetTextField(
-            value = state.breed,
-            onValueChange = onBreedChange,
-            label = "Breed"
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier.width(280.dp)
+            ) {
+                OutlinedTextField(
+                    value = state.sex.name.replaceFirstChar { it.uppercase() },
+                    onValueChange = {},
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(PrimaryNotEditable, true),
+                    label = {Text("Sex")},
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = Color.Transparent,
+                        unfocusedTextColor = Color(0xFFBDADD5),
+                        focusedContainerColor = Color(0xFFFFFFFF),
+                        unfocusedContainerColor = Color(0xFFFFFFFF),
+                        focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedLabelColor = Color(0xFFBDADD5),
+                        focusedTextColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
+                        focusedTrailingIconColor = MaterialTheme.colorScheme.secondary
+                    ),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(Color.White)
+                ) {
+                    options.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption) },
+                            onClick = {
+                                val selectedEnum = when (selectionOption) {
+                                    "Male" -> sexEnum.male
+                                    "Female" -> sexEnum.female
+                                    "Unknown" -> sexEnum.unknown
+                                    else -> sexEnum.unknown
+                                }
+                                onSexChange(selectedEnum)
+                                expanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        )
+                    }
+                }
+            }
 
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
-            modifier = Modifier.width(280.dp)
-        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
             OutlinedTextField(
-                value = state.sex.name.replaceFirstChar { it.uppercase() },
+                value = state.birthDate?.toString() ?: "",
                 onValueChange = {},
                 readOnly = true,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(PrimaryNotEditable, true),
-                label = {Text("Sex")},
+                    .clickable { onDateClick() },
+                label = {Text("Date of birth")},
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.secondary,
                     unfocusedBorderColor = Color.Transparent,
@@ -489,99 +541,51 @@ fun CreateNewPetContent(
                     focusedLabelColor = MaterialTheme.colorScheme.secondary,
                     unfocusedLabelColor = Color(0xFFBDADD5),
                     focusedTextColor = MaterialTheme.colorScheme.secondary,
-                    unfocusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
-                    focusedTrailingIconColor = MaterialTheme.colorScheme.secondary
+                    disabledContainerColor = Color.White,
+                    disabledBorderColor = Color.Transparent,
+                    disabledTextColor = MaterialTheme.colorScheme.secondary,
+                    disabledLabelColor = Color(0xFFBDADD5),
+                    disabledPlaceholderColor = Color(0xFFBDADD5)
                 ),
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                placeholder = {
+                    Text(
+                        text = "YYYY-MM-DD",
+                        color = Color(0xFFBDADD5)
+                    )
                 },
+                trailingIcon = {
+                    IconButton(onClick = onDateClick) {
+                        Image(
+                            painter = painterResource(id = R.drawable.calendar),
+                            contentDescription = "Select date",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
+                enabled = false,
+                singleLine = true
             )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Color.White)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = onSaveClick,
+                modifier = Modifier
+                    .height(76.dp)
+                    .width(300.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                shape = RoundedCornerShape(10.dp)
             ) {
-                options.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = { Text(selectionOption) },
-                        onClick = {
-                            val selectedEnum = when (selectionOption) {
-                                "Male" -> sexEnum.male
-                                "Female" -> sexEnum.female
-                                "Unknown" -> sexEnum.unknown
-                                else -> sexEnum.unknown
-                            }
-                            onSexChange(selectedEnum)
-                            expanded = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = state.birthDate?.toString() ?: "",
-            onValueChange = {},
-            readOnly = true,
-            modifier = Modifier
-                .clickable { onDateClick() },
-            label = {Text("Date of birth")},
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = Color(0xFFFFFFFF),
-                unfocusedContainerColor = Color(0xFFFFFFFF),
-                focusedLabelColor = MaterialTheme.colorScheme.secondary,
-                unfocusedLabelColor = Color(0xFFBDADD5),
-                focusedTextColor = MaterialTheme.colorScheme.secondary,
-                disabledContainerColor = Color.White,
-                disabledBorderColor = Color.Transparent,
-                disabledTextColor = MaterialTheme.colorScheme.secondary,
-                disabledLabelColor = Color(0xFFBDADD5),
-                disabledPlaceholderColor = Color(0xFFBDADD5)
-            ),
-            placeholder = {
                 Text(
-                    text = "YYYY-MM-DD",
-                    color = Color(0xFFBDADD5)
+                    text = "ADD PET",
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 28.sp
                 )
-            },
-            trailingIcon = {
-                IconButton(onClick = onDateClick) {
-                    Image(
-                        painter = painterResource(id = R.drawable.calendar),
-                        contentDescription = "Select date",
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            },
-            enabled = false,
-            singleLine = true
-        )
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = onSaveClick,
-            modifier = Modifier
-                .height(76.dp)
-                .width(300.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text(
-                text = "ADD PET",
-                color = Color.White,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 28.sp
-            )
+            Spacer(modifier = Modifier.height(100.dp))
         }
-
-        Spacer(modifier = Modifier.height(100.dp))
-    }
 }
 
 @Composable

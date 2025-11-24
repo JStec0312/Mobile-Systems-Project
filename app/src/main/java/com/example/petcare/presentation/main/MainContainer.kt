@@ -40,6 +40,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.petcare.R
 import com.example.petcare.presentation.add_pet.AddPetRoute
+import com.example.petcare.presentation.edit_pet.EditPetRoute
 import com.example.petcare.presentation.my_pets.MyPetsRoute
 import kotlinx.coroutines.launch
 
@@ -56,6 +57,7 @@ fun MainContainer() {
     val topBarTitle = when (currentRoute) {
         "my_pets" -> "MY PETS"
         "add_pet" -> "NEW PET"
+        "edit_pet" -> "EDIT PET"
         else -> ""
     }
 
@@ -181,13 +183,20 @@ fun MainContainer() {
                             navController.navigate("add_pet")
                         },
                         onNavigateToEditPet = {
-                            println("Kliknięto przycisk Edytuj Zwierze")
+                            navController.navigate("edit_pet")
                         }
                     )
                 }
                 composable("add_pet") {
                     AddPetRoute(
                         onNavigationToMyPets = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable(route = "edit_pet") {
+                    EditPetRoute(
+                        onNavigateBack = {
                             navController.popBackStack()
                         }
                     )

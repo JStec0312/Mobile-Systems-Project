@@ -22,6 +22,10 @@ data class Pet(
             name = this.name,
             species = this.species,
             breed = this.breed,
+            sex = this.sex,
+            birthDate = this.birthDate?.toString(),
+            avatarThumbUrl = this.avatarThumbUrl,
+            createdAt = this.createdAt?.toString()
         )
     }
 }

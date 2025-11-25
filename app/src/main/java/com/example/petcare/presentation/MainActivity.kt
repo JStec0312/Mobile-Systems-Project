@@ -88,7 +88,7 @@ fun AppNavigation() {
             MainContainer(
                 onNavigateToLogin = {
                     navController.navigate(Routes.SIGN_IN_SCREEN) {
-                        popUpTo(0)
+                        popUpTo(Routes.MAIN_APP) { inclusive = true }
                     }
                 }
             )

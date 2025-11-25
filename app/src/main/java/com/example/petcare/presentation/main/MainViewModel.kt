@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,14 +20,17 @@ class MainViewModel @Inject constructor(
 
     fun onLogout() {
         viewModelScope.launch {
+            Timber.d("DEBUG: rozpoczynam wylogowanie")
             logoutUseCase().collect { result ->
                 when (result) {
                     is Resource.Loading -> {}
                     is Resource.Success -> {
+                        Timber.d("DEBUG: wylogowanie zakończone")
                         _logoutChannel.send(Unit)
                     }
 
                     is Resource.Error -> {
+                        Timber.d("DEBUG: wylogowanie zakończone z błędem")
                         _logoutChannel.send(Unit)
                     }
                 }

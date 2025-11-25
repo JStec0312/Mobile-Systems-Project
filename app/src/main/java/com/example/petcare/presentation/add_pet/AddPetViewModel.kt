@@ -46,9 +46,11 @@ class AddPetViewModel @Inject constructor(
         _state.update { it.copy(breed = value) }
     }
     fun onSexChange(value: sexEnum) {
+        Timber.d("DEBUG: Zmieniono płeć zwierzaka na $value")
         _state.update { it.copy(sex = value) }
     }
     fun onBirthDateChange(date: LocalDate) {
+        Timber.d("DEBUG: Zmieniono datę urodzenia zwierzaka na $date")
         _state.update { it.copy(birthDate = date) }
     }
     fun onIdChange(value: String) {
@@ -75,6 +77,13 @@ class AddPetViewModel @Inject constructor(
                     null
                 }
             }
+            Timber.tag("AddPetDebug").d("""
+                === PRÓBA ZAPISU ===
+                1. Sex ze stanu (_state.value.sex): ${_state.value.sex}
+                2. BirthDate ze stanu (_state.value.birthDate): ${_state.value.birthDate}
+                3. BirthDate przetworzone (zmienna): $birthDate
+                ====================
+            """.trimIndent())
 
             addPetUseCase(
                 name = _state.value.name,

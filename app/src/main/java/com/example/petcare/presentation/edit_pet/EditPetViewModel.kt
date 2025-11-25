@@ -120,20 +120,16 @@ class EditPetViewModel @Inject constructor(
                 }
             }
             Timber.d("Editing pet with id: ${_state.value.petId}");
-            val petToUpdate = Pet(
-                id = _state.value.petId,
+
+            editPetUseCase(
+                pet_id = _state.value.petId,
                 ownerUserId = _state.value.ownerUserId,
                 name = _state.value.name,
                 species = _state.value.species,
                 breed = _state.value.breed,
                 sex = _state.value.sex,
-                birthDate = _state.value.birthDate ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                birthDate = _state.value.birthDate,
                 avatarThumbUrl = _state.value.avatarThumbUrl,
-                createdAt = _state.value.birthDate ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-            )
-
-            editPetUseCase(
-                pet = petToUpdate,
                 byteArrayImage = imageBytes
             ).collect { result ->
                 when (result) {

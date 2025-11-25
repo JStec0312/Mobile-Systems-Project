@@ -20,6 +20,7 @@ import javax.inject.Inject
 import kotlinx.datetime.todayIn
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone.Companion.currentSystemDefault
+import timber.log.Timber
 
 
 @HiltViewModel
@@ -63,6 +64,7 @@ class AddPetViewModel @Inject constructor(
 
             val birthDate = _state.value.birthDate
                 ?: Clock.System.todayIn(currentSystemDefault())
+            Timber.tag("AddPetViewModel").d("Birth date: $birthDate")
 
             val imageBytes = _state.value.avatarThumbUrl?.let { uriString ->
                 try {

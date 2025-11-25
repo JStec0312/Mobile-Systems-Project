@@ -33,6 +33,7 @@ class EditPetUseCase @Inject constructor(
 
             Timber.tag("EditPetUseCase").d("Editing pet with ID: $petId, owner id: ${pet.ownerUserId} by user: $userId")
             if (pet.ownerUserId != userId){
+                Timber.tag("EditPetUseCase").d("User id: $userId is not owner of pet with id: $petId, owner id: ${pet.ownerUserId}")
                 emit(Resource.Error("You are not an owner of the pet"))
                 return@flow
             }

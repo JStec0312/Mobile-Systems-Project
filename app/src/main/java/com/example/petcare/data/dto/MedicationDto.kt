@@ -4,7 +4,7 @@ import com.example.petcare.domain.model.Medication
 
 data class MedicationDto(
     val id: String,
-    val pet_id: String,                 // subkolekcja pod pets/{petId}/medications => pole opcjonalne
+    val petId: String,                 // subkolekcja pod pets/{petId}/medications => pole opcjonalne
     val name: String,
     val form: String? = null,           // "tablet" | "syrup" | "drops" | "other"
     val dose: String? = null,           // np. "1 tab", "5 ml", "10 mg/kg"
@@ -16,7 +16,7 @@ data class MedicationDto(
 ) {
     fun toModel(): Medication{
         return Medication(
-            petId = this.pet_id,
+            petId = this.petId,
             name = this.name,
             form = this.form,
             dose = this.dose,

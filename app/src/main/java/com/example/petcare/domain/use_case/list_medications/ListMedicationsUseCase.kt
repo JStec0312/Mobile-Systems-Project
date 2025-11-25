@@ -1,9 +1,13 @@
 package com.example.petcare.domain.use_case.list_medications
 import com.example.petcare.common.Resource
+import com.example.petcare.data.repository.MedicationRepository
 import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
+import com.example.petcare.domain.repository.IMedicationRepository
 import com.example.petcare.domain.repository.IPetRepository
+import com.example.petcare.exceptions.Failure
+import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -14,52 +18,29 @@ import javax.inject.Inject
 class ListMedicationsUseCase @Inject constructor(
     private val userProvider: IUserProvider,
     private val petProvider: IPetProvider,
-    private val petRepository: IPetRepository
+    private val medicationRepository: IMedicationRepository
 ){
     operator fun invoke(
-        petId: UUID,
-        delayMs: Long = 600, //@NOTE Simulated delay
-        shouldFail : Boolean = false, //@NOTE Simulated failure
+        petId: String,
     ): Flow<Resource<List<Medication>>> = flow {
         emit(Resource.Loading<List<Medication>>())
-        delay(delayMs)
-        if (shouldFail){
-            emit(Resource.Error<List<Medication>>("Failed to get medications"))
-
-        } else{
-            val petId = petProvider.getCurrentPetId()
-            if (petId==null){
-                emit(Resource.Error<List<Medication>>("No pet selected"))
+        try{
+            val userId = userProvider.getUserId();
+            if (userId == null){
+                emit(Resource.Error<List<Medication>>("User not logged in"))
                 return@flow
             }
-            val medications = listOf(
-                Medication(
-                    id = UUID.randomUUID().toString(),
-                    name = "Flea Treatment",
-                    notes = "Ensure full coverage on the back",
-                    petId = petId,
-                    form = "Topical",
-                    dose = "10ml",
-                    active = true,
-                    createdAt = LocalDate(12023, 9, 1),
-                    from = LocalDate(2023, 9, 1),
-                    to = LocalDate(2024, 9, 1)
-                ),
-                Medication(
-                    id = UUID.randomUUID().toString(),
-                    name = "Heartworm Prevention",
-                    notes = "Administer monthly",
-                    petId = petId,
-                    form = "Oral",
-                    dose = "1 tablet",
-                    active = true,
-                    createdAt = LocalDate(2023, 11, 1),
-                    from = LocalDate(2023, 11, 1),
-                    to = LocalDate(2024, 11, 1)
-                )
-            )
+            val medicationsDto = medicationRepository.listMedicationsForPet(petId)
+            val medications = medicationsDto.map { it.toModel() }
             emit(Resource.Success<List<Medication>>(medications))
+        } catch (e: Failure){
+            emit(Resource.Error<List<Medication>>(e.message))
+                return@flow
+        }  catch (e: GeneralFailure.MedicationNotFound){
+            emit(Resource.Error<List<Medication>>(e.message))
+                return@flow
         }
+
     }
 
 }

@@ -13,12 +13,12 @@ data class Medication(
     val active: Boolean = true,
     val createdAt: LocalDate,
     val from: LocalDate,
-    val to: LocalDate
+    val to: LocalDate?
 ) {
     fun toDto(): MedicationDto {
         return MedicationDto(
             id = this.id,
-            pet_id = this.petId,
+            petId = this.petId,
             name = this.name,
             form = this.form,
             dose = this.dose,

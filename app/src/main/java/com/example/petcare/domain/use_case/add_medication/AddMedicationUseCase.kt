@@ -1,10 +1,11 @@
 package com.example.petcare.domain.use_case.add_medication
 import com.example.petcare.common.Resource
+import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IMedicationRepository
-import kotlinx.coroutines.delay
+import com.example.petcare.exceptions.Failure
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -18,33 +19,38 @@ class AddMedicationUseCase @Inject constructor(
     private val medicationRepository: IMedicationRepository
 ){
     operator fun invoke(
-        petId: UUID,
+        petId: String,
         name: String,
         form: String?,
         dose: String?,
         notes: String?,
-        delayMs: Long = 600, //@NOTE Simulated delay
-        shouldFail : Boolean = false, //@NOTE Simulated failure
-    ): Flow<Resource<Medication>> = flow {
-        emit(Resource.Loading<Medication>())
-        delay(delayMs)
-        if (shouldFail){
-            emit(Resource.Error<Medication>("Failed to add medication"))
-
-        } else{
+        from: LocalDate,
+        to: LocalDate?
+    ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading<Unit>())
+        try{
+            val userId = userProvider.getUserId();
+            if (userId == null){
+                emit(Resource.Error<Unit>("User not logged in"))
+                return@flow
+            }
             val medication = Medication(
                 id = UUID.randomUUID().toString(),
-                petId = UUID.randomUUID().toString(),
-                name = "Mock",
-                form = "Mock",
-                dose = "Mock dose",
-                notes = "Mock notes",
-                createdAt = LocalDate(2023,1,1),
+                petId = petId,
+                name = name,
+                form = form,
+                dose = dose,
+                notes = notes,
                 active = true,
-                from = LocalDate(2023,1,1),
-                to = LocalDate(2023, 12, 31),
+                createdAt = DateConverter.localDateNow(),
+                from = from,
+                to = to
             )
-            emit(Resource.Success<Medication>(medication))
+            medicationRepository.createMedication(medication)
+        } catch (e: Failure){
+            emit(Resource.Error<Unit>(e.message))
+                return@flow
         }
+
     }
 }

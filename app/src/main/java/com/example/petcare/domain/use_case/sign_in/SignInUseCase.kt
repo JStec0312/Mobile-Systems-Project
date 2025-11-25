@@ -1,6 +1,5 @@
 package com.example.petcare.domain.use_case.sign_in
 import com.example.petcare.common.Resource
-import com.example.petcare.data.dto.UserDto
 import com.example.petcare.domain.model.User
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
@@ -26,9 +25,8 @@ class SignInUseCase  @Inject constructor(
             return@flow
         }
         try{
-            val userDto: UserDto = userRepository.signInWithEmailAndPassword(email, password)
-            val user = userDto.toModel();
-            userProvider.setUserId(user.id);
+            val user: User = userRepository.signInWithEmailAndPassword(email, password)
+            userProvider.setUserId(user.id)
             emit(Resource.Success<User>(user))
             return@flow
         }  catch(e: AuthFailure.InvalidCredentials){

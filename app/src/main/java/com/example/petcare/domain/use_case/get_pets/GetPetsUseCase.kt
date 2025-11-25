@@ -27,10 +27,9 @@ class GetPetsUseCase @Inject constructor(
                 return@flow
             }
             val petIds = petMemberRepository.getPetIdsByUserId(userId)
-            val petsDto = petRepository.getPetsByIds(petIds)
+            val pets = petRepository.getPetsByIds(petIds)
 
-            Timber.d("Pets: $petsDto")
-            val pets = petsDto.map { it.toModel() }
+            Timber.d("Pets: $pets")
             emit(Resource.Success<List<Pet>>(pets))
             return@flow
         } catch(e: Failure){

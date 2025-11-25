@@ -1,6 +1,4 @@
 package com.example.petcare.data.dto
-import com.example.petcare.common.utils.DateConverter
-import com.example.petcare.domain.model.Medication
 
 data class MedicationDto(
     val id: String,
@@ -13,19 +11,4 @@ data class MedicationDto(
     val createdAt: String,
     val from: String,
     val to: String,
-) {
-    fun toModel(): Medication{
-        return Medication(
-            petId = this.petId,
-            name = this.name,
-            form = this.form,
-            dose = this.dose,
-            notes = this.notes,
-            active = this.active,
-            createdAt = DateConverter.stringToLocalDate(this.createdAt),
-            id = this.id,
-            from = DateConverter.stringToLocalDate(this.from),
-            to = DateConverter.stringToLocalDate(this.to),
-        )
-    }
-}
+)

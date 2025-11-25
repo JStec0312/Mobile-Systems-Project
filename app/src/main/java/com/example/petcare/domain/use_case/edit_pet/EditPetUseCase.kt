@@ -2,7 +2,6 @@ package com.example.petcare.domain.use_case.edit_pet
 import com.example.petcare.common.Resource
 import com.example.petcare.common.sexEnum
 import com.example.petcare.common.speciesEnum
-import com.example.petcare.data.dto.PetDto
 import com.example.petcare.domain.model.Pet
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
@@ -43,7 +42,7 @@ class EditPetUseCase @Inject constructor(
 
             Timber.tag("EditPetUseCase").d("Editing pet with ID: $petId, owner id: $ownerUserId by user: $userId")
 
-            val petFromDb = petRepository.getPetById(petId).toModel();
+            val petFromDb = petRepository.getPetById(petId)
             if (petFromDb.ownerUserId!= userId){
                 Timber.tag("EditPetUseCase").d("User id: $userId is not owner of pet with id: $petId, owner id: $ownerUserId")
                 emit(Resource.Error("You are not an owner of the pet"))
@@ -59,9 +58,8 @@ class EditPetUseCase @Inject constructor(
                 birthDate = birthDate ?: petFromDb.birthDate,
                 avatarThumbUrl = avatarThumbUrl ?: petFromDb.avatarThumbUrl,
                 createdAt = petFromDb.createdAt,
-            );
-            val newPetDto: PetDto = petRepository.editPet(pet, byteArrayImage);
-            val newPet: Pet = newPetDto.toModel();
+            )
+            val newPet: Pet = petRepository.editPet(pet, byteArrayImage)
             emit(Resource.Success(newPet))
             return@flow
         } catch (e: Failure){

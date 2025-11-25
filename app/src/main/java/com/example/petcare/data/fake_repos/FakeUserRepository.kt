@@ -1,31 +1,30 @@
 package com.example.petcare.data.fake_repos
 import com.example.petcare.config.DeveloperSettings
-import com.example.petcare.data.dto.PetDto
-import java.util.UUID
 import com.example.petcare.data.dto.UserDto
+import com.example.petcare.data.mapper.toDomain
+import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.User
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
-import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
 
 class FakeUserRepository @Inject constructor() : IUserRepository {
-        private val users =  mutableListOf<UserDto>();
-        private val passwords = mutableMapOf<String, String>(); // email -> password
+    private val users = mutableListOf<UserDto>()
+    private val passwords = mutableMapOf<String, String>() // email -> password
 
-        init {
-            val testUser = UserDto(
-                id = DeveloperSettings.TEST_USER_ID,
-                email = DeveloperSettings.TEST_USER_EMAIL,
-                displayName = "Test User",
-            );
-            users.add(testUser);
-            passwords[testUser.email] = DeveloperSettings.TEST_USER_PASSWORD;
-        }
+    init {
+        val testUser = UserDto(
+            id = DeveloperSettings.TEST_USER_ID,
+            email = DeveloperSettings.TEST_USER_EMAIL,
+            displayName = "Test User",
+        )
+        users.add(testUser)
+        passwords[testUser.email] = DeveloperSettings.TEST_USER_PASSWORD
+    }
 
-    override suspend fun createUser(user: User, password: String): UserDto {
+    override suspend fun createUser(user: User, password: String): User {
         // --- Symulacja błędów ---
         // Używamy "magicznych" stringów, aby frontend mógł testować scenariusze błędów
         when {
@@ -42,16 +41,16 @@ class FakeUserRepository @Inject constructor() : IUserRepository {
                 throw Failure.UnknownError()
             }
         }
-        val userDto: UserDto = user.toDto();
-        users.add(userDto);
-        passwords[user.email] = password;
-        return userDto;
+        val userDto: UserDto = user.toDto()
+        users.add(userDto)
+        passwords[user.email] = password
+        return userDto.toDomain()
     }
 
     override suspend fun signInWithEmailAndPassword(
         email: String,
         password: String
-    ): UserDto {
+    ): User {
         Timber.d("signInWithEmailAndPassword: $email, $password")
         Timber.d("Stored users: $users")
         val user: UserDto = users.find { it.email == email }
@@ -71,10 +70,11 @@ class FakeUserRepository @Inject constructor() : IUserRepository {
                 throw Failure.UnknownError()
             }
         }
-        return user;
-        }
+        return user.toDomain()
+    }
 
-    override suspend fun getUserById(userId: String) {
-        TODO("Not yet implemented")
+    override suspend fun getUserById(userId: String): User {
+        val user = users.find { it.id == userId }
+        return user?.toDomain() ?: throw AuthFailure.UserNotFound()
     }
 }

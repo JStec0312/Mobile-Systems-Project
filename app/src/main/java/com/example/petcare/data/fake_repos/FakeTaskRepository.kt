@@ -2,6 +2,8 @@ package com.example.petcare.data.fake_repos
 
 import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.data.dto.TaskDto
+import com.example.petcare.data.mapper.toDomain
+import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.Task
 import com.example.petcare.domain.repository.ITaskRepository
 
@@ -21,7 +23,7 @@ class FakeTaskRepository: ITaskRepository {
         tasks.add(task.toDto())
     }
 
-    override fun getTasksByPetId(petId: String): List<TaskDto> {
+    override fun getTasksByPetId(petId: String): List<Task> {
         if (petId == "Network Error") {
             throw com.example.petcare.exceptions.Failure.NetworkError()
         }
@@ -31,8 +33,9 @@ class FakeTaskRepository: ITaskRepository {
         if (petId == "Unknown Error") {
             throw com.example.petcare.exceptions.Failure.UnknownError()
         }
-        return tasks.filter { it.petId == petId }
+        return tasks.filter { it.petId == petId }.map { it.toDomain() }
     }
+
     override fun updateTaskStatus(taskId: String, newStatus: taskStatusEnum){
         if (taskId == "Network Error") {
             throw com.example.petcare.exceptions.Failure.NetworkError()
@@ -44,11 +47,11 @@ class FakeTaskRepository: ITaskRepository {
             throw com.example.petcare.exceptions.Failure.UnknownError()
         }
         val taskIndex = tasks.indexOfFirst { it.id == taskId}
-        tasks[taskIndex].status = newStatus;
+        tasks[taskIndex].status = newStatus
         return
     }
 
-    override fun getTasksByPetIds(petIds: List<String>): List<TaskDto> {
+    override fun getTasksByPetIds(petIds: List<String>): List<Task> {
         if (petIds.contains("Network Error")) {
             throw com.example.petcare.exceptions.Failure.NetworkError()
         }
@@ -58,9 +61,10 @@ class FakeTaskRepository: ITaskRepository {
         if (petIds.contains("Unknown Error")) {
             throw com.example.petcare.exceptions.Failure.UnknownError()
         }
-        return tasks.filter { petIds.contains(it.petId) }}
+        return tasks.filter { petIds.contains(it.petId) }.map { it.toDomain() }
+    }
 
-    override fun getTaskById(taskId: String): TaskDto {
+    override fun getTaskById(taskId: String): Task {
         if (taskId == "Network Error") {
             throw com.example.petcare.exceptions.Failure.NetworkError()
         }
@@ -74,7 +78,7 @@ class FakeTaskRepository: ITaskRepository {
         if (task == null) {
             throw com.example.petcare.exceptions.GeneralFailure.TaskNotFound()
         }
-        return task
+        return task.toDomain()
     }
 }
 

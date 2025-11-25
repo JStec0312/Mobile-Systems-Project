@@ -12,7 +12,7 @@ class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepositor
         TODO("Not yet implemented")
     }
 
-    override fun getTasksByPetId(petId: String): List<TaskDto> {
+    override fun getTasksByPetId(petId: String): List<Task> {
         TODO("Not yet implemented")
     }
 
@@ -23,11 +23,11 @@ class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepositor
         TODO("Not yet implemented")
     }
 
-    override fun getTasksByPetIds(petIds: List<String>): List<TaskDto> {
+    override fun getTasksByPetIds(petIds: List<String>): List<Task> {
         TODO("Not yet implemented")
     }
 
-    override fun getTaskById(taskId: String): TaskDto {
+    override fun getTaskById(taskId: String): Task {
         TODO("Not yet implemented")
     }
 }

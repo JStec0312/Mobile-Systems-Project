@@ -28,8 +28,7 @@ class  GetTasksUseCase @Inject constructor(
                 emit(Resource.Error<List<Task>>("No pet selected"))
                 return@flow
             }
-            val tasksDto = petRepository.getTasksByPetId(petId)
-            val tasks = tasksDto.map{ it.toModel() }
+            val tasks = petRepository.getTasksByPetId(petId)
             emit(Resource.Success<List<Task>>(tasks))
         } catch (e: Failure){
             emit(Resource.Error<List<Task>>("An error occurred: ${e.message}"))

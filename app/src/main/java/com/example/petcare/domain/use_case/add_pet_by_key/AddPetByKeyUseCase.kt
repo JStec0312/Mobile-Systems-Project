@@ -2,7 +2,6 @@ package com.example.petcare.domain.use_case.add_pet_by_key
 
 import com.example.petcare.common.Resource
 import com.example.petcare.common.utils.DateConverter
-import com.example.petcare.data.dto.PetShareCodeDto
 import com.example.petcare.domain.model.PetMember
 import com.example.petcare.domain.model.PetShareCode
 import com.example.petcare.domain.providers.IPetProvider
@@ -33,12 +32,11 @@ class AddPetByKeyUseCase @Inject constructor(
                 emit(Resource.Error("User not logged in"))
                 return@flow
             }
-            val petShareCodeDto: PetShareCodeDto? = petShareCodeRepository.getPetShareCodeByValue(shareCode = petKey);
-            if (petShareCodeDto == null){
+            val petShareCode: PetShareCode? = petShareCodeRepository.getPetShareCodeByValue(shareCode = petKey)
+            if (petShareCode == null){
                 emit(Resource.Error("Invalid pet key"))
                 return@flow
             }
-            val petShareCode = petShareCodeDto.toModel();
 
             if (petShareCode.expiresAt < DateConverter.instantNow()){
                 emit(Resource.Error("Pet key has expired"))

@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class PetShareCodeRepository(db: FirebaseFirestore, auth: FirebaseAuth) : IPetShareCodeRepository {
-    override fun getPetShareCodeByValue(shareCode: String): PetShareCodeDto? {
+    override fun getPetShareCodeByValue(shareCode: String): PetShareCode? {
         TODO("Not yet implemented")
     }
 
@@ -15,7 +15,7 @@ class PetShareCodeRepository(db: FirebaseFirestore, auth: FirebaseAuth) : IPetSh
         TODO("Not yet implemented")
     }
 
-    override suspend fun createPetShareCode(petShareCode: PetShareCode): PetShareCodeDto {
+    override suspend fun createPetShareCode(petShareCode: PetShareCode): PetShareCode {
         TODO("Not yet implemented")
     }
 }

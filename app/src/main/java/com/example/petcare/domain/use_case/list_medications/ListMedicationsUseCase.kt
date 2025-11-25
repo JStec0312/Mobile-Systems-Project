@@ -30,8 +30,7 @@ class ListMedicationsUseCase @Inject constructor(
                 emit(Resource.Error<List<Medication>>("User not logged in"))
                 return@flow
             }
-            val medicationsDto = medicationRepository.listMedicationsForPet(petId)
-            val medications = medicationsDto.map { it.toModel() }
+            val medications = medicationRepository.listMedicationsForPet(petId)
             emit(Resource.Success<List<Medication>>(medications))
         } catch (e: Failure){
             emit(Resource.Error<List<Medication>>(e.message))

@@ -5,14 +5,14 @@ import com.example.petcare.common.speciesEnum
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.config.DeveloperSettings
 import com.example.petcare.data.dto.PetDto
+import com.example.petcare.data.mapper.toDomain
+import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.Pet
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
 import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.datetime.LocalDate
-import timber.log.Timber
-import java.util.UUID
 
 class FakePetRepository : IPetRepository {
     private val pets = mutableListOf<PetDto>();
@@ -46,7 +46,7 @@ class FakePetRepository : IPetRepository {
     override suspend fun createPet(
         pet: Pet,
         avatarByteArray: ByteArray?
-    ): PetDto {
+    ): Pet {
         if (pet.name=="NetworkError"){
             throw Failure.NetworkError()
         }
@@ -56,12 +56,12 @@ class FakePetRepository : IPetRepository {
         if (pet.name=="UnknownError"){
             throw Failure.UnknownError()
         }
-        val petDto:PetDto = pet.toDto();
-        pets.add(petDto);
-        return petDto;
+        val petDto: PetDto = pet.toDto()
+        pets.add(petDto)
+        return petDto.toDomain()
     }
 
-    override suspend fun getPetById(petId: String): PetDto {
+    override suspend fun getPetById(petId: String): Pet {
         val pet = pets.find { it.id == petId }
         if (petId=="NetworkError"){
             throw Failure.NetworkError()
@@ -70,7 +70,7 @@ class FakePetRepository : IPetRepository {
         } else if (petId=="UnknownError"){
             throw Failure.UnknownError()
         }
-        return pet ?: throw GeneralFailure.PetNotFound()
+        return pet?.toDomain() ?: throw GeneralFailure.PetNotFound()
     }
 
     override suspend fun deletePetById(petId: String, userId: String) {
@@ -85,21 +85,21 @@ class FakePetRepository : IPetRepository {
         return
     }
 
-    override suspend fun getPetsByIds(petIds: List<String>): List<PetDto> {
-        return pets.filter { petIds.contains(it.id) }
+    override suspend fun getPetsByIds(petIds: List<String>): List<Pet> {
+        return pets.filter { petIds.contains(it.id) }.map { it.toDomain() }
     }
 
     override suspend fun editPet(
         pet: Pet,
         avatarByteArray: ByteArray?
-    ): PetDto {
-        val petDto: PetDto = pet.toDto();
+    ): Pet {
+        val petDto: PetDto = pet.toDto()
         val index = pets.indexOfFirst { it.id == petDto.id }
         if (index == -1) {
             throw GeneralFailure.PetNotFound()
         } else {
             pets[index] = petDto
-            return petDto
+            return petDto.toDomain()
         }
     }
 

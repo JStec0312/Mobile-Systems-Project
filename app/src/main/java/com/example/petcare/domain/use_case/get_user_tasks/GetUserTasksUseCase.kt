@@ -24,8 +24,7 @@ class GetUserTasksUseCase @Inject constructor(
                 return@flow
             }
             val petIds = memberRepository.getPetIdsByUserId(userId);
-            val tasksDto = taskRepository.getTasksByPetIds(petIds);
-            val tasks = tasksDto.map { it.toModel() };
+            val tasks = taskRepository.getTasksByPetIds(petIds)
             emit(Resource.Success<List<Task>>(tasks))
         } catch (e: Failure){
             emit(Resource.Error<List<Task>>("An error occurred: ${e.message}"))

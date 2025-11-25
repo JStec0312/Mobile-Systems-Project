@@ -31,8 +31,7 @@ class GetTaskByIdUseCase @Inject constructor(
                     emit(Resource.Error("User not logged in"))
                     return@flow
                 }
-                val taskDto = taskRepository.getTaskById(taskId);
-                val task = taskDto.toModel();
+                val task = taskRepository.getTaskById(taskId)
                 emit(Resource.Success(task))
          } catch (e: Failure){
                 emit(Resource.Error(e.message));

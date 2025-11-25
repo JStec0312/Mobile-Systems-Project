@@ -71,7 +71,7 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation(libs.androidx.compose.foundation.layout)
     implementation("androidx.navigation:navigation-compose:2.7.7")
-
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     testImplementation(libs.androidx.room.compiler.processing.testing)
 
@@ -88,4 +88,5 @@ dependencies {
     kaptAndroidTest(libs.hilt.compiler)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
     testImplementation(kotlin("test"))
+
 }

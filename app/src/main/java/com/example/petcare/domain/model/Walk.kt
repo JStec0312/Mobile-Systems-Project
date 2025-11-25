@@ -7,10 +7,11 @@ data class Walk(
     val id: String,
     val petId: String,
     val startedAt: LocalDate,
-    val endedAt: LocalDate,
+    val endedAt: LocalDate?,
     val durationSec: Int?,
     val distanceMeters: Int?,
     val steps: Int?,
+    val pending: Boolean,
     val createdAt: LocalDate
 ) {
     fun toDto(): WalkDto{
@@ -22,6 +23,7 @@ data class Walk(
             durationSec = this.durationSec,
             distanceMeters = this.distanceMeters,
             steps = this.steps,
+            pending = this.pending,
             createdAt = this.createdAt.toString()
         )
     }

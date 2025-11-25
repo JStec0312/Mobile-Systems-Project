@@ -1,5 +1,6 @@
 package com.example.petcare.data.repository
 
+import com.example.petcare.data.dto.MedicationDto
 import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.repository.IMedicationRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -14,7 +15,7 @@ class MedicationRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IMedicat
         TODO("Not yet implemented")
     }
 
-    override fun listMedicationsForPet(petId: String): List<Medication> {
+    override fun listMedicationsForPet(petId: String): List<MedicationDto> {
         TODO("Not yet implemented")
     }
 }

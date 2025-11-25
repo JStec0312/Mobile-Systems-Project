@@ -10,4 +10,7 @@ object Settings {
     val PET_SHARE_CODE_EXP_SECONDS = 15 * 60 // 15 minutes
     const val USER_ID_KEY = "CURRENT_USER_ID"
 
+    const val WALK_TRACK_POINT_INTERVAL_MS = 20000L
 }
+
+

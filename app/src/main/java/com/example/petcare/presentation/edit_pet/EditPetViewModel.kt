@@ -122,7 +122,7 @@ class EditPetViewModel @Inject constructor(
             Timber.d("Editing pet with id: ${_state.value.petId}");
 
             editPetUseCase(
-                pet_id = _state.value.petId,
+                petId = _state.value.petId,
                 ownerUserId = _state.value.ownerUserId,
                 name = _state.value.name,
                 species = _state.value.species,

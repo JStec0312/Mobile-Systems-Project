@@ -22,7 +22,7 @@ class EditPetUseCase @Inject constructor(
     private val petRepository: IPetRepository
 ) {
     operator fun invoke(
-        pet_id: String,
+        petId: String,
         ownerUserId : String,
         name: String?,
         species: speciesEnum?,
@@ -34,18 +34,16 @@ class EditPetUseCase @Inject constructor(
     ): Flow<Resource<Pet>> = flow {
         emit(Resource.Loading())
         try{
-            val petId = pet_id;
+            val petId = petId;
             val userId: String? = userProvider.getUserId();
             if (userId==null){
                 emit(Resource.Error("User not logged in"))
                 return@flow
             }
 
-            Timber.tag("EditPetUseCase").d("Editing pet with ID: $petId, owner id: ${pet.ownerUserId} by user: $userId")
 
-            var petFromDb = petRepository.getPetById(petId).toModel();
+            val petFromDb = petRepository.getPetById(petId).toModel();
             if (petFromDb.ownerUserId!= userId){
-                Timber.tag("EditPetUseCase").d("User id: $userId is not owner of pet with id: $petId, owner id: ${pet.ownerUserId}")
                 emit(Resource.Error("You are not an owner of the pet"))
                 return@flow
             }

@@ -31,7 +31,7 @@ class MyPetsViewModel @Inject constructor(
     init {
         getPets()
     }
-    private fun getPets() {
+    fun getPets() {
 
         getPetsUseCase().onEach { result ->
             when (result) {

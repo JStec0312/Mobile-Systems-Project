@@ -161,7 +161,7 @@ fun AddPetScreen(
                         val selectedMillis = datePickerState.selectedDateMillis
                         if (selectedMillis != null) {
                             val date = Instant.fromEpochMilliseconds(selectedMillis)
-                                .toLocalDateTime(TimeZone.UTC).date
+                                .toLocalDateTime(TimeZone.currentSystemDefault()).date
                             onDateSelected(date)
                         }
                         showDatePicker = false
@@ -482,7 +482,8 @@ fun CreateNewPetContent(
                     readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(PrimaryNotEditable, true),
+                        .menuAnchor()
+                        .clickable{expanded=true},
                     label = {Text("Sex")},
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.secondary,
@@ -562,7 +563,6 @@ fun CreateNewPetContent(
                         )
                     }
                 },
-                enabled = false,
                 singleLine = true
             )
 

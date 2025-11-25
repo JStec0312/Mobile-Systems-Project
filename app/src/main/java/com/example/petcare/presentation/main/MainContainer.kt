@@ -1,6 +1,7 @@
 package com.example.petcare.presentation.main
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +29,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -49,7 +52,12 @@ import com.example.petcare.domain.use_case.logout.LogoutUseCase
 import com.example.petcare.presentation.add_pet.AddPetRoute
 import com.example.petcare.presentation.edit_pet.EditPetRoute
 import com.example.petcare.presentation.my_pets.MyPetsRoute
+import com.example.petcare.presentation.my_pets.MyPetsViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.remember
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +65,7 @@ fun MainContainer(
     viewModel: MainViewModel = hiltViewModel(),
     onNavigateToLogin: () -> Unit
 ) {
-    val navController = rememberNavController()
+    val mainNavController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -68,7 +76,7 @@ fun MainContainer(
         }
     }
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val navBackStackEntry by mainNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     val topBarTitle = when {
@@ -104,7 +112,7 @@ fun MainContainer(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     @Composable
-                    fun DrawerItem(label: String, icon: Int, route: String) {
+                    fun DrawerItem(label: String, icon: Int, route: String, onClickOverride: (() -> Unit)? = null) {
                         NavigationDrawerItem(
                             label = {
                                 Text(
@@ -123,7 +131,10 @@ fun MainContainer(
                             },
                             selected = currentRoute == route,
                             onClick = {
-                                navController.navigate(route)
+                                if(onClickOverride != null) {onClickOverride()}
+                                else {
+                                    mainNavController.navigate(route)
+                                }
                                 scope.launch { drawerState.close() }
                             },
                             colors = NavigationDrawerItemDefaults.colors(
@@ -140,31 +151,16 @@ fun MainContainer(
                     DrawerItem("Settings", R.drawable.settings, "settings")
                     DrawerItem("Help", R.drawable.info, "help")
                     DrawerItem("About", R.drawable.about, "about")
+                    DrawerItem(
+                        label ="Log out",
+                        icon = R.drawable.logout,
+                        route = "logout",
+                        onClickOverride = {viewModel.onLogout()}
+                    )
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            TextButton(
-                                onClick = {viewModel.onLogout()},
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.back),
-                                    contentDescription = "Logout",
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "LOGOUT",
-                                    fontSize = 18.sp,
-                                    color = MaterialTheme.colorScheme.tertiary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Image(
                                 painter = painterResource(id = R.drawable.petcare_logo_purple),
@@ -172,8 +168,7 @@ fun MainContainer(
                                 modifier = Modifier.size(150.dp)
                             )
                         }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                 }
             }
         }
@@ -205,27 +200,41 @@ fun MainContainer(
         ) {
             innerPadding ->
             NavHost(
-                navController = navController,
+                navController = mainNavController,
                 startDestination = "my_pets",
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("my_pets") {
+                    val savedStateHandle = mainNavController.currentBackStackEntry?.savedStateHandle
+                    val shouldRefresh by savedStateHandle?.getLiveData<Boolean>("should_refresh_pets")
+                        ?.observeAsState(initial = false) ?: remember { mutableStateOf(false) }
+                    val myPetsViewModel: MyPetsViewModel = hiltViewModel()
+
+                    LaunchedEffect(shouldRefresh) {
+                        if(shouldRefresh) {
+                            myPetsViewModel.getPets()
+                        }
+                    }
+
                     MyPetsRoute(
                         onNavigateToPetDetails = { petId ->
                             println("Kliknieto szczegoly zwierzaka o ID: $petId")
                         },
                         onNavigateToAddPet = {
-                            navController.navigate("add_pet")
+                            mainNavController.navigate("add_pet")
                         },
                         onNavigateToEditPet = { petId ->
-                            navController.navigate("edit_pet/$petId")
+                            mainNavController.navigate("edit_pet/$petId")
                         }
                     )
                 }
                 composable("add_pet") {
                     AddPetRoute(
                         onNavigationToMyPets = {
-                            navController.popBackStack()
+                            mainNavController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("should_refresh_pets", true)
+                            mainNavController.popBackStack()
                         }
                     )
                 }
@@ -237,7 +246,7 @@ fun MainContainer(
                 ) {
                     EditPetRoute(
                         onNavigateBack = {
-                            navController.popBackStack()
+                            mainNavController.popBackStack()
                         }
                     )
                 }

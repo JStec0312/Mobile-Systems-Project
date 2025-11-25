@@ -41,11 +41,11 @@ class EditPetUseCase @Inject constructor(
                 return@flow
             }
 
-            Timber.tag("EditPetUseCase").d("Editing pet with ID: $petId, owner id: ${pet.ownerUserId} by user: $userId")
+            Timber.tag("EditPetUseCase").d("Editing pet with ID: $petId, owner id: $ownerUserId by user: $userId")
 
             var petFromDb = petRepository.getPetById(petId).toModel();
             if (petFromDb.ownerUserId!= userId){
-                Timber.tag("EditPetUseCase").d("User id: $userId is not owner of pet with id: $petId, owner id: ${pet.ownerUserId}")
+                Timber.tag("EditPetUseCase").d("User id: $userId is not owner of pet with id: $petId, owner id: $ownerUserId")
                 emit(Resource.Error("You are not an owner of the pet"))
                 return@flow
             }

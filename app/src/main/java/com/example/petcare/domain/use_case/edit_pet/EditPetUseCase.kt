@@ -41,17 +41,11 @@ class EditPetUseCase @Inject constructor(
                 return@flow
             }
 
-<<<<<<< HEAD
-=======
             Timber.tag("EditPetUseCase").d("Editing pet with ID: $petId, owner id: $ownerUserId by user: $userId")
->>>>>>> 38077737f14684d97ea28e8437ee23e9b35678d0
 
             val petFromDb = petRepository.getPetById(petId).toModel();
             if (petFromDb.ownerUserId!= userId){
-<<<<<<< HEAD
-=======
                 Timber.tag("EditPetUseCase").d("User id: $userId is not owner of pet with id: $petId, owner id: $ownerUserId")
->>>>>>> 38077737f14684d97ea28e8437ee23e9b35678d0
                 emit(Resource.Error("You are not an owner of the pet"))
                 return@flow
             }

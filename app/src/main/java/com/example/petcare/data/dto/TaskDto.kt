@@ -13,10 +13,11 @@ data class TaskDto(
     val title : String,
     val description : String? = null,
     val notes : String? = null,
-    val status: taskStatusEnum,
+    var status: taskStatusEnum,
     val dueAt : String? = null,
     val priority: taskPriorityEnum? = taskPriorityEnum.normal,
     val createdAt: String? = null,
+    val date : String? = null
 ) {
     fun toModel(): Task{
         return Task(
@@ -27,7 +28,8 @@ data class TaskDto(
             notes = this.notes,
             priority = this.priority,
             status = this.status,
-            createdAt = DateConverter.stringToLocalDate(this.createdAt)
+            createdAt = DateConverter.stringToLocalDate(this.createdAt),
+            date = DateConverter.stringToInstant(this.date)
         )
     }
 }

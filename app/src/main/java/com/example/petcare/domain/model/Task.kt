@@ -4,6 +4,7 @@ import com.example.petcare.common.taskPriorityEnum
 import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.data.dto.TaskDto
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 
 data class Task(
@@ -14,7 +15,8 @@ data class Task(
     val notes: String?,
     val priority: taskPriorityEnum? = taskPriorityEnum.normal,
     var status: taskStatusEnum = taskStatusEnum.planned,
-    val createdAt: LocalDate
+    val createdAt: LocalDate,
+    val date: Instant
 ) {
     fun toDto(): TaskDto{
         return TaskDto(
@@ -25,7 +27,8 @@ data class Task(
             notes = this.notes,
             priority = this.priority,
             status = this.status,
-            createdAt = this.createdAt.toString()
+            createdAt = this.createdAt.toString(),
+            date = this.date.toString()
         )
     }
 }

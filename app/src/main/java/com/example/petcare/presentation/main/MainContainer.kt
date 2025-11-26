@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.petcare.presentation.dashboard.PetDashboardRoute
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +84,7 @@ fun MainContainer(
         currentRoute == "my_pets" -> "MY PETS"
         currentRoute == "add_pet" -> "NEW PET"
         currentRoute?.startsWith("edit_pet") == true  -> "EDIT PET"
+        currentRoute?.startsWith("dashboard") == true -> "DASHBOARD"
         else -> ""
     }
 
@@ -218,7 +220,7 @@ fun MainContainer(
 
                     MyPetsRoute(
                         onNavigateToPetDetails = { petId ->
-                            println("Kliknieto szczegoly zwierzaka o ID: $petId")
+                            mainNavController.navigate("dashboard/$petId")
                         },
                         onNavigateToAddPet = {
                             mainNavController.navigate("add_pet")
@@ -248,6 +250,17 @@ fun MainContainer(
                         onNavigateBack = {
                             mainNavController.popBackStack()
                         }
+                    )
+                }
+                composable(
+                    route = "dashboard/{petId}",
+                    arguments = listOf(navArgument("petId") {type = NavType.StringType})
+                ) {
+                    PetDashboardRoute(
+                        onNavigateToTasks = {},
+                        onNavigateToMedicationHistory = {},
+                        onNavigateToChat = {},
+                        onNavigateToWalk = {}
                     )
                 }
                 composable("dashboard") {

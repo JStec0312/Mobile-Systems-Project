@@ -29,7 +29,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -59,6 +58,9 @@ import com.example.petcare.domain.model.Pet
 import com.example.petcare.domain.model.Task
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaInstant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun PetDashboardRoute(
@@ -187,7 +189,7 @@ fun PetDashboardScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(250.dp)
+                        .height(270.dp)
                         .padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = 0.dp),
                     shape = RoundedCornerShape(
                         topStart = 12.dp,
@@ -213,7 +215,7 @@ fun PetDashboardScreen(
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(8.dp),
+                            contentPadding = PaddingValues(20.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(state.tasks) { task ->
@@ -221,7 +223,8 @@ fun PetDashboardScreen(
                                     title = task.title,
                                     type = task.type ?: taskTypeEnum.other,
                                     status = task.status,
-                                    onCheckClick = { onTaskDone() }
+                                    onCheckClick = { onTaskDone() },
+                                    date = task.date
                                 )
                             }
                         }
@@ -355,16 +358,19 @@ fun TaskItem(
     title: String,
     type: taskTypeEnum,
     status: taskStatusEnum,
+    date: Instant,
     onCheckClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(70.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = if (status == taskStatusEnum.done) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.secondary)
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 10.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -376,16 +382,19 @@ fun TaskItem(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                    .withZone(ZoneId.systemDefault())
+                val timeString = formatter.format(date.toJavaInstant())
+                val typeString = type.name.replaceFirstChar { it.uppercase() }
                 Text(
-                    text = type.toString(),
+                    text = "$timeString - $typeString",
                     color = Color.White,
-                    fontSize = 12.sp
+                    fontSize = 13.sp
                 )
             }
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
                     .clickable { onCheckClick() },
                 contentAlignment = Alignment.Center
@@ -394,14 +403,14 @@ fun TaskItem(
                     Image(
                         painter = painterResource(id = R.drawable.task_done),
                         contentDescription = "Task done",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(70.dp)
                     )
                 }
                 else {
                     Image(
                         painter = painterResource(id = R.drawable.task_notdone),
                         contentDescription = "Task not done",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(70.dp)
                     )
                 }
             }
@@ -435,7 +444,7 @@ fun PetDashboardScreenPreview() {
                 notes = "",
                 priority = taskPriorityEnum.high,
                 createdAt = LocalDate(2024, 1, 1),
-                date = Instant.parse("2025-11-26TO08:00:00Z")
+                date = Instant.parse("2025-11-26T08:00:00Z")
             ),
             Task(
                 id = "2",
@@ -446,7 +455,18 @@ fun PetDashboardScreenPreview() {
                 type = taskTypeEnum.feeding,
                 priority = taskPriorityEnum.normal,
                 createdAt = LocalDate(2024, 1, 1),
-                date = Instant.parse("2025-11-26TO14:30:00Z")
+                date = Instant.parse("2025-11-26T14:30:00Z")
+            ),
+            Task(
+                id = "2",
+                petId = "1",
+                title = "Dinner",
+                status = taskStatusEnum.planned,
+                notes = "No meat",
+                type = taskTypeEnum.feeding,
+                priority = taskPriorityEnum.normal,
+                createdAt = LocalDate(2024, 1, 1),
+                date = Instant.parse("2025-11-26T14:30:00Z")
             )
         )
 

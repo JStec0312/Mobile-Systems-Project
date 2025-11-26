@@ -6,7 +6,7 @@ import com.example.petcare.domain.model.Task
 import com.example.petcare.domain.repository.ITaskRepository
 
 class FakeTaskRepository: ITaskRepository {
-    private val tasks = mutableListOf<Task>()
+    private val tasks = mutableListOf<TaskDto>()
 
     override fun createTask(task: Task) {
         if (task.title == "Network Error") {
@@ -18,7 +18,7 @@ class FakeTaskRepository: ITaskRepository {
         if (task.title == "Unknown Error") {
             throw com.example.petcare.exceptions.Failure.UnknownError()
         }
-        tasks.add(task)
+        tasks.add(task.toDto())
     }
 
     override fun getTasksByPetId(petId: String): List<TaskDto> {
@@ -31,7 +31,7 @@ class FakeTaskRepository: ITaskRepository {
         if (petId == "Unknown Error") {
             throw com.example.petcare.exceptions.Failure.UnknownError()
         }
-        return tasks.filter { it.petId == petId }.map { it.toDto() }
+        return tasks.filter { it.petId == petId }
     }
     override fun updateTaskStatus(taskId: String, newStatus: taskStatusEnum){
         if (taskId == "Network Error") {
@@ -58,7 +58,25 @@ class FakeTaskRepository: ITaskRepository {
         if (petIds.contains("Unknown Error")) {
             throw com.example.petcare.exceptions.Failure.UnknownError()
         }
-        return tasks.filter { petIds.contains(it.petId) }.map { it.toDto() }
-    }
+        return tasks.filter { petIds.contains(it.petId) }}
 
+    override fun getTaskById(taskId: String): TaskDto {
+        if (taskId == "Network Error") {
+            throw com.example.petcare.exceptions.Failure.NetworkError()
+        }
+        if (taskId == "Server Error") {
+            throw com.example.petcare.exceptions.Failure.ServerError()
+        }
+        if (taskId == "Unknown Error") {
+            throw com.example.petcare.exceptions.Failure.UnknownError()
+        }
+        val task = tasks.find { it.id == taskId }
+        if (task == null) {
+            throw com.example.petcare.exceptions.GeneralFailure.TaskNotFound()
+        }
+        return task
+    }
 }
+
+
+

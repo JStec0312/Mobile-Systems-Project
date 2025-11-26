@@ -2,6 +2,7 @@ package com.example.petcare.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.petcare.data.device_api.LocationTracker
 import com.example.petcare.data.fake_repos.FakeMedicationRepository
 import com.example.petcare.data.fake_repos.FakeNotificationRepository
 import com.example.petcare.data.fake_repos.FakePetMemberRepository
@@ -10,6 +11,7 @@ import com.example.petcare.data.fake_repos.FakePetShareCodeRepository
 import com.example.petcare.data.fake_repos.FakeTaskRepository
 import com.example.petcare.data.fake_repos.FakeUserRepository
 import com.example.petcare.data.fake_repos.FakeWalkRepository
+import com.example.petcare.data.fake_repos.FakeWalkTrackPointRepository
 import com.example.petcare.data.repository.PetMemberRepository
 import com.example.petcare.data.repository.WalkRepository
 import dagger.Module
@@ -29,6 +31,10 @@ import com.example.petcare.domain.repository.IPetShareCodeRepository
 import com.example.petcare.domain.repository.ITaskRepository
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.domain.repository.IWalkRepository
+import com.example.petcare.domain.repository.IWalkTrackPointRepository
+import com.example.petcare.service.interfaces.ILocationTracker
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -113,6 +119,13 @@ object RepositoryModule {
         //return PetMemberRepository(db= db, auth= auth);
         return FakePetMemberRepository();
     }
+
+    @Provides
+    @Singleton
+    fun provideWalkTrackPointRepository(): IWalkTrackPointRepository{
+        //return WalkTrackPointRepository();
+        return FakeWalkTrackPointRepository();
+    }
 }
 
 @Module
@@ -155,5 +168,28 @@ object FirebaseModule {;
         val auth = FirebaseAuth.getInstance(app)
 
         return auth
+    }
+}
+@Module
+@InstallIn(SingletonComponent::class) // Dostępne w całej aplikacji
+object LocationModule {
+
+    // 1. Dostarcza klienta Google Maps
+    @Provides
+    @Singleton
+    fun provideFusedLocationProviderClient(
+        @ApplicationContext context: Context
+    ): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    // 2. Wiąże interfejs z implementacją
+    @Provides
+    @Singleton
+    fun provideLocationTracker(
+        client: FusedLocationProviderClient,
+        @ApplicationContext context: Context
+    ): ILocationTracker {
+        return LocationTracker( context, client)
     }
 }

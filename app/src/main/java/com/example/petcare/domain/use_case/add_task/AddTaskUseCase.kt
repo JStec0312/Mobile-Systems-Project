@@ -14,6 +14,7 @@ import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.datetime.Instant
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.datetime.LocalDate
@@ -28,7 +29,8 @@ class AddTaskUseCase @Inject constructor(
         type: taskTypeEnum,
         title: String,
         notes: String,
-        priority: taskPriorityEnum
+        priority: taskPriorityEnum,
+        date: Instant,
     ): Flow<Resource<Task>> = flow {
         emit(Resource.Loading())
         try {
@@ -47,7 +49,8 @@ class AddTaskUseCase @Inject constructor(
                 notes = notes,
                 priority = priority,
                 status = taskStatusEnum.planned,
-                createdAt = DateConverter.localDateNow()
+                createdAt = DateConverter.localDateNow(),
+                date = date
             )
             taskRepository.createTask(task);
             emit(Resource.Success(task))

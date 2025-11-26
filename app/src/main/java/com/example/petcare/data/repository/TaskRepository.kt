@@ -26,4 +26,8 @@ class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepositor
     override fun getTasksByPetIds(petIds: List<String>): List<TaskDto> {
         TODO("Not yet implemented")
     }
+
+    override fun getTaskById(taskId: String): TaskDto {
+        TODO("Not yet implemented")
+    }
 }

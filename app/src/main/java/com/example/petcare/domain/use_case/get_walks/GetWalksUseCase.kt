@@ -41,7 +41,8 @@ class GetWalkUseCase @Inject constructor(
                 distanceMeters = 1500,
                 steps = 2000,
                 createdAt = LocalDate(2024,1,1),
-            )
+                pending = true,
+            );
             val walk2 = Walk(
                 id = UUID.randomUUID().toString(),
                 petId = petId,
@@ -51,6 +52,7 @@ class GetWalkUseCase @Inject constructor(
                 distanceMeters = 2500,
                 steps = 3500,
                 createdAt = LocalDate(2024,1,2),
+                pending = false,
             )
             val walks = listOf(walk1, walk2)
             emit(Resource.Success<List<Walk>>(walks))

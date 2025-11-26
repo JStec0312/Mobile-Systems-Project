@@ -9,7 +9,7 @@ fun NotificationSettingDto.toDomain(): NotificationSettings {
     return NotificationSettings(
         id = this.id,
         userId = this.userId,
-        channel = this.channel,
+        category = this.category,
         createdAt = DateConverter.stringToLocalDate(this.createdAt),
         enabled = this.enabled
     )
@@ -80,7 +80,7 @@ fun NotificationSettings.toDto(): NotificationSettingDto {
     return NotificationSettingDto(
         id = this.id,
         userId = this.userId,
-        channel = this.channel,
+        category = this.category,
         createdAt = this.createdAt.toString(),
         enabled = this.enabled
     )

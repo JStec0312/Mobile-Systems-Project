@@ -53,7 +53,11 @@ import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.presentation.common.BaseScreen
 import com.example.petcare.R
+import com.example.petcare.common.sexEnum
 import com.example.petcare.common.taskPriorityEnum
+import com.example.petcare.domain.model.Pet
+import com.example.petcare.domain.model.Task
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun PetDashboardRoute(
@@ -408,20 +412,20 @@ fun TaskItem(
 @Composable
 fun PetDashboardScreenPreview() {
     PetCareTheme {
-        val samplePet = com.example.petcare.domain.model.Pet(
+        val samplePet = Pet(
             id = "1",
             ownerUserId = "user1",
             name = "Aslan",
             species = speciesEnum.dog,
             breed = "Golden Retriever",
-            sex = com.example.petcare.common.sexEnum.male,
-            birthDate = kotlinx.datetime.LocalDate(2021, 5, 20),
+            sex = sexEnum.male,
+            birthDate = LocalDate(2021, 5, 20),
             avatarThumbUrl = null,
-            createdAt = kotlinx.datetime.LocalDate(2024, 1, 1)
+            createdAt = LocalDate(2024, 1, 1)
         )
 
         val sampleTasks = listOf(
-            com.example.petcare.domain.model.Task(
+            Task(
                 id = "1",
                 petId = "1",
                 title = "Morning Walk",
@@ -429,9 +433,10 @@ fun PetDashboardScreenPreview() {
                 type = taskTypeEnum.walk,
                 notes = "",
                 priority = taskPriorityEnum.high,
-                createdAt = kotlinx.datetime.LocalDate(2024, 1, 1)
+                createdAt = LocalDate(2024, 1, 1),
+                date = TODO()
             ),
-            com.example.petcare.domain.model.Task(
+            Task(
                 id = "2",
                 petId = "1",
                 title = "Dinner",
@@ -439,7 +444,8 @@ fun PetDashboardScreenPreview() {
                 notes = "No meat",
                 type = taskTypeEnum.feeding,
                 priority = taskPriorityEnum.normal,
-                createdAt = kotlinx.datetime.LocalDate(2024, 1, 1)
+                createdAt = LocalDate(2024, 1, 1),
+                date = TODO()
             )
         )
 
@@ -462,16 +468,16 @@ fun PetDashboardScreenPreview() {
 @Composable
 fun PetDashboardScreenPreview2() {
     PetCareTheme {
-        val samplePet = com.example.petcare.domain.model.Pet(
+        val samplePet = Pet(
             id = "1",
             ownerUserId = "user1",
             name = "Aslan",
             species = speciesEnum.dog,
             breed = "Golden Retriever",
-            sex = com.example.petcare.common.sexEnum.male,
-            birthDate = kotlinx.datetime.LocalDate(2021, 5, 20),
+            sex = sexEnum.male,
+            birthDate = LocalDate(2021, 5, 20),
             avatarThumbUrl = null,
-            createdAt = kotlinx.datetime.LocalDate(2024, 1, 1)
+            createdAt = LocalDate(2024, 1, 1)
         )
 
         PetDashboardScreen(

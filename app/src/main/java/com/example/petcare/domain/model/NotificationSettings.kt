@@ -1,12 +1,12 @@
 package com.example.petcare.domain.model
 
-import com.example.petcare.common.notificationChannelEnum
+import com.example.petcare.common.notificationCategoryEnum
 import kotlinx.datetime.LocalDate
 
 data class NotificationSettings(
     val id: String,
     val userId: String,
-    val channel: notificationChannelEnum,
+    val category: notificationCategoryEnum,
     val createdAt: LocalDate,
     val enabled: Boolean,
 )

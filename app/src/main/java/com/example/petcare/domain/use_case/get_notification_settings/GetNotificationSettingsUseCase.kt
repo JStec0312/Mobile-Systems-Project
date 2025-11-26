@@ -1,7 +1,6 @@
 package com.example.petcare.domain.use_case.get_notification_settings
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.model.NotificationSettings
-import com.example.petcare.common.notificationChannelEnum
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.INotificationSettingsRepository
@@ -23,31 +22,7 @@ class GetNotificationSettingsUseCase @Inject constructor(
         delayMs: Long = 600, //@NOTE Simulated delay
         shouldFail : Boolean = false, //@NOTE Simulated failure
     ): Flow<Resource<List<NotificationSettings>>> = flow {
-        emit(Resource.Loading<List<NotificationSettings>>())
-        delay(delayMs)
-        if (shouldFail){
-            emit(Resource.Error("Failed to get notification settings"))
-
-        } else{
-            val example_settings = ArrayList<NotificationSettings>()
-            val setting1 = NotificationSettings(
-                id = UUID.randomUUID().toString(),
-                userId = userProvider.getUserId() ?: "",
-                channel = notificationChannelEnum.meds,
-                createdAt = LocalDate(1970, 1, 1),
-                enabled = true,
-            )
-            val setting2 = NotificationSettings(
-                id = UUID.randomUUID().toString(),
-                userId = userProvider.getUserId() ?: "",
-                channel = notificationChannelEnum.tasks,
-                createdAt = LocalDate(1970, 1, 1),
-                enabled = false,
-            )
-            example_settings.add(setting1)
-            example_settings.add(setting2)
-
-            emit(Resource.Success<List<NotificationSettings>>(example_settings))
-        }
+        emit(Resource.Error("Not implemented"))
+        return@flow
     }
 }

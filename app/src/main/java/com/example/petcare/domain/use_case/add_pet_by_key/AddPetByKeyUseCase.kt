@@ -2,6 +2,7 @@ package com.example.petcare.domain.use_case.add_pet_by_key
 
 import com.example.petcare.common.Resource
 import com.example.petcare.common.utils.DateConverter
+import com.example.petcare.data.dto.PetShareCodeDto
 import com.example.petcare.domain.model.PetMember
 import com.example.petcare.domain.model.PetShareCode
 import com.example.petcare.domain.providers.IPetProvider

@@ -57,6 +57,7 @@ import com.example.petcare.common.sexEnum
 import com.example.petcare.common.taskPriorityEnum
 import com.example.petcare.domain.model.Pet
 import com.example.petcare.domain.model.Task
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 
 @Composable
@@ -434,7 +435,7 @@ fun PetDashboardScreenPreview() {
                 notes = "",
                 priority = taskPriorityEnum.high,
                 createdAt = LocalDate(2024, 1, 1),
-                date = TODO()
+                date = Instant.parse("2025-11-26TO08:00:00Z")
             ),
             Task(
                 id = "2",
@@ -445,7 +446,7 @@ fun PetDashboardScreenPreview() {
                 type = taskTypeEnum.feeding,
                 priority = taskPriorityEnum.normal,
                 createdAt = LocalDate(2024, 1, 1),
-                date = TODO()
+                date = Instant.parse("2025-11-26TO14:30:00Z")
             )
         )
 

@@ -58,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.petcare.presentation.dashboard.PetDashboardRoute
+import com.example.petcare.presentation.walk.WalkRoute
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,6 +86,7 @@ fun MainContainer(
         currentRoute == "add_pet" -> "NEW PET"
         currentRoute?.startsWith("edit_pet") == true  -> "EDIT PET"
         currentRoute?.startsWith("dashboard") == true -> "DASHBOARD"
+        currentRoute == "walk" -> "WALK TRACKER"
         else -> ""
     }
 
@@ -260,7 +262,17 @@ fun MainContainer(
                         onNavigateToTasks = {},
                         onNavigateToMedicationHistory = {},
                         onNavigateToChat = {},
-                        onNavigateToWalk = {}
+                        onNavigateToWalk = {
+                            mainNavController.navigate("walk")
+                        }
+                    )
+                }
+                composable("walk") {
+                    WalkRoute(
+                        onNavigateToStats = { },
+                        onStopClick = {
+                            mainNavController.popBackStack()
+                        }
                     )
                 }
                 composable("dashboard") {

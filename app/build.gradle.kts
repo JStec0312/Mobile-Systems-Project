@@ -18,6 +18,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "com.example.petcare.HiltTestRunner"
+        val mapsApiKey = project.findProperty("MAPS_API_KEY") as String? ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -74,6 +76,9 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
 
     testImplementation(libs.androidx.room.compiler.processing.testing)
 

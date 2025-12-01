@@ -26,7 +26,7 @@ class GetTaskByIdUseCase @Inject constructor(
     ): Flow<Resource<Task>> = flow {
        emit(Resource.Loading())
          try {
-             val userId: String? = userProvider.getUserId();
+             val userId: String? = userProvider.getUserId()
                 if (userId==null){
                     emit(Resource.Error("User not logged in"))
                     return@flow

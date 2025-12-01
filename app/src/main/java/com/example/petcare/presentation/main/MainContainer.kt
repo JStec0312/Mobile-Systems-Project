@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.petcare.presentation.all_tasks.AllTasksRoute
 import com.example.petcare.presentation.dashboard.PetDashboardRoute
 import com.example.petcare.presentation.walk.WalkRoute
 
@@ -87,6 +88,7 @@ fun MainContainer(
         currentRoute?.startsWith("edit_pet") == true  -> "EDIT PET"
         currentRoute?.startsWith("dashboard") == true -> "DASHBOARD"
         currentRoute == "walk" -> "WALK TRACKER"
+        currentRoute == "all_tasks" -> "TASKS"
         else -> ""
     }
 
@@ -259,7 +261,9 @@ fun MainContainer(
                     arguments = listOf(navArgument("petId") {type = NavType.StringType})
                 ) {
                     PetDashboardRoute(
-                        onNavigateToTasks = {},
+                        onNavigateToTasks = {
+                            mainNavController.navigate("all_tasks")
+                        },
                         onNavigateToMedicationHistory = {},
                         onNavigateToChat = {},
                         onNavigateToWalk = {
@@ -272,6 +276,13 @@ fun MainContainer(
                         onNavigateToStats = { },
                         onStopClick = {
                             mainNavController.popBackStack()
+                        }
+                    )
+                }
+                composable("all_tasks") {
+                    AllTasksRoute(
+                        onAddTaskClick = {
+                            //tu kiedys add task
                         }
                     )
                 }

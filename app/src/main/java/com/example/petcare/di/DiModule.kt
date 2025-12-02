@@ -1,7 +1,23 @@
 package com.example.petcare.di
 
 import android.content.Context
+<<<<<<< Updated upstream
 import com.example.petcare.data.repository.UserRepository
+=======
+import android.content.SharedPreferences
+import com.example.petcare.data.fake_repos.FakeMedicationRepository
+import com.example.petcare.data.fake_repos.FakeNotificationRepository
+import com.example.petcare.data.fake_repos.FakePetMemberRepository
+import com.example.petcare.data.fake_repos.FakePetRepository
+import com.example.petcare.data.fake_repos.FakePetShareCodeRepository
+import com.example.petcare.data.fake_repos.FakeTaskRepository
+import com.example.petcare.data.fake_repos.FakeUserRepository
+import com.example.petcare.data.fake_repos.FakeWalkRepository
+import com.example.petcare.data.fake_repos.FakeWalkTrackPointRepository
+import com.example.petcare.data.repository.PetMemberRepository
+import com.example.petcare.data.repository.WalkRepository
+import com.example.petcare.domain.device_api.IWalkTracker
+>>>>>>> Stashed changes
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,11 +28,19 @@ import com.example.petcare.domain.providers.implementation.UserProvider
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.implementation.PetProvider
 import com.example.petcare.domain.repository.IUserRepository
+<<<<<<< Updated upstream
+=======
+import com.example.petcare.domain.repository.IWalkRepository
+import com.example.petcare.domain.repository.IWalkTrackPointRepository
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+>>>>>>> Stashed changes
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import dagger.Binds
 
 import dagger.hilt.android.qualifiers.ApplicationContext
 
@@ -85,4 +109,17 @@ object FirebaseModule {;
 
         return auth
     }
+<<<<<<< Updated upstream
+=======
+}
+@Module
+@InstallIn(SingletonComponent::class) // Dostępne w całej aplikacji
+object LocationModule {
+    @Provides
+    @Singleton
+    fun provideLocationTracker(@ApplicationContext ctx: Context) : IWalkTracker{
+        return com.example.petcare.data.device_api_impl.WalkTracker(ctx);
+    }
+
+>>>>>>> Stashed changes
 }

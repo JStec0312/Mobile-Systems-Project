@@ -8,7 +8,11 @@ import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
+<<<<<<< Updated upstream
 import kotlinx.datetime.Instant
+=======
+import kotlinx.datetime.LocalDate
+>>>>>>> Stashed changes
 import javax.inject.Inject
 
 
@@ -29,22 +33,40 @@ class GetWalkUseCase @Inject constructor(
 
         } else {
             val walk1 = Walk(
+<<<<<<< Updated upstream
                 id = UUID.randomUUID(),
                 pet_id = petProvider.getCurrentPetId(),
                 started_at = Instant.parse("2024-01-01T10:00:00Z"),
                 ended_at = Instant.parse("2024-01-01T10:30:00Z"),
                 duration_sec = 1800,
                 distance_meters = 1500,
+=======
+                id = UUID.randomUUID().toString(),
+                petId = petId,
+                startedAt = Clock.System.now(),
+                endedAt = LocalDate(2024, 1,1),
+                durationSec = 1800,
+                distanceMeters = 1500,
+>>>>>>> Stashed changes
                 steps = 2000,
                 createdAt = Clock.System.now(),
             )
             val walk2 = Walk(
+<<<<<<< Updated upstream
                 id = UUID.randomUUID(),
                 pet_id = petProvider.getCurrentPetId(),
                 started_at = Instant.parse("2024-01-02T11:00:00Z"),
                 ended_at = Instant.parse("2024-01-02T11:45:00Z"),
                 duration_sec = 2700,
                 distance_meters = 2500,
+=======
+                id = UUID.randomUUID().toString(),
+                petId = petId,
+                startedAt = Clock.System.now(),
+                endedAt = LocalDate(2024, 1,2),
+                durationSec = 2700,
+                distanceMeters = 2500,
+>>>>>>> Stashed changes
                 steps = 3500,
                 createdAt = Clock.System.now(),
             )

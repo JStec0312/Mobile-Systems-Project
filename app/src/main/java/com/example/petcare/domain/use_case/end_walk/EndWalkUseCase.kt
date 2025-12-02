@@ -5,7 +5,6 @@ import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IWalkRepository
 import kotlinx.coroutines.delay
-import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
@@ -17,10 +16,10 @@ class EndWalkUseCase @Inject constructor(
     private val walkRepository: IWalkRepository
 ){
     operator fun invoke(
-        walkId: UUID,
+        walkId: String,
         endTime: Long = Clock.System.now().toEpochMilliseconds(),
         delayMs: Long = 600, //@NOTE Simulated delay
-        shouldFail : Boolean = false, //@NOTE Simulated failure
+        shouldFail: Boolean = false, //@NOTE Simulated failure
     ): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading<Unit>())
         delay(delayMs)

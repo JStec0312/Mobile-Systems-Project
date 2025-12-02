@@ -1,9 +1,13 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     id("com.google.gms.google-services") version "4.4.4" apply false
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
     kotlin("kapt")
 }
 
@@ -18,6 +22,20 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "com.example.petcare.HiltTestRunner"
+<<<<<<< Updated upstream
+=======
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+
+        // 2. Pobieramy klucz (lub pusty ciąg, jeśli brak)
+        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
+
+        // 3. Wstrzykujemy go do Manifestu jako placeholder
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+>>>>>>> Stashed changes
     }
 
     buildTypes {
@@ -53,7 +71,13 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
+<<<<<<< Updated upstream
 
+=======
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.5")
+    implementation("androidx.lifecycle:lifecycle-service:2.10.0")
+>>>>>>> Stashed changes
 
 
     //

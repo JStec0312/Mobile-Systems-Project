@@ -7,5 +7,8 @@ data class WalkTrackPointDto(
     val ts: Timestamp,
     val lat: Double,
     val lon: Double,
+<<<<<<< Updated upstream
     val altitude: Double? = null
+=======
+>>>>>>> Stashed changes
 )

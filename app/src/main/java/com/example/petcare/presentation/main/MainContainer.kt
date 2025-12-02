@@ -60,6 +60,8 @@ import androidx.navigation.NavHostController
 import com.example.petcare.presentation.all_tasks.AllTasksRoute
 import com.example.petcare.presentation.dashboard.PetDashboardRoute
 import com.example.petcare.presentation.walk.WalkRoute
+import com.example.petcare.presentation.help.HelpScreen
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,6 +91,7 @@ fun MainContainer(
         currentRoute?.startsWith("dashboard") == true -> "DASHBOARD"
         currentRoute == "walk" -> "WALK TRACKER"
         currentRoute == "all_tasks" -> "TASKS"
+        currentRoute == "help" -> "HELP"
         else -> ""
     }
 
@@ -288,6 +291,9 @@ fun MainContainer(
                 }
                 composable("dashboard") {
                     Text("DASHBOARD")
+                }
+                composable("help") {
+                    HelpScreen()
                 }
             }
         }

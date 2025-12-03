@@ -61,6 +61,7 @@ import com.example.petcare.presentation.all_tasks.AllTasksRoute
 import com.example.petcare.presentation.dashboard.PetDashboardRoute
 import com.example.petcare.presentation.walk.WalkRoute
 import com.example.petcare.presentation.help.HelpScreen
+import com.example.petcare.presentation.about.AboutScreen
 
 
 
@@ -92,6 +93,7 @@ fun MainContainer(
         currentRoute == "walk" -> "WALK TRACKER"
         currentRoute == "all_tasks" -> "TASKS"
         currentRoute == "help" -> "HELP"
+        currentRoute == "about" -> "ABOUT"
         else -> ""
     }
 
@@ -295,6 +297,10 @@ fun MainContainer(
                 composable("help") {
                     HelpScreen()
                 }
+                composable("about") {
+                    AboutScreen()
+                }
+
             }
         }
     }

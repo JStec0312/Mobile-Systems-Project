@@ -181,7 +181,6 @@ fun WalkTrackPointDto.toDomain(): WalkTrackPoint {
         ts = this.ts,
         lat = this.lat,
         lon = this.lon,
-        altitude = this.altitude
     )
 }
 
@@ -192,7 +191,6 @@ fun WalkTrackPoint.toDto(): WalkTrackPointDto {
         ts = this.ts,
         lat = this.lat,
         lon = this.lon,
-        altitude = this.altitude
     )
 }
 

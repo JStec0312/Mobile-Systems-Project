@@ -1,7 +1,11 @@
 package com.example.petcare.domain.repository
 
 import com.example.petcare.domain.model.WalkTrackPoint
+import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 interface IWalkTrackPointRepository {
-    fun addWalkTrackPoint(walkTrackPoint: WalkTrackPoint)
+    suspend fun addWalkTrackPoint(walkTrackPoint: WalkTrackPoint)
+    fun observeWalkPoints(walkId: String): Flow<List<WalkTrackPoint>>
+
 }

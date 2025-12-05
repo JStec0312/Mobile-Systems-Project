@@ -6,4 +6,7 @@ sealed class GeneralFailure(override val message: String) : Failure(message) {
     class MedicationNotFound(msg: String? = "Medication not found") : GeneralFailure(msg!!)
 
     class TaskNotFound(msg: String? = "Task not found") : GeneralFailure(msg!!)
+    class WalkNotFound(msg: String? = "Walk not found") : GeneralFailure(msg!!)
+
+    class WalkAlreadyEnded(msg: String? = "Walk has already been ended") : GeneralFailure(msg!!)
 }

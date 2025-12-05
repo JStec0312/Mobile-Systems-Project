@@ -3,6 +3,8 @@ import com.example.petcare.common.Resource
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IWalkRepository
+import com.example.petcare.exceptions.Failure
+import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -16,18 +18,22 @@ class EndWalkUseCase @Inject constructor(
     private val walkRepository: IWalkRepository
 ){
     operator fun invoke(
-        walkId: UUID,
-        endTime: Long = Clock.System.now().toEpochMilliseconds(),
-        delayMs: Long = 600, //@NOTE Simulated delay
-        shouldFail : Boolean = false, //@NOTE Simulated failure
+        walkId: String,
+        totalDistanceMeters: Float,
+        totalSteps: Int,
     ): Flow<Resource<Unit>> = flow {
-        emit(Resource.Loading<Unit>())
-        delay(delayMs)
-        if (shouldFail){
-            emit(Resource.Error<Unit>("Failed to end walk"))
-
-        } else{
-            emit(Resource.Success<Unit>(Unit))
+        emit(Resource.Loading())
+        try{
+            walkRepository.setWalkAsEnded(
+                walkId = walkId,
+                totalDistanceMeters = totalDistanceMeters,
+                totalSteps = totalSteps,
+                endTime = Clock.System.now()
+            )
+        } catch (e: Failure){
+            emit(Resource.Error(e.message))
+        } catch(e: GeneralFailure){
+            emit(Resource.Error(e.message))
         }
     }
 }

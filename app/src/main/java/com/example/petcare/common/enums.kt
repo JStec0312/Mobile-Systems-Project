@@ -6,5 +6,5 @@ enum class taskTypeEnum { walk, training, grooming, vaccination, deworming, feed
 enum class taskStatusEnum { planned, done, skipped, cancelled }
 enum class taskPriorityEnum { low, normal, high }
 enum class notificationCategoryEnum{ tasks, meds, general }
-
+enum class medicationStatusEnum { planned, taken, cancelled }
 enum class frequencyEnum { daily, weekly, monthly, custom }

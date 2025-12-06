@@ -1,12 +1,14 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
-    id("com.google.gms.google-services") version "4.4.4" apply false
+    id("com.google.gms.google-services") version "4.4.4" apply true
     kotlin("kapt")
 }
-
 android {
     namespace = "com.example.petcare"
     compileSdk = 36
@@ -18,8 +20,19 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "com.example.petcare.HiltTestRunner"
-        val mapsApiKey = project.findProperty("MAPS_API_KEY") as String? ?: ""
-        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey;
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        buildFeatures{
+            compose = true
+            buildConfig = true
+        }
+
     }
 
     buildTypes {
@@ -40,9 +53,7 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures {
-        compose = true
-    }
+
 }
 
 configurations.matching { it.name.endsWith("RuntimeClasspath") }.configureEach {
@@ -52,6 +63,7 @@ configurations.matching { it.name.endsWith("RuntimeClasspath") }.configureEach {
 
 dependencies {
     //firebase
+    implementation("org.dmfs:lib-recur:0.17.1")
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")

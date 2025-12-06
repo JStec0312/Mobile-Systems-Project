@@ -71,7 +71,9 @@ fun MedicationDto.toDomain(): Medication {
         active = this.active,
         createdAt = DateConverter.stringToLocalDate(this.createdAt),
         from = DateConverter.stringToLocalDate(this.from),
-        to = DateConverter.stringToLocalDate(this.to)
+        to = DateConverter.stringToLocalDate(this.to),
+        reccurenceString = this.reccurenceString,
+        times = this.times.map { it ->  DateConverter.stringToLocalTime(it)}
     )
 }
 
@@ -82,7 +84,7 @@ fun NotificationSettings.toDto(): NotificationSettingDto {
         userId = this.userId,
         category = this.category,
         createdAt = this.createdAt.toString(),
-        enabled = this.enabled
+        enabled = this.enabled,
     )
 }
 
@@ -142,7 +144,9 @@ fun Medication.toDto(): MedicationDto {
         active = this.active,
         createdAt = DateConverter.localDateToString(this.createdAt),
         from = DateConverter.localDateToString(this.from),
-        to = DateConverter.localDateToString(this.to)
+        to = DateConverter.localDateToString(this.to),
+        reccurenceString = this.reccurenceString,
+        times = this.times.map { it.toString() }
     )
 }
 
@@ -214,31 +218,8 @@ fun PetShareCode.toDto(): PetShareCodeDto {
     )
 }
 
-fun MedicationScheduleDto.toDomain(): MedicationSchedule {
-    return MedicationSchedule(
-        medicationId = this.medicationId,
-        startDate = DateConverter.stringToLocalDate(this.startDate),
-        endDate = DateConverter.stringToLocalDate(this.endDate),
-        freq = this.freq,
-        interval = this.interval,
-        byWeekday = this.byWeekday,
-        byMonthDay = this.byMonthDay,
-        rruleText = this.rruleText
-    )
-}
 
-fun MedicationSchedule.toDto(): MedicationScheduleDto {
-    return MedicationScheduleDto(
-        medicationId = this.medicationId,
-        startDate = DateConverter.localDateToString(this.startDate),
-        endDate = DateConverter.localDateToString(this.endDate),
-        freq = this.freq,
-        interval = this.interval,
-        byWeekday = this.byWeekday,
-        byMonthDay = this.byMonthDay,
-        rruleText = this.rruleText
-    )
-}
+
 
 fun MedicationEventDto.toDomain(): MedicationEvent {
     return MedicationEvent(
@@ -246,7 +227,8 @@ fun MedicationEventDto.toDomain(): MedicationEvent {
         medicationId = this.medicationId,
         takenAt = DateConverter.stringToLocalDate(this.takenAt),
         status = this.status,
-        notes = this.notes
+        notes = this.notes,
+        scheduledAt = DateConverter.stringToLocalDate(this.scheduledAt!!),
     )
 }
 
@@ -256,7 +238,8 @@ fun MedicationEvent.toDto(): MedicationEventDto {
         medicationId = this.medicationId,
         takenAt = this.takenAt.toString(),
         status = this.status,
-        notes = this.notes
+        notes = this.notes,
+        scheduledAt = this.scheduledAt.toString(),
     )
 }
 

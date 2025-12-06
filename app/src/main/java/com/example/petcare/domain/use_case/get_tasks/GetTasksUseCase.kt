@@ -24,6 +24,7 @@ class  GetTasksUseCase @Inject constructor(
         emit(Resource.Loading<List<Task>>())
         try{
             val petId = petProvider.getCurrentPetId()
+
             if (petId==null){
                 emit(Resource.Error<List<Task>>("No pet selected"))
                 return@flow

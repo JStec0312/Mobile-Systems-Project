@@ -6,7 +6,7 @@ import com.example.petcare.exceptions.GeneralFailure
 
 interface ITaskRepository {
     @Throws (Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
-    fun createTask(task: Task)
+    fun createTask(task: Task, rrule: String?)
 
     @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
     fun getTasksByPetId(petId: String): List<Task>
@@ -19,4 +19,6 @@ interface ITaskRepository {
 
     @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class, GeneralFailure.TaskNotFound::class)
     fun getTaskById(taskId: String): Task
+
+    fun deleteTaskById(task: Task, deleteWholeSeries: Boolean);
 }

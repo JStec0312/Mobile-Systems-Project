@@ -8,6 +8,7 @@ import kotlinx.datetime.LocalDate
 
 data class Task(
     val id: String,
+    val seriesId : String? = null,
     val petId: String,
     val type: taskTypeEnum?,
     val title: String,

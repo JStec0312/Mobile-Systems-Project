@@ -9,4 +9,5 @@ sealed class GeneralFailure(override val message: String) : Failure(message) {
     class WalkNotFound(msg: String? = "Walk not found") : GeneralFailure(msg!!)
 
     class WalkAlreadyEnded(msg: String? = "Walk has already been ended") : GeneralFailure(msg!!)
+    class InvalidIntervalPassed(msg: String? = "Invalid interval passed") : GeneralFailure(msg!!)
 }

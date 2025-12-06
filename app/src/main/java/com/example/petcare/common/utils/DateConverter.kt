@@ -1,5 +1,6 @@
 package com.example.petcare.common.utils
 
+import android.R
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.petcare.config.Settings
@@ -9,6 +10,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import java.time.LocalTime
 
 object DateConverter {
 
@@ -40,6 +42,9 @@ object DateConverter {
         } catch (e: IllegalArgumentException) {
             Instant.DISTANT_PAST
         }
+    }
+    fun stringToLocalTime(timeStr: String): kotlinx.datetime.LocalTime {
+        return kotlinx.datetime.LocalTime.parse(timeStr)
     }
 
 }

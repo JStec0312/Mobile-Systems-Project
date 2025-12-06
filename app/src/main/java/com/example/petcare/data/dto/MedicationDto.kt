@@ -11,4 +11,6 @@ data class MedicationDto(
     val createdAt: String,
     val from: String,
     val to: String,
+    val reccurenceString: String,
+    val times: List<String>
 )

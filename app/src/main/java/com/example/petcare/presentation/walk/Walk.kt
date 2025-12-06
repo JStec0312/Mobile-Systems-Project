@@ -20,10 +20,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,18 +39,16 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.petcare.presentation.common.BaseScreen
-import com.example.petcare.presentation.theme.PetCareTheme
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
-import java.util.jar.Manifest
 
 @Composable
 fun WalkRoute(
@@ -61,6 +59,12 @@ fun WalkRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    // 1. Klient do pobrania pozycji startowej (tylko dla UI mapy, żeby nie startować w Warszawie)
+    val fusedLocationClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    // 2. Stan uprawnień
     var hasLocationPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -70,36 +74,64 @@ fun WalkRoute(
         )
     }
 
-    var permissionLauncher = rememberLauncherForActivityResult(
+    val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             hasLocationPermission = isGranted
         }
     )
 
+    // 3. Konfiguracja kamery
+    val defaultLocation = LatLng(52.2297, 21.0122) // Domyślnie Wwa (fallback)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(defaultLocation, 15f)
+    }
+
+    // 4. Launcher uprawnień - pytamy na starcie
     LaunchedEffect(Unit) {
         if(!hasLocationPermission) {
             permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    val defaultLocation = LatLng(52.2297, 21.0122)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultLocation, 15f)
+    // 5. Logic Start: Gdy mamy uprawnienia -> Startujemy serwis ORAZ ustawiamy kamerę na usera
+    LaunchedEffect(hasLocationPermission) {
+        if (hasLocationPermission) {
+            // A. Powiadom ViewModel żeby odpalił serwis
+            viewModel.onPermissionGranted()
+
+            // B. Pobierz ostatnią lokalizację i przesuń mapę (naprawa problemu Warszawy)
+            try {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        val userLatLng = LatLng(location.latitude, location.longitude)
+                        // Przesuwamy kamerę bez animacji na start
+                        cameraPositionState.position = CameraPosition.fromLatLngZoom(userLatLng, 17f)
+                    }
+                }
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
+        }
     }
 
+    // 6. Śledzenie trasy (gdy już idziesz i przybywają nowe punkty z serwisu)
     LaunchedEffect(state.routePoints) {
         if(state.routePoints.isNotEmpty()) {
             cameraPositionState.animate(
                 update = CameraUpdateFactory.newLatLngZoom(state.routePoints.last(), 17f)
             )
-
         }
     }
+
+    // Wywołanie ekranu
     WalkScreen(
         state = state.copy(isLocationEnabled = hasLocationPermission),
         cameraPositionState = cameraPositionState,
-        onStopClick = {onStopClick()},
+        onStopClick = {
+            viewModel.onStopClick() // Stop logiczny
+            onStopClick() // Nawigacja
+        },
         onStatsClick = onNavigateToStats
     )
 }
@@ -111,7 +143,11 @@ fun WalkScreen(
     onStopClick: () -> Unit,
     onStatsClick: () -> Unit,
 ) {
-    BaseScreen {
+    // Zastąpiono BaseScreen zwykłym Surface
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -250,10 +286,11 @@ fun StatCard(
 @Preview
 @Composable
 fun WalkScreenPreview() {
-    PetCareTheme {
+    // Zastąpiono PetCareTheme standardowym MaterialTheme
+    MaterialTheme {
         val warsaw = LatLng(52.2297, 21.0122)
-        val cameraState = com.google.maps.android.compose.rememberCameraPositionState {
-            position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(warsaw, 15f)
+        val cameraState = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(warsaw, 15f)
         }
         val mockRoute = listOf(
             LatLng(52.2297, 21.0122),

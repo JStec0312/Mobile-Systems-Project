@@ -8,8 +8,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepository {
-    override fun createTask(task: Task) {
-        TODO("Not yet implemented")
+    override fun createTask(task: Task, rrule: String?) {
+
     }
 
     override fun getTasksByPetId(petId: String): List<Task> {
@@ -30,4 +30,13 @@ class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepositor
     override fun getTaskById(taskId: String): Task {
         TODO("Not yet implemented")
     }
+
+    override fun deleteTaskById(
+        task: Task,
+        deleteWholeSeries: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
+
+
 }

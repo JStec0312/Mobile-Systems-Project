@@ -4,9 +4,21 @@ import com.example.petcare.domain.model.Walk
 import com.example.petcare.domain.repository.IWalkRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.datetime.Instant
 
 class WalkRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IWalkRepository{
     override fun createWalk(walk: Walk) {
         TODO("Not yet implemented")
     }
+
+    override fun setWalkAsEnded(
+        walkId: String,
+        totalDistanceMeters: Float,
+        totalSteps: Int,
+        endTime: Instant
+    ) {
+        TODO("Not yet implemented")
+    }
+
+
 }

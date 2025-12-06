@@ -25,24 +25,33 @@ class AddTaskUseCase @Inject constructor(
     private val petProvider: IPetProvider
 ) {
     operator fun invoke(
-        petId: String,
         type: taskTypeEnum,
         title: String,
         notes: String,
         priority: taskPriorityEnum,
         date: Instant,
+        rrule: String?,
     ): Flow<Resource<Task>> = flow {
         emit(Resource.Loading())
         try {
+            val petId = petProvider.getCurrentPetId()
+            if (petId == null) {
+                emit(Resource.Error("No pet selected"))
+                return@flow
+            }
             val userId = userProvider.getUserId();
             if (userId == null) {
                 emit(Resource.Error("User not logged in"))
                 return@flow
             }
             val newTaskId = UUID.randomUUID().toString()
-
+            var seriesId : String? = null
+            if(rrule!=null ){
+                seriesId = UUID.randomUUID().toString()
+            }
             val task = Task(
                 id = newTaskId,
+                seriesId = seriesId,
                 petId = petId,
                 type = type,
                 title = title,
@@ -52,9 +61,11 @@ class AddTaskUseCase @Inject constructor(
                 createdAt = DateConverter.localDateNow(),
                 date = date
             )
-            taskRepository.createTask(task);
+            taskRepository.createTask(task, rrule);
             emit(Resource.Success(task))
         } catch (e: Failure){
+            emit(Resource.Error("An error occurred: ${e.message}"))
+        } catch (e: GeneralFailure){
             emit(Resource.Error("An error occurred: ${e.message}"))
         }
     }

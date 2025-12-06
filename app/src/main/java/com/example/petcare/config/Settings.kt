@@ -11,6 +11,8 @@ object Settings {
     const val USER_ID_KEY = "CURRENT_USER_ID"
 
     const val WALK_TRACK_POINT_INTERVAL_MS = 20000L
+    const val WALK_MIN_UPDATE_DISTANCE_METERS = 1f
+    const val WALK_MIN_UPDATE_TIME_MS = 15000L
 }
 
 

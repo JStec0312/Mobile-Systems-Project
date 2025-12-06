@@ -2,7 +2,7 @@ package com.example.petcare.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.petcare.data.device_api.LocationTracker
+import com.example.petcare.data.device_api.LocationClient
 import com.example.petcare.data.fake_repos.FakeMedicationRepository
 import com.example.petcare.data.fake_repos.FakeNotificationRepository
 import com.example.petcare.data.fake_repos.FakePetMemberRepository
@@ -14,6 +14,7 @@ import com.example.petcare.data.fake_repos.FakeWalkRepository
 import com.example.petcare.data.fake_repos.FakeWalkTrackPointRepository
 import com.example.petcare.data.repository.PetMemberRepository
 import com.example.petcare.data.repository.WalkRepository
+import com.example.petcare.domain.device_api.ILocationClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,7 +33,6 @@ import com.example.petcare.domain.repository.ITaskRepository
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.domain.repository.IWalkRepository
 import com.example.petcare.domain.repository.IWalkTrackPointRepository
-import com.example.petcare.service.interfaces.ILocationTracker
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.FirebaseApp
@@ -173,23 +173,18 @@ object FirebaseModule {;
 @Module
 @InstallIn(SingletonComponent::class) // Dostępne w całej aplikacji
 object LocationModule {
-
-    // 1. Dostarcza klienta Google Maps
     @Provides
     @Singleton
-    fun provideFusedLocationProviderClient(
-        @ApplicationContext context: Context
-    ): FusedLocationProviderClient {
+    fun provideFusedLocationProviderClient(@ApplicationContext context: Context): FusedLocationProviderClient {
         return LocationServices.getFusedLocationProviderClient(context)
     }
 
-    // 2. Wiąże interfejs z implementacją
     @Provides
     @Singleton
-    fun provideLocationTracker(
-        client: FusedLocationProviderClient,
-        @ApplicationContext context: Context
-    ): ILocationTracker {
-        return LocationTracker( context, client)
+    fun providceLocationClient(@ApplicationContext ctx: Context, fusedLocationProviderClient: FusedLocationProviderClient): ILocationClient{
+        return LocationClient(
+            context = ctx,
+            client = fusedLocationProviderClient
+        )
     }
 }

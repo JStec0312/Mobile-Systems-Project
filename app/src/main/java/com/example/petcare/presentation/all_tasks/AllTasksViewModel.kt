@@ -1,9 +1,12 @@
 package com.example.petcare.presentation.all_tasks
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.petcare.common.Resource
+import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.domain.model.Task
+import com.example.petcare.domain.use_case.change_task_status.ChangeTaskStatusUseCase
 import com.example.petcare.domain.use_case.get_tasks.GetTasksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +24,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AllTasksViewModel @Inject constructor(
-    private  val getTasksUseCase: GetTasksUseCase
+    private  val getTasksUseCase: GetTasksUseCase,
+    private val changeTaskStatusUseCase: ChangeTaskStatusUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
@@ -87,7 +92,13 @@ class AllTasksViewModel @Inject constructor(
         return allTasks.filter { task ->
             val taskDate = task.date.toLocalDateTime(TimeZone.currentSystemDefault()).date
             taskDate == date
-        }.sortedBy { it.date }
+        }.sortedWith(
+            compareBy<Task> { task ->
+                if (task.status == taskStatusEnum.cancelled) 1 else 0
+            }.thenBy { task ->
+                task.date
+            }
+        )
     }
 
     private fun updateDateText(date: LocalDate) {
@@ -121,6 +132,64 @@ class AllTasksViewModel @Inject constructor(
 
 
     fun onTaskDone(task: Task) {
-        // TODO: updateTaskUseCase
+        val now = Clock.System.now()
+        val newStatus = if(task.status == taskStatusEnum.done) {
+            if (task.date < now) taskStatusEnum.skipped
+            else taskStatusEnum.planned
+        }
+        else {
+            taskStatusEnum.done
+        }
+        updateTaskStatus(task.id, newStatus)
+    }
+
+    fun onTaskCancelled(task: Task) {
+        updateTaskStatus(task.id, taskStatusEnum.cancelled)
+    }
+
+    private fun updateTaskStatus(taskId: String, newStatus: taskStatusEnum) {
+        viewModelScope.launch {
+            val previousStatus = _state.value.allTasksCache.find {
+                it.id == taskId
+            }?.status
+            _state.update { currentState ->
+                val updatedCache = currentState.allTasksCache.map {
+                    if (it.id == taskId) {
+                        it.copy(status = newStatus)
+                    } else it
+                }
+                currentState.copy(
+                    allTasksCache = updatedCache,
+                    tasksForSelectedDate = filterTasksByDate(
+                        updatedCache,
+                        currentState.selectedDate ?: today
+                    )
+                )
+            }
+            changeTaskStatusUseCase(taskId, newStatus).collect { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        if (previousStatus != null) {
+                            _state.update { errorState ->
+                                val revertedCache = errorState.allTasksCache.map {
+                                    if (it.id == taskId) it.copy(status = previousStatus)
+                                    else it
+                                }
+                                errorState.copy(
+                                    error = result.message ?: "Failed to update status",
+                                    allTasksCache = revertedCache,
+                                    tasksForSelectedDate = filterTasksByDate(
+                                        revertedCache,
+                                        errorState.selectedDate ?: today
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
     }
 }

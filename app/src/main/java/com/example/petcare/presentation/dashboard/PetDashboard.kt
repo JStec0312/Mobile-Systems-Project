@@ -29,7 +29,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,8 +43,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,6 +61,7 @@ import com.example.petcare.common.sexEnum
 import com.example.petcare.common.taskPriorityEnum
 import com.example.petcare.domain.model.Pet
 import com.example.petcare.domain.model.Task
+import com.example.petcare.presentation.all_tasks.TaskItem
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaInstant
@@ -78,17 +84,19 @@ fun PetDashboardRoute(
         onViewAllTasks = onNavigateToTasks,
         onMedicationHistory = onNavigateToMedicationHistory,
         onChatWithVet = onNavigateToChat,
-        onWalkClick = onNavigateToWalk
+        onWalkClick = onNavigateToWalk,
+        onTaskCancelled = viewModel::onTaskCancelled
     )
 }
 @Composable
 fun PetDashboardScreen(
     state: PetDashboardState,
-    onTaskDone: () -> Unit,
+    onTaskDone: (Task) -> Unit,
     onViewAllTasks: () -> Unit,
     onMedicationHistory: () -> Unit,
     onChatWithVet: () -> Unit,
-    onWalkClick: () -> Unit
+    onWalkClick: () -> Unit,
+    onTaskCancelled: (Task) -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -219,13 +227,44 @@ fun PetDashboardScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(state.tasks) { task ->
-                                TaskItem(
-                                    title = task.title,
-                                    type = task.type ?: taskTypeEnum.other,
-                                    status = task.status,
-                                    onCheckClick = { onTaskDone() },
-                                    date = task.date
-                                )
+                                    val dismissState = rememberSwipeToDismissBoxState (
+                                        confirmValueChange = {
+                                            if( it == SwipeToDismissBoxValue.EndToStart) {
+                                                onTaskCancelled(task)
+                                                return@rememberSwipeToDismissBoxState false
+                                            }
+                                            false
+                                        }
+                                    )
+                                    SwipeToDismissBox(
+                                        state = dismissState,
+                                        enableDismissFromEndToStart = false,
+                                        backgroundContent = {
+                                            val color = if(dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                                                Color(0xFFd15b5b)
+                                            }
+                                            else Color.Transparent
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .background(color, shape = RoundedCornerShape(12.dp))
+                                                    .padding(end = 24.dp),
+                                                contentAlignment = Alignment.CenterEnd
+                                            ) {
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.task_cancelled),
+                                                    contentDescription = "Cancel",
+                                                    modifier = Modifier.size(28.dp)
+                                                )
+                                            }
+                                        },
+                                        content = {
+                                            TaskItem(
+                                                task = task,
+                                                onCheckClick = { onTaskDone(task) },
+                                            )
+                                        }
+                                    )
                             }
                         }
                     }
@@ -353,24 +392,29 @@ fun PetDashboardScreen(
 }
 
 
-    @Composable
+@Composable
 fun TaskItem(
-    title: String,
-    type: taskTypeEnum,
-    status: taskStatusEnum,
-    date: Instant,
+    task: Task,
     onCheckClick: () -> Unit
 ) {
+    val isDone = task.status == taskStatusEnum.done
+    val isCalncelled = task.status == taskStatusEnum.cancelled
+    val isSkipped = task.status == taskStatusEnum.skipped
+
+    val title = task.title
+    val type = task.type ?: taskTypeEnum.other
+    val date = task.date
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = if (status == taskStatusEnum.done) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.secondary)
+        colors = CardDefaults.cardColors(containerColor = if (isDone) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.secondary)
     ) {
         Row(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 10.dp)
+                .padding(16.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -380,7 +424,8 @@ fun TaskItem(
                     text = title,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    style = TextStyle(textDecoration = if(isCalncelled) TextDecoration.LineThrough else null)
                 )
                 val formatter = DateTimeFormatter.ofPattern("HH:mm")
                     .withZone(ZoneId.systemDefault())
@@ -389,28 +434,36 @@ fun TaskItem(
                 Text(
                     text = "$timeString - $typeString",
                     color = Color.White,
-                    fontSize = 13.sp
+                    fontSize = 13.sp,
+                    style = TextStyle(textDecoration = if(isCalncelled) TextDecoration.LineThrough else null)
                 )
             }
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
                     .clickable { onCheckClick() },
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
-                if (status == taskStatusEnum.done) {
+                if (isDone) {
                     Image(
                         painter = painterResource(id = R.drawable.task_done),
                         contentDescription = "Task done",
-                        modifier = Modifier.size(70.dp)
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                else if(isCalncelled) {
+                    Image(
+                        painter = painterResource(id = R.drawable.task_cancelled),
+                        contentDescription = "Task cancelled",
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
                 else {
                     Image(
                         painter = painterResource(id = R.drawable.task_notdone),
                         contentDescription = "Task not done",
-                        modifier = Modifier.size(70.dp)
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
@@ -480,7 +533,8 @@ fun PetDashboardScreenPreview() {
             onViewAllTasks = {},
             onMedicationHistory = {},
             onChatWithVet = {},
-            onWalkClick = {}
+            onWalkClick = {},
+            onTaskCancelled = {}
         )
     }
 }
@@ -511,7 +565,8 @@ fun PetDashboardScreenPreview2() {
             onViewAllTasks = {},
             onMedicationHistory = {},
             onChatWithVet = {},
-            onWalkClick = {}
+            onWalkClick = {},
+            onTaskCancelled = {}
         )
     }
 }

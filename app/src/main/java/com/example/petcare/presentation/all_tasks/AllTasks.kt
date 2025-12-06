@@ -156,7 +156,9 @@ fun AllTasksScreen(
                                 )
                                 SwipeToDismissBox(
                                     state = dismissState,
-                                    enableDismissFromEndToStart = false,
+                                    enableDismissFromEndToStart = true,
+                                    enableDismissFromStartToEnd = false
+                                    ,
                                     backgroundContent = {
                                         val color = if(dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
                                             Color(0xFFd15b5b)

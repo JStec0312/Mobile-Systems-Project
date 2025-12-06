@@ -66,12 +66,18 @@ class PetDashboardViewModel @Inject constructor(
                 .onEach { result ->
                     when (result) {
                         is Resource.Success -> {
-                            _state.update {
-                                it.copy(
-                                    tasks = result.data ?: emptyList(),
-                                    isLoading = false
-                                )
+                            val allTasks = result.data ?: emptyList()
+                            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+                            val todayTasks = allTasks.filter { task ->
+                                task.date.toLocalDateTime(TimeZone.currentSystemDefault()).date == today
                             }
+                            val sortedTasks = sortTasks(todayTasks)
+                                _state.update {
+                                    it.copy(
+                                        tasks = sortedTasks,
+                                        isLoading = false
+                                    )
+                                }
                         }
 
                         is Resource.Error -> {

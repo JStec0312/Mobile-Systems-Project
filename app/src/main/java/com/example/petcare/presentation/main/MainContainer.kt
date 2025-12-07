@@ -62,7 +62,8 @@ import com.example.petcare.presentation.dashboard.PetDashboardRoute
 import com.example.petcare.presentation.walk.WalkRoute
 import com.example.petcare.presentation.help.HelpScreen
 import com.example.petcare.presentation.about.AboutScreen
-
+import com.example.petcare.presentation.add_task.AddTaskRoute
+import com.example.petcare.presentation.all_tasks.AllTasksViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,6 +95,7 @@ fun MainContainer(
         currentRoute == "all_tasks" -> "TASKS"
         currentRoute == "help" -> "HELP"
         currentRoute == "about" -> "ABOUT"
+        currentRoute =="add_task" -> "NEW TASK"
         else -> ""
     }
 
@@ -285,11 +287,36 @@ fun MainContainer(
                     )
                 }
                 composable("all_tasks") {
+                    val savedStateHandle = mainNavController.currentBackStackEntry?.savedStateHandle
+                    val shouldRefresh by savedStateHandle?.getLiveData<Boolean>("should_refresh_tasks")
+                        ?.observeAsState(initial = false) ?: remember { mutableStateOf(false) }
+                    val allTasksViewModel: AllTasksViewModel = hiltViewModel()
+
+                    LaunchedEffect(shouldRefresh) {
+                        if(shouldRefresh) {
+                            allTasksViewModel.loadTasks()
+                            savedStateHandle?.set("should_refresh_tasks", false)
+                        }
+                    }
+
                     AllTasksRoute(
                         onAddTaskClick = {
-                            //tu kiedys add task
+                            mainNavController.navigate("add_task")
                         }
                     )
+                }
+                composable("add_task") {
+                    AddTaskRoute(
+                        onNavigateBack = {
+                            mainNavController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("should_refresh_tasks", true)
+                            mainNavController.popBackStack()
+                        }
+                    )
+                }
+                composable("profile") {
+                    Text("PROFILE")
                 }
                 composable("dashboard") {
                     Text("DASHBOARD")
@@ -300,7 +327,6 @@ fun MainContainer(
                 composable("about") {
                     AboutScreen()
                 }
-
             }
         }
     }

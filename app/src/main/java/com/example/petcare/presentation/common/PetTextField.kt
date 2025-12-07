@@ -35,8 +35,15 @@ fun PetTextField(
             unfocusedContainerColor = Color(0xFFFFFFFF),
             focusedLabelColor = MaterialTheme.colorScheme.secondary,
             unfocusedLabelColor = Color(0xFFBDADD5),
-            focusedTextColor = MaterialTheme.colorScheme.secondary
-
+            focusedTextColor = MaterialTheme.colorScheme.secondary,
+            unfocusedTextColor = MaterialTheme.colorScheme.secondary,
+            unfocusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
+            focusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
+            disabledContainerColor = Color.White,
+            disabledBorderColor = Color.Transparent,
+            disabledTextColor = MaterialTheme.colorScheme.secondary,
+            disabledLabelColor = Color(0xFFBDADD5),
+            disabledPlaceholderColor = Color(0xFFBDADD5)
         ),
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType)

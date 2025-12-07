@@ -25,8 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AllTasksViewModel @Inject constructor(
     private  val getTasksUseCase: GetTasksUseCase,
-    private val changeTaskStatusUseCase: ChangeTaskStatusUseCase,
-    savedStateHandle: SavedStateHandle
+    private val changeTaskStatusUseCase: ChangeTaskStatusUseCase
 ) : ViewModel() {
     private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
@@ -38,7 +37,7 @@ class AllTasksViewModel @Inject constructor(
         loadTasks()
     }
 
-    private fun loadTasks() {
+    fun loadTasks() {
         viewModelScope.launch {
             getTasksUseCase().collect { result ->
                 when (result) {

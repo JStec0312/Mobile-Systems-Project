@@ -15,6 +15,7 @@ composeBom = "2024.09.00"
 roomCompilerProcessingTesting = "2.8.3"
 foundationLayout = "1.9.4"
 timber = "5.0.1"
+material3 = "1.4.0"
 
 
 [libraries]
@@ -40,6 +41,7 @@ androidx-room-compiler-processing-testing = { group = "androidx.room", name = "r
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 lib-recur = { module = "org.dmfs:lib-recur", version.ref = "libRecur" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

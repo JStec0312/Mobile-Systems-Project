@@ -12,8 +12,6 @@ import com.example.petcare.data.fake_repos.FakeTaskRepository
 import com.example.petcare.data.fake_repos.FakeUserRepository
 import com.example.petcare.data.fake_repos.FakeWalkRepository
 import com.example.petcare.data.fake_repos.FakeWalkTrackPointRepository
-import com.example.petcare.data.repository.PetMemberRepository
-import com.example.petcare.data.repository.WalkRepository
 import com.example.petcare.domain.device_api.ILocationClient
 import dagger.Module
 import dagger.Provides
@@ -25,7 +23,7 @@ import com.example.petcare.domain.providers.implementation.UserProvider
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.implementation.PetProvider
 import com.example.petcare.domain.repository.IMedicationRepository
-import com.example.petcare.domain.repository.INotificationSettingsRepository
+import com.example.petcare.domain.repository.INotificationRepository
 import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.domain.repository.IPetShareCodeRepository
@@ -87,7 +85,7 @@ object RepositoryModule {
     }
     @Provides
     @Singleton
-    fun provideNotificationSettingsRepository(auth: FirebaseAuth, db: FirebaseFirestore): INotificationSettingsRepository{
+    fun provideNotificationSettingsRepository(auth: FirebaseAuth, db: FirebaseFirestore): INotificationRepository{
         //return NotificationSettingsRepository(auth = auth, db = db)
         return FakeNotificationRepository();
     }

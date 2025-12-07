@@ -38,5 +38,12 @@ class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepositor
         TODO("Not yet implemented")
     }
 
+    override fun updatateTask(
+        task: Task,
+        updateWholeSeries: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
+
 
 }

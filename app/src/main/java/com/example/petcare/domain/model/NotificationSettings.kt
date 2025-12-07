@@ -7,6 +7,6 @@ data class NotificationSettings(
     val id: String,
     val userId: String,
     val category: notificationCategoryEnum,
-    val createdAt: LocalDate,
+    val updatedAt: LocalDate,
     val enabled: Boolean,
 )

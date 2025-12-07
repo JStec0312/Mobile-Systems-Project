@@ -10,7 +10,7 @@ fun NotificationSettingDto.toDomain(): NotificationSettings {
         id = this.id,
         userId = this.userId,
         category = this.category,
-        createdAt = DateConverter.stringToLocalDate(this.createdAt),
+        updatedAt = DateConverter.stringToLocalDate(this.updatedAt),
         enabled = this.enabled
     )
 }
@@ -83,7 +83,7 @@ fun NotificationSettings.toDto(): NotificationSettingDto {
         id = this.id,
         userId = this.userId,
         category = this.category,
-        createdAt = this.createdAt.toString(),
+        updatedAt = this.updatedAt.toString(),
         enabled = this.enabled,
     )
 }
@@ -240,6 +240,30 @@ fun MedicationEvent.toDto(): MedicationEventDto {
         status = this.status,
         notes = this.notes,
         scheduledAt = this.scheduledAt.toString(),
+    )
+}
+fun ScheduledNotificationDto.toDomain(): ScheduledNotification {
+    return ScheduledNotification(
+        id = this.id,
+        userId = this.userId,
+        parentEntityId = this.parentEntityId,
+        category = this.category,
+        scheduledAt = DateConverter.stringToLocalTime(this.scheduledAt),
+        isDelivered = this.isDelivered,
+        title = this.title,
+        message = this.message,
+    )
+}
+fun ScheduledNotification.toDto(): ScheduledNotificationDto {
+    return ScheduledNotificationDto(
+        id = this.id,
+        userId = this.userId,
+        parentEntityId = this.parentEntityId,
+        category = this.category,
+        scheduledAt = this.scheduledAt.toString(),
+        isDelivered = this.isDelivered,
+        title = this.title,
+        message = this.message,
     )
 }
 

@@ -40,8 +40,8 @@ class LocationService : Service(), SensorEventListener {
 
     private fun updateNotification(steps: Int) {
         val notification = NotificationCompat.Builder(this, "walk_channel")
-            .setContentTitle("Spacer trwa")
-            .setContentText("Liczba kroków: $steps")
+            .setContentTitle("Walk in progress")
+            .setContentText("Steps:: $steps")
             .setSmallIcon(com.example.petcare.R.drawable.paw)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -81,7 +81,7 @@ class LocationService : Service(), SensorEventListener {
     }
     private fun start() {
         val channelId = "walk_channel"
-        val channelName = "Śledzenie spaceru"
+        val channelName = "Walk Tracking"
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             val channel = android.app.NotificationChannel(
@@ -94,8 +94,8 @@ class LocationService : Service(), SensorEventListener {
         }
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Spacer trwa")
-            .setContentText("Śledzę Twoją trasę...")
+            .setContentTitle("Walk in progress")
+            .setContentText("Tracking the route...")
             .setSmallIcon(com.example.petcare.R.drawable.paw)
             .setOngoing(true)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE) // Dla Android 12+

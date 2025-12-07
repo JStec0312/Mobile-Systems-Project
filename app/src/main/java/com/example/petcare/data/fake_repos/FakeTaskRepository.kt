@@ -174,4 +174,37 @@ class FakeTaskRepository: ITaskRepository {
             tasks.removeAll { it.id == task.id }
         }
     }
+
+    override fun updatateTask(
+        task: Task,
+        updateWholeSeries: Boolean
+    ) {
+        if (task.id == "Network Error") {
+            throw Failure.NetworkError()
+        }
+        if (task.id == "Server Error") {
+            throw Failure.ServerError()
+        }
+        if (task.id == "Unknown Error") {
+            throw Failure.UnknownError()
+        }
+        if (updateWholeSeries && task.seriesId != null){
+            val tasksToUpdate = tasks.filter { it.seriesId == task.seriesId }
+            if (tasksToUpdate.isEmpty()){
+                throw GeneralFailure.TaskNotFound()
+            }
+            for (t in tasksToUpdate){
+                val index = tasks.indexOfFirst { it.id == t.id }
+                tasks[index] = task.toDto()
+            }
+        }
+        else{
+            val index = tasks.indexOfFirst { it.id == task.id }
+            if (index == -1){
+                throw GeneralFailure.TaskNotFound()
+            }
+            tasks[index] = task.toDto()
+        }
+    }
+
 }

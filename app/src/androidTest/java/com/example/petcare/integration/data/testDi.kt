@@ -1,14 +1,7 @@
 package com.example.petcare.integration.data
 import android.content.Context
-import com.example.petcare.data.fake_repos.FakeMedicationRepository
-import com.example.petcare.data.fake_repos.FakeNotificationRepository
-import com.example.petcare.data.fake_repos.FakePetRepository
-import com.example.petcare.data.fake_repos.FakePetShareCodeRepository
-import com.example.petcare.data.fake_repos.FakeTaskRepository
-import com.example.petcare.data.fake_repos.FakeUserRepository
-import com.example.petcare.data.fake_repos.FakeWalkRepository
 import com.example.petcare.data.repository.MedicationRepository
-import com.example.petcare.data.repository.NotificationSettingsRepository
+import com.example.petcare.data.repository.NotificationRepository
 import com.example.petcare.data.repository.PetRepository
 import com.example.petcare.data.repository.PetShareCodeRepository
 import com.example.petcare.data.repository.TaskRepository
@@ -19,7 +12,6 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.storage.FirebaseStorage
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,7 +19,7 @@ import dagger.hilt.components.SingletonComponent
 import com.example.petcare.di.FirebaseModule
 import com.example.petcare.di.RepositoryModule
 import com.example.petcare.domain.repository.IMedicationRepository
-import com.example.petcare.domain.repository.INotificationSettingsRepository
+import com.example.petcare.domain.repository.INotificationRepository
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.domain.repository.IPetShareCodeRepository
 import com.example.petcare.domain.repository.ITaskRepository
@@ -127,8 +119,8 @@ object TrueRepositoryModule{
     }
     @Provides
     @Singleton
-    fun provideNotificationSettingsRepository(auth: FirebaseAuth, db: FirebaseFirestore): INotificationSettingsRepository{
-        return NotificationSettingsRepository(auth = auth, db = db)
+    fun provideNotificationSettingsRepository(auth: FirebaseAuth, db: FirebaseFirestore): INotificationRepository{
+        return NotificationRepository(auth = auth, db = db)
     }
 
     @Provides

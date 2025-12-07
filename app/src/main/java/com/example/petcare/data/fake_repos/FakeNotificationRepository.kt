@@ -1,6 +1,6 @@
 package com.example.petcare.data.fake_repos
 
-import com.example.petcare.domain.repository.INotificationSettingsRepository
+import com.example.petcare.domain.repository.INotificationRepository
 
-class FakeNotificationRepository: INotificationSettingsRepository {
+class FakeNotificationRepository: INotificationRepository {
 }

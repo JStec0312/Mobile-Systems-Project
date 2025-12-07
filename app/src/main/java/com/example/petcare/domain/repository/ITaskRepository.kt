@@ -20,5 +20,10 @@ interface ITaskRepository {
     @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class, GeneralFailure.TaskNotFound::class)
     fun getTaskById(taskId: String): Task
 
-    fun deleteTaskById(task: Task, deleteWholeSeries: Boolean);
+    @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
+    fun deleteTaskById(task: Task, deleteWholeSeries: Boolean)
+
+    @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
+    fun updatateTask(task: Task, updateWholeSeries: Boolean)
 }
+

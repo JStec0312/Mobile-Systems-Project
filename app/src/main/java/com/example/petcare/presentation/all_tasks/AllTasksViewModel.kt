@@ -7,6 +7,7 @@ import com.example.petcare.common.Resource
 import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.domain.model.Task
 import com.example.petcare.domain.use_case.change_task_status.ChangeTaskStatusUseCase
+import com.example.petcare.domain.use_case.delete_task.DeleteTaskUseCase
 import com.example.petcare.domain.use_case.get_tasks.GetTasksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AllTasksViewModel @Inject constructor(
     private  val getTasksUseCase: GetTasksUseCase,
-    private val changeTaskStatusUseCase: ChangeTaskStatusUseCase
+    private val changeTaskStatusUseCase: ChangeTaskStatusUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
@@ -70,6 +73,35 @@ class AllTasksViewModel @Inject constructor(
     }
     fun onPrevDayClick() {
         changeDate(-1)
+    }
+
+    fun onDeleteConfirmed(task: Task, deleteWholeSeries: Boolean) {
+        viewModelScope.launch {
+            _state.update { currentState ->
+                val updatedCache = if (deleteWholeSeries) {
+                    currentState.allTasksCache.filter { it.seriesId != task.seriesId }
+                } else {
+                    currentState.allTasksCache.filter { it.id != task.id }
+                }
+                currentState.copy(
+                    allTasksCache = updatedCache,
+                    tasksForSelectedDate = filterTasksByDate(
+                        updatedCache,
+                        currentState.selectedDate ?: today
+                    )
+                )
+            }
+            deleteTaskUseCase(task.id, deleteWholeSeries).collect { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        _state.update { it.copy(error = result.message) }
+                        loadTasks()
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
     }
 
     private fun changeDate(daysToAdd: Int) {

@@ -300,9 +300,12 @@ fun MainContainer(
                     }
 
                     AllTasksRoute(
+                        viewModel = allTasksViewModel,
                         onAddTaskClick = {
                             mainNavController.navigate("add_task")
-                        }
+                        },
+                        onNavigateToTaskDetails = {},
+                        onNavigateToEditTask = {},
                     )
                 }
                 composable("add_task") {

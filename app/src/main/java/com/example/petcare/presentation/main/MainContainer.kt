@@ -64,6 +64,7 @@ import com.example.petcare.presentation.help.HelpScreen
 import com.example.petcare.presentation.about.AboutScreen
 import com.example.petcare.presentation.add_task.AddTaskRoute
 import com.example.petcare.presentation.all_tasks.AllTasksViewModel
+import com.example.petcare.presentation.task_details.TaskDetailsRoute
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,6 +97,7 @@ fun MainContainer(
         currentRoute == "help" -> "HELP"
         currentRoute == "about" -> "ABOUT"
         currentRoute =="add_task" -> "NEW TASK"
+        currentRoute?.startsWith("task_details") == true -> "TASK DETAILS"
         else -> ""
     }
 
@@ -304,7 +306,9 @@ fun MainContainer(
                         onAddTaskClick = {
                             mainNavController.navigate("add_task")
                         },
-                        onNavigateToTaskDetails = {},
+                        onNavigateToTaskDetails = { taskId ->
+                            mainNavController.navigate("task_details/$taskId")
+                        },
                         onNavigateToEditTask = {},
                     )
                 }
@@ -314,6 +318,16 @@ fun MainContainer(
                             mainNavController.previousBackStackEntry
                                 ?.savedStateHandle
                                 ?.set("should_refresh_tasks", true)
+                            mainNavController.popBackStack()
+                        }
+                    )
+                }
+                composable(
+                    route="task_details/{taskId}",
+                    arguments = listOf(navArgument("taskId") {type = NavType.StringType})
+                ) {
+                    TaskDetailsRoute(
+                        onNavigateBack = {
                             mainNavController.popBackStack()
                         }
                     )

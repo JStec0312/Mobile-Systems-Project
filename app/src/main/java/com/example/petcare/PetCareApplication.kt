@@ -33,18 +33,16 @@ class PetCareApplication : Application(), Configuration.Provider {
     }
 
     private fun scheduleUpcomingNotificationsWorker() {
-//        val request = PeriodicWorkRequestBuilder<UpcomingNotificationsWorker>(
-//            Settings.PERIODIC_WORKER_INTERVAL_MINUTES,
-//            TimeUnit.MINUTES
-//        ).build()
-//
-//        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-//            "upcoming_notifications",
-//            ExistingPeriodicWorkPolicy.KEEP,
-//            request
-//        )
-        val request = OneTimeWorkRequestBuilder<UpcomingNotificationsWorker>()
-            .build()
+        val request = PeriodicWorkRequestBuilder<UpcomingNotificationsWorker>(
+            Settings.PERIODIC_WORKER_INTERVAL_MINUTES,
+            TimeUnit.MINUTES
+        ).build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "upcoming_notifications",
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
 
         WorkManager.getInstance(this).enqueue(request)
     }

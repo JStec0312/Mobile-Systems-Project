@@ -114,6 +114,7 @@ class UpcomingNotificationsWorker @AssistedInject constructor(
             .setContentTitle(title)
             .setContentText(item.title)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
             .build()
 
         manager.notify(item.id.hashCode(), notification)

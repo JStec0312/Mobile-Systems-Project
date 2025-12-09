@@ -1,9 +1,12 @@
 package com.example.petcare.domain.use_case.edit_notification_settings
+import android.app.NotificationChannel
 import com.example.petcare.common.Resource
+import com.example.petcare.common.notificationCategoryEnum
 import com.example.petcare.domain.model.NotificationSettings
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.INotificationRepository
+import com.example.petcare.exceptions.Failure
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -15,17 +18,22 @@ class EditNotificationSettingsUseCase @Inject constructor(
     private val notificationSettingsRepository: INotificationRepository
 ){
     operator fun invoke(
-        settings: NotificationSettings,
-        delayMs: Long = 600,
-        shouldFail : Boolean = false,
+        category: notificationCategoryEnum,
     ): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading<Unit>())
-        delay(delayMs)
-        if (shouldFail){
-            emit(Resource.Error<Unit>("Failed to edit notification settings"))
-
-        } else{
-            emit(Resource.Success<Unit>(Unit))
+        try{
+            val userId = userProvider.getUserId();
+            if (userId == null){
+                emit(Resource.Error<Unit>("User not logged in"))
+                return@flow
+            }
+            notificationSettingsRepository.toggleNotificationSettingsForUser(
+                userId = userId,
+                newCategory = category
+            );
+            emit(Resource.Success<Unit>(Unit));
+        } catch (e: Failure){
+            emit(Resource.Error<Unit>(e.message ?: "An unexpected error occurred"))
         }
     }
 }

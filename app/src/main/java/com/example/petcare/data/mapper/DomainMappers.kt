@@ -10,7 +10,7 @@ fun NotificationSettingDto.toDomain(): NotificationSettings {
         id = this.id,
         userId = this.userId,
         category = this.category,
-        updatedAt = DateConverter.stringToLocalDate(this.updatedAt),
+        updatedAt = DateConverter.stringToInstant(this.updatedAt),
         enabled = this.enabled
     )
 }
@@ -47,7 +47,8 @@ fun TaskDto.toDomain(): Task {
         priority = this.priority,
         status = this.status,
         createdAt = DateConverter.stringToLocalDate(this.createdAt),
-        date = DateConverter.stringToInstant(this.date)
+        date = DateConverter.stringToInstant(this.date),
+        rrule = this.rrule,
     )
 }
 
@@ -73,7 +74,7 @@ fun MedicationDto.toDomain(): Medication {
         from = DateConverter.stringToLocalDate(this.from),
         to = DateConverter.stringToLocalDate(this.to),
         reccurenceString = this.reccurenceString,
-        times = this.times.map { it ->  DateConverter.stringToLocalTime(it)}
+        times = this.times.map { it ->  DateConverter.stringToInstant(it)}
     )
 }
 
@@ -84,7 +85,7 @@ fun NotificationSettings.toDto(): NotificationSettingDto {
         userId = this.userId,
         category = this.category,
         updatedAt = this.updatedAt.toString(),
-        enabled = this.enabled,
+        enabled = this.enabled
     )
 }
 
@@ -120,7 +121,8 @@ fun Task.toDto(): TaskDto {
         priority = this.priority,
         status = this.status,
         createdAt = this.createdAt.toString(),
-        date = this.date.toString()
+        date = this.date.toString(),
+        rrule = this.rrule,
     )
 }
 
@@ -225,10 +227,12 @@ fun MedicationEventDto.toDomain(): MedicationEvent {
     return MedicationEvent(
         id = this.id,
         medicationId = this.medicationId,
-        takenAt = DateConverter.stringToLocalDate(this.takenAt),
+        takenAt = DateConverter.stringToInstant(this.takenAt),
         status = this.status,
         notes = this.notes,
-        scheduledAt = DateConverter.stringToLocalDate(this.scheduledAt!!),
+        scheduledAt = DateConverter.stringToInstant(this.scheduledAt),
+        petId = this.petId,
+        title = this.title
     )
 }
 
@@ -240,6 +244,8 @@ fun MedicationEvent.toDto(): MedicationEventDto {
         status = this.status,
         notes = this.notes,
         scheduledAt = this.scheduledAt.toString(),
+        petId = this.petId,
+        title = this.title
     )
 }
 fun ScheduledNotificationDto.toDomain(): ScheduledNotification {
@@ -264,6 +270,27 @@ fun ScheduledNotification.toDto(): ScheduledNotificationDto {
         isDelivered = this.isDelivered,
         title = this.title,
         message = this.message,
+    )
+}
+
+fun NotificationDto.toDomain(): Notification {
+    return Notification(
+        id = this.id,
+        userId = this.userId,
+        category = this.category,
+        title = this.title,
+        time = this.time,
+        type = this.type
+    )
+}
+fun Notification.toDto(): NotificationDto {
+    return NotificationDto(
+        id = this.id,
+        userId = this.userId,
+        category = this.category,
+        title = this.title,
+        time = this.time,
+        type = this.type
     )
 }
 

@@ -46,4 +46,19 @@ class FakeMedicationRepository : IMedicationRepository {
         }
         return medsForPet.map { it.toDomain() }
     }
+
+    override fun getMedicationById(medicationId: String): Medication {
+        val medication = medications.find { it.id == medicationId }
+        if (medication == null) {
+            throw GeneralFailure.MedicationNotFound("Medication with id $medicationId not found")
+        }
+        if (medicationId == "Server error") {
+            throw Failure.ServerError("Simulated server error")
+        } else if (medicationId == "Network error") {
+            throw Failure.NetworkError("Simulated network error")
+        } else if (medicationId == "Unknown error") {
+            throw Failure.UnknownError("Simulated unknown error")
+        }
+        return medication.toDomain()
+    }
 }

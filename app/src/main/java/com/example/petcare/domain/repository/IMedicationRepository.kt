@@ -13,4 +13,8 @@ interface IMedicationRepository {
 
     @Throws(Failure.ServerError::class, Failure.NetworkError::class, Failure.UnknownError::class, GeneralFailure.MedicationNotFound::class, GeneralFailure.PetNotFound::class)
     fun listMedicationsForPet(petId: String): List<Medication>
+
+    @Throws
+    fun getMedicationById(medicationId: String): Medication
+
 }

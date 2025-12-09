@@ -16,5 +16,6 @@ data class Task(
     val priority: taskPriorityEnum? = taskPriorityEnum.normal,
     var status: taskStatusEnum = taskStatusEnum.planned,
     val createdAt: LocalDate,
-    val date: Instant
+    val date: Instant,
+    var rrule: String? = null,
 )

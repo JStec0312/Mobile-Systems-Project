@@ -59,7 +59,8 @@ class AddTaskUseCase @Inject constructor(
                 priority = priority,
                 status = taskStatusEnum.planned,
                 createdAt = DateConverter.localDateNow(),
-                date = date
+                date = date,
+                rrule = rrule
             )
             taskRepository.createTask(task, rrule);
             emit(Resource.Success(task))

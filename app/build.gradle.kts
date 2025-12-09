@@ -70,7 +70,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.7.5")
-
+    implementation("androidx.work:work-runtime-ktx:2.11.0")
 
 
     //logger
@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.hilt:hilt-work:1.3.0")
     implementation(libs.androidx.compose.foundation.layout)
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.android.gms:play-services-location:21.3.0")
@@ -103,6 +104,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation("androidx.hilt:hilt-work:1.3.0")
+    kapt("androidx.hilt:hilt-compiler:1.3.0")
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.compiler)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")

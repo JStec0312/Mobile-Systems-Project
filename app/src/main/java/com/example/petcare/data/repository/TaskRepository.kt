@@ -6,6 +6,7 @@ import com.example.petcare.domain.model.Task
 import com.example.petcare.domain.repository.ITaskRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.datetime.Instant
 
 class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepository {
     override fun createTask(task: Task, rrule: String?) {
@@ -42,6 +43,14 @@ class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepositor
         task: Task,
         updateWholeSeries: Boolean
     ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getTasksByPetIdsInDateRange(
+        petIds: List<String>,
+        from: Instant,
+        to: Instant
+    ): List<Task> {
         TODO("Not yet implemented")
     }
 

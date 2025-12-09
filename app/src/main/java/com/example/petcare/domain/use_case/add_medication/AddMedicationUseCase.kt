@@ -11,6 +11,7 @@ import com.example.petcare.exceptions.Failure
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import javax.inject.Inject
@@ -30,7 +31,7 @@ class AddMedicationUseCase @Inject constructor(
         from: LocalDate,
         to: LocalDate?,
         reccurenceString: String,
-        times: List<LocalTime>
+        times: List<Instant>
     ): Flow<Resource<Unit>> = flow {
        val userId = userProvider.getUserId();
         if(userId == null){

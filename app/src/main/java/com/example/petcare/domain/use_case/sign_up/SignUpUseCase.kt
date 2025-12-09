@@ -5,6 +5,7 @@ import com.example.petcare.common.utils.EmailValidator
 import com.example.petcare.config.Settings
 import com.example.petcare.domain.model.User
 import com.example.petcare.domain.providers.IPetProvider
+import com.example.petcare.domain.repository.INotificationRepository
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(
     private val petProvider: IPetProvider,
-    private val userRepository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val notificationRepository: INotificationRepository
 ) {
 
     operator fun invoke(
@@ -55,6 +57,7 @@ class SignUpUseCase @Inject constructor(
                displayName = name,
            )
             userRepository.createUser(user, password)
+            notificationRepository.createNotificationChannelForNewUser(user.id)
         } catch(e: AuthFailure.EmailAlreadyInUse ){
             emit(Resource.Error<Unit>(e.message))
             return@flow

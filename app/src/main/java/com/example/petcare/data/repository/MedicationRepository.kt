@@ -18,4 +18,8 @@ class MedicationRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IMedicat
     override fun listMedicationsForPet(petId: String): List<Medication> {
         TODO("Not yet implemented")
     }
+
+    override fun getMedicationById(medicationId: String): Medication {
+        TODO("Not yet implemented")
+    }
 }

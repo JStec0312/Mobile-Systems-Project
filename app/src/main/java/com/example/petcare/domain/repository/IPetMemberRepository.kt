@@ -13,4 +13,5 @@ interface IPetMemberRepository {
     @Throws (Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
     fun isUserPetMember(userId: String, petId: String): Boolean;
 
+
 }

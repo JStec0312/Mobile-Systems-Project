@@ -15,5 +15,6 @@ data class TaskDto(
     var status: taskStatusEnum,
     val priority: taskPriorityEnum? = taskPriorityEnum.normal,
     val createdAt: String? = null,
-    val date : String? = null
+    val date : String? = null,
+    val rrule: String? = null
 )

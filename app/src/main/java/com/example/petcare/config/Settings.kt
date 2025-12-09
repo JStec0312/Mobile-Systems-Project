@@ -13,6 +13,11 @@ object Settings {
     const val WALK_TRACK_POINT_INTERVAL_MS = 20000L
     const val WALK_MIN_UPDATE_DISTANCE_METERS = 1f
     const val WALK_MIN_UPDATE_TIME_MS = 15000L
+
+    const val NOTIFICATION_BEFORE_MINUTES = 25
+    const val NOTIFICATION_WINDOW_MINUTES = 10
+
+    const val PERIODIC_WORKER_INTERVAL_MINUTES: Long = 1L
 }
 
 

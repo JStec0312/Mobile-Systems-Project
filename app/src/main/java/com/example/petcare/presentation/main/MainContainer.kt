@@ -64,6 +64,7 @@ import com.example.petcare.presentation.help.HelpScreen
 import com.example.petcare.presentation.about.AboutScreen
 import com.example.petcare.presentation.add_task.AddTaskRoute
 import com.example.petcare.presentation.all_tasks.AllTasksViewModel
+import com.example.petcare.presentation.edit_task.EditTaskRoute
 import com.example.petcare.presentation.task_details.TaskDetailsRoute
 
 
@@ -93,12 +94,13 @@ fun MainContainer(
         currentRoute?.startsWith("edit_pet") == true  -> "EDIT PET"
         currentRoute?.startsWith("dashboard") == true -> "DASHBOARD"
         currentRoute == "walk" -> "WALK TRACKER"
-        currentRoute == "all_tasks" -> "TASKS"
+        currentRoute?.startsWith("all_tasks") == true -> "TASKS"
         currentRoute == "help" -> "HELP"
         currentRoute == "about" -> "ABOUT"
-        currentRoute =="add_task" -> "NEW TASK"
+        currentRoute?.startsWith("add_task") == true -> "NEW TASK"
         currentRoute?.startsWith("task_details") == true -> "TASK DETAILS"
-        else -> ""
+        currentRoute?.startsWith("edit_task") == true -> "EDIT TASK"
+         else -> ""
     }
 
     ModalNavigationDrawer(
@@ -261,6 +263,9 @@ fun MainContainer(
                 ) {
                     EditPetRoute(
                         onNavigateBack = {
+                            mainNavController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("should_refresh_pets", true)
                             mainNavController.popBackStack()
                         }
                     )
@@ -268,10 +273,11 @@ fun MainContainer(
                 composable(
                     route = "dashboard/{petId}",
                     arguments = listOf(navArgument("petId") {type = NavType.StringType})
-                ) {
+                ) { backStackEntry ->
+                    val petId = backStackEntry.arguments?.getString("petId") ?: ""
                     PetDashboardRoute(
                         onNavigateToTasks = {
-                            mainNavController.navigate("all_tasks")
+                            mainNavController.navigate("all_tasks/$petId")
                         },
                         onNavigateToMedicationHistory = {},
                         onNavigateToChat = {},
@@ -288,7 +294,8 @@ fun MainContainer(
                         }
                     )
                 }
-                composable("all_tasks") {
+                composable("all_tasks/{petId}") { backStackEntry ->
+                    val petId = backStackEntry.arguments?.getString("petId") ?: ""
                     val savedStateHandle = mainNavController.currentBackStackEntry?.savedStateHandle
                     val shouldRefresh by savedStateHandle?.getLiveData<Boolean>("should_refresh_tasks")
                         ?.observeAsState(initial = false) ?: remember { mutableStateOf(false) }
@@ -304,15 +311,20 @@ fun MainContainer(
                     AllTasksRoute(
                         viewModel = allTasksViewModel,
                         onAddTaskClick = {
-                            mainNavController.navigate("add_task")
+                            mainNavController.navigate("add_task/$petId")
                         },
                         onNavigateToTaskDetails = { taskId ->
                             mainNavController.navigate("task_details/$taskId")
                         },
-                        onNavigateToEditTask = {},
+                        onNavigateToEditTask = { taskId ->
+                            mainNavController.navigate("edit_task/$petId/$taskId")
+                        },
                     )
                 }
-                composable("add_task") {
+                composable(
+                    route="add_task/{petId}",
+                    arguments = listOf(navArgument("petId") {type = NavType.StringType})
+                ) {
                     AddTaskRoute(
                         onNavigateBack = {
                             mainNavController.previousBackStackEntry
@@ -328,6 +340,22 @@ fun MainContainer(
                 ) {
                     TaskDetailsRoute(
                         onNavigateBack = {
+                            mainNavController.popBackStack()
+                        }
+                    )
+                }
+                composable(
+                    route = "edit_task/{petId}/{taskId}",
+                    arguments = listOf(
+                        navArgument("taskId") {type = NavType.StringType},
+                        navArgument("petId") {type = NavType.StringType}
+                    )
+                ) {
+                    EditTaskRoute(
+                        onNavigateBack = {
+                            mainNavController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("should_refresh_tasks", true)
                             mainNavController.popBackStack()
                         }
                     )

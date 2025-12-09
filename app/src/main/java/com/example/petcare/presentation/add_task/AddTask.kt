@@ -542,7 +542,7 @@ fun AddTaskScreen(
                     onValueChange = onNotesChange,
                     singleLine = false,
                     maxLines = 3,
-                    modifier = Modifier.height(100.dp).width(280.dp),
+                    modifier = Modifier.height(150.dp).width(280.dp),
                     label = { Text("Notes") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.secondary,

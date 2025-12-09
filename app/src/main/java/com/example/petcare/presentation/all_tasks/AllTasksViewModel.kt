@@ -97,7 +97,9 @@ class AllTasksViewModel @Inject constructor(
                         _state.update { it.copy(error = result.message) }
                         loadTasks()
                     }
-
+                    is Resource.Success -> {
+                        _state.update { it.copy(isRemoveSuccess = true) }
+                    }
                     else -> Unit
                 }
             }
@@ -222,5 +224,13 @@ class AllTasksViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun onErrorShown() {
+        _state.update { it.copy(error = null) }
+    }
+
+    fun onSuccessShown() {
+        _state.update { it.copy(isRemoveSuccess = false) }
     }
 }

@@ -13,5 +13,6 @@ data class AllTasksState(
     val allTasksCache: List<Task> = emptyList(),
 
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isRemoveSuccess: Boolean = false
 )

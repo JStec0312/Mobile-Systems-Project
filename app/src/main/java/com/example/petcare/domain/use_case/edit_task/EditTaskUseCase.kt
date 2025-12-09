@@ -13,6 +13,7 @@ import com.example.petcare.common.taskPriorityEnum
 import com.example.petcare.exceptions.Failure
 import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.flow.flow
+import kotlinx.datetime.Instant
 
 
 class EditTaskUseCase  @Inject constructor(
@@ -23,17 +24,21 @@ class EditTaskUseCase  @Inject constructor(
 ) {
     operator fun invoke(
         taskId: String,
+        //to dodaje bo nie dzialalo
+        petId: String?,
         seriesId: String? = null,
         type: taskTypeEnum? = null,
         title: String?,
         notes: String? = null,
         priority: taskPriorityEnum? = null,
+        date: Instant? = null,
         editWholeSeries: Boolean = false,
     ) : Flow<Resource<Task>> = flow {
         emit(Resource.Loading())
         try {
             val currentUser = userProvider.getUserId()
-            val currentPet = petProvider.getCurrentPetId()
+            // val currentPet = petProvider.getPetId()
+            val currentPet = petId ?: ""
             if (currentUser==null) {
                 emit(Resource.Error("User is not set."))
                 return@flow
@@ -50,11 +55,18 @@ class EditTaskUseCase  @Inject constructor(
             val existingTask = taskRepository.getTaskById(taskId)
 
             val updatedTask = existingTask.copy(
-                seriesId = if (editWholeSeries) seriesId ?: existingTask.seriesId else existingTask.seriesId,
-                type = if (editWholeSeries) type ?: existingTask.type else existingTask.type,
+                seriesId = seriesId ?: existingTask.seriesId,
+                type = type ?: existingTask.type,
                 title = title ?: existingTask.title,
-                notes = if (editWholeSeries) notes ?: existingTask.notes else existingTask.notes,
-                priority = if (editWholeSeries) priority ?: existingTask.priority else existingTask.priority
+                notes = notes ?: existingTask.notes,
+                priority = priority ?: existingTask.priority,
+                date = date ?: existingTask.date
+                //seriesId = if (editWholeSeries) seriesId ?: existingTask.seriesId else existingTask.seriesId,
+               // type = if (editWholeSeries) type ?: existingTask.type else existingTask.type,
+              //  title = title ?: existingTask.title,
+               // notes = if (editWholeSeries) notes ?: existingTask.notes else existingTask.notes,
+               // priority = if (editWholeSeries) priority ?: existingTask.priority else existingTask.priority,
+              //  date = if (editWholeSeries) date ?: existingTask.date else existingTask.date
             )
             taskRepository.updatateTask(updatedTask, editWholeSeries)
 

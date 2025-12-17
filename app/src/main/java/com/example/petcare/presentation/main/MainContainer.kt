@@ -64,6 +64,7 @@ import com.example.petcare.presentation.help.HelpScreen
 import com.example.petcare.presentation.about.AboutScreen
 import com.example.petcare.presentation.add_task.AddTaskRoute
 import com.example.petcare.presentation.all_tasks.AllTasksViewModel
+import com.example.petcare.presentation.calendar.CalendarRoute
 import com.example.petcare.presentation.edit_task.EditTaskRoute
 import com.example.petcare.presentation.task_details.TaskDetailsRoute
 
@@ -100,6 +101,7 @@ fun MainContainer(
         currentRoute?.startsWith("add_task") == true -> "NEW TASK"
         currentRoute?.startsWith("task_details") == true -> "TASK DETAILS"
         currentRoute?.startsWith("edit_task") == true -> "EDIT TASK"
+        currentRoute == "calendar" -> "CALENDAR"
          else -> ""
     }
 
@@ -357,6 +359,21 @@ fun MainContainer(
                                 ?.savedStateHandle
                                 ?.set("should_refresh_tasks", true)
                             mainNavController.popBackStack()
+                        }
+                    )
+                }
+                composable("calendar") {
+                    val savedStateHandle = mainNavController.currentBackStackEntry?.savedStateHandle
+                    val shouldRefresh by savedStateHandle?.getLiveData<Boolean>("should_refresh_tasks")
+                        ?.observeAsState(initial = false) ?: remember { mutableStateOf(false) }
+                    val allTasksViewModel: AllTasksViewModel = hiltViewModel()
+                    CalendarRoute(
+                        onNavigateToAddTask = {
+                        },
+                        onNavigateToTaskDetails = { taskId ->
+                            mainNavController.navigate("task_details/$taskId")
+                        },
+                        onNavigateToEditTask = {
                         }
                     )
                 }

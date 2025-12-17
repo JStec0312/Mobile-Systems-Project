@@ -102,10 +102,14 @@ fun CalendarRoute(
     viewModel: CalendarViewModel = hiltViewModel(),
     onNavigateToAddTask: () -> Unit,
     onNavigateToTaskDetails: (String) -> Unit,
-    onNavigateToEditTask: (String) -> Unit
+    onNavigateToEditTask: (Task) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshData()
+    }
 
     LaunchedEffect(state.error) {
         state.error?.let { errorMessage ->
@@ -198,7 +202,7 @@ fun CalendarRoute(
         },
         onTaskDone = viewModel::onTaskDone,
         onTaskCancelled = viewModel::onTaskCancelled,
-        onTaskEdit = {task -> onNavigateToEditTask(task.id)},
+        onTaskEdit = {task -> onNavigateToEditTask(task)},
         onTaskDetails = {task -> onNavigateToTaskDetails(task.id)}
     )
 }

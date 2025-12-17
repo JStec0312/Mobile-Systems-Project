@@ -243,7 +243,7 @@ fun AllTasksScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp), // Dajemy minimalną wysokość, żeby tekst nie był ściśnięty
+                                    .height(200.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(

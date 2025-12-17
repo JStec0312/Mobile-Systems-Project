@@ -46,7 +46,7 @@ class FakeTaskRepository: ITaskRepository {
             status = taskStatusEnum.planned,
             priority = taskPriorityEnum.high,
             createdAt = DateConverter.localDateNow().toString(),
-            date = ("2025-12-11T10:00:00")
+            date = ("2025-12-25T10:00:00")
         )
         val task2 = TaskDto(
             id = UUID.randomUUID().toString(),
@@ -59,7 +59,7 @@ class FakeTaskRepository: ITaskRepository {
             status = taskStatusEnum.done,
             priority = taskPriorityEnum.normal,
             createdAt = DateConverter.localDateNow().toString(),
-            date = ("2025-12-10T07:00:00Z")
+            date = ("2025-12-24T07:00:00Z")
         );
         val soonTask = TaskDto(
             id = UUID.randomUUID().toString(),

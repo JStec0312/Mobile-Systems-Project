@@ -369,11 +369,13 @@ fun MainContainer(
                     val allTasksViewModel: AllTasksViewModel = hiltViewModel()
                     CalendarRoute(
                         onNavigateToAddTask = {
+                            mainNavController.navigate("add_task/no_id")
                         },
                         onNavigateToTaskDetails = { taskId ->
                             mainNavController.navigate("task_details/$taskId")
                         },
-                        onNavigateToEditTask = {
+                        onNavigateToEditTask = { task ->
+                            mainNavController.navigate("edit_task/${task.petId}/${task.id}")
                         }
                     )
                 }

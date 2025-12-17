@@ -37,32 +37,7 @@ class CalendarViewModel @Inject constructor(
     val state: StateFlow<CalendarState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            combine(
-                getUserTasksUseCase(),
-                getPetsUseCase()
-            ) { tasksResource, petResource ->
-                Pair(tasksResource, petResource)
-            }.collect { (tasksResource, petResource) ->
-                _state.update { currentState ->
-                    val isLoading =
-                        tasksResource is Resource.Loading || petResource is Resource.Loading
-                    val error = tasksResource.message ?: petResource.message
-
-                    val newAllTasks = tasksResource.data ?: currentState.allUserTasks
-                    val newAllPets = petResource.data ?: currentState.allPets
-
-                    calculateNewState(
-                        baseState = currentState.copy(
-                            allUserTasks = newAllTasks,
-                            allPets = newAllPets,
-                            isLoading = isLoading,
-                            error = error
-                        )
-                    )
-                }
-            }
-        }
+        refreshData()
     }
 
     private fun calculateNewState(baseState: CalendarState): CalendarState {
@@ -244,6 +219,35 @@ class CalendarViewModel @Inject constructor(
                     }
 
                     else -> Unit
+                }
+            }
+        }
+    }
+
+    fun refreshData() {
+        viewModelScope.launch {
+            combine(
+                getUserTasksUseCase(),
+                getPetsUseCase()
+            ) { tasksResource, petResource ->
+                Pair(tasksResource, petResource)
+            }.collect { (tasksResource, petResource) ->
+                _state.update { currentState ->
+                    val isLoading =
+                        tasksResource is Resource.Loading || petResource is Resource.Loading
+                    val error = tasksResource.message ?: petResource.message
+
+                    val newAllTasks = tasksResource.data ?: currentState.allUserTasks
+                    val newAllPets = petResource.data ?: currentState.allPets
+
+                    calculateNewState(
+                        baseState = currentState.copy(
+                            allUserTasks = newAllTasks,
+                            allPets = newAllPets,
+                            isLoading = isLoading,
+                            error = error
+                        )
+                    )
                 }
             }
         }

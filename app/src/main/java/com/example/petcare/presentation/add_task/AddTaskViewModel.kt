@@ -7,6 +7,7 @@ import com.example.petcare.common.Resource
 import com.example.petcare.common.taskPriorityEnum
 import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.domain.use_case.add_task.AddTaskUseCase
+import com.example.petcare.domain.use_case.get_pets.GetPetsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,10 +23,43 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddTaskViewModel @Inject constructor(
-    private val addTaskUseCase: AddTaskUseCase
+    private val addTaskUseCase: AddTaskUseCase,
+    private val getPetsUseCase: GetPetsUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddTaskState())
     val state = _state.asStateFlow()
+
+    init {
+        val petId = savedStateHandle.get<String>("petId")
+        loadPets()
+
+        if(petId != "no_id" && petId != null && petId != "{petId}") {
+            _state.update { it.copy(
+                selectedPetId = petId,
+                isPetSelectionEnabled = false
+            ) }
+        } else {
+            _state.update { it.copy(
+                selectedPetId = null,
+                isPetSelectionEnabled = true
+            ) }
+        }
+    }
+
+    private fun loadPets() {
+        viewModelScope.launch {
+            getPetsUseCase().collect { result ->
+                if (result is Resource.Success) {
+                    _state.update { it.copy(availablePets = result.data ?: emptyList()) }
+                }
+            }
+        }
+    }
+
+    fun onPetSelected(petId: String) {
+        _state.update { it.copy(selectedPetId = petId) }
+    }
 
     fun onTitleChange(newTitle: String) {
         _state.update { it.copy(title = newTitle) }
@@ -110,6 +144,7 @@ class AddTaskViewModel @Inject constructor(
         }
         viewModelScope.launch {
             addTaskUseCase(
+                petId = currentState.selectedPetId,
                 type = currentState.type,
                 title = currentState.title,
                 notes = currentState.notes,

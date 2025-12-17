@@ -1,6 +1,7 @@
 package com.example.petcare.presentation.add_task
 
 import com.example.petcare.common.taskTypeEnum
+import com.example.petcare.domain.model.Pet
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -19,6 +20,9 @@ data class AddTaskState(
     val repeatInterval: Int = 1,
     val selectedDaysOfWeek: Set<DayOfWeek> = emptySet(),
     val recurrenceEndDate: LocalDate? = null,
+    val selectedPetId: String? = null,
+    val isPetSelectionEnabled: Boolean = true,
+    val availablePets: List<Pet> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val isSuccessful: Boolean = false

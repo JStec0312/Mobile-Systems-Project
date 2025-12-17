@@ -41,6 +41,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -67,6 +68,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.petcare.R
 import com.example.petcare.common.taskTypeEnum
+import com.example.petcare.domain.model.Pet
 import com.example.petcare.presentation.common.BaseScreen
 import com.example.petcare.presentation.common.PetTextField
 import com.example.petcare.presentation.theme.PetCareTheme
@@ -111,7 +113,8 @@ fun AddTaskRoute(
         onIntervalChange = viewModel::onIntervalChange,
         onDaySelected = viewModel::onDaySelected,
         onSaveClick = viewModel::onSaveClick,
-        onBackClick = onNavigateBack
+        onBackClick = onNavigateBack,
+        onPetSelected = viewModel::onPetSelected
     )
 }
 
@@ -129,7 +132,8 @@ fun AddTaskScreen(
     onIntervalChange: (String) -> Unit,
     onDaySelected: (DayOfWeek) -> Unit,
     onSaveClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onPetSelected: (String) -> Unit
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -181,6 +185,14 @@ fun AddTaskScreen(
                     .fillMaxSize()
             ) {
                 Spacer(modifier = Modifier.height(80.dp))
+                if(state.isPetSelectionEnabled) {
+                    PetSelector(
+                        availablePets = state.availablePets,
+                        selectedPetId = state.selectedPetId,
+                        onPetSelected = onPetSelected
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
                 PetTextField(
                     value = state.title,
                     onValueChange = onTitleChange,
@@ -599,6 +611,73 @@ fun AddTaskScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PetSelector(
+    availablePets: List<Pet>,
+    selectedPetId: String?,
+    onPetSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedPetName = availablePets.find { it.id == selectedPetId }?.name ?: "Select pet"
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier.width(280.dp)
+    ) {
+        OutlinedTextField(
+            value = selectedPetName,
+            onValueChange = {},
+            readOnly = true,
+            placeholder = { Text("Select pet") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            label = { Text("For who?") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                unfocusedBorderColor = Color.Transparent,
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFFFFFFF),
+                focusedLabelColor = MaterialTheme.colorScheme.secondary,
+                unfocusedLabelColor = Color(0xFFBDADD5),
+                focusedTextColor = MaterialTheme.colorScheme.secondary,
+                unfocusedTextColor = MaterialTheme.colorScheme.secondary,
+                unfocusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
+                focusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
+                disabledContainerColor = Color.White,
+                disabledBorderColor = Color.Transparent,
+                disabledTextColor = MaterialTheme.colorScheme.secondary,
+                disabledLabelColor = Color(0xFFBDADD5),
+                disabledPlaceholderColor = Color(0xFFBDADD5)
+            ),
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color.White)
+        ) {
+            availablePets.forEach { pet ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            pet.name.lowercase().replaceFirstChar { it.uppercase() })
+                    },
+                    onClick = {
+                        onPetSelected(pet.id)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun DayCircle(
     text: String,
@@ -648,7 +727,8 @@ fun AddTaskPreview_Normal() {
                 onIntervalChange = {},
                 onDaySelected = {},
                 onSaveClick = {},
-                onBackClick = {}
+                onBackClick = {},
+                onPetSelected = {}
             )
         }
 
@@ -681,7 +761,8 @@ fun AddTaskPreview_Recurring() {
             onIntervalChange = {},
             onDaySelected = {},
             onSaveClick = {},
-            onBackClick = {}
+            onBackClick = {},
+            onPetSelected = {}
         )
     }
 }

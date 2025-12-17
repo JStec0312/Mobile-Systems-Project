@@ -44,6 +44,5 @@ class PetCareApplication : Application(), Configuration.Provider {
             request
         )
 
-        WorkManager.getInstance(this).enqueue(request)
     }
 }

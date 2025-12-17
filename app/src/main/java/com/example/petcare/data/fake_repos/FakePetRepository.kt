@@ -4,7 +4,7 @@ import com.example.petcare.common.sexEnum
 import com.example.petcare.common.speciesEnum
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.config.DeveloperSettings
-import com.example.petcare.data.dto.PetDto
+import com.example.petcare.data.dto.fake.PetDto
 import com.example.petcare.data.mapper.toDomain
 import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.Pet

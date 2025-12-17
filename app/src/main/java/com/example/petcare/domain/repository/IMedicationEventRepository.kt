@@ -6,8 +6,8 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 
 interface IMedicationEventRepository {
-    fun createByMedication(medication: Medication)
-    fun getUpcomingMedicationEventsForUserInDateRange(
+    suspend fun createByMedication(medication: Medication)
+    suspend fun getUpcomingMedicationEventsForUserInDateRange(
         petIds: List<String>,
         startDate: Instant,
         endDate: Instant,

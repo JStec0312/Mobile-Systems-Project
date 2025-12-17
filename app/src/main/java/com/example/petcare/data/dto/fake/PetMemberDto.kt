@@ -1,4 +1,4 @@
-package com.example.petcare.data.dto
+package com.example.petcare.data.dto.fake
 
 // @NOTE The data classes were ai generated basing on the database schema
 

@@ -2,6 +2,17 @@ package com.example.petcare.data.mapper
 
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.data.dto.*
+import com.example.petcare.data.dto.fake.MedicationDto
+import com.example.petcare.data.dto.fake.MedicationEventDto
+import com.example.petcare.data.dto.fake.NotificationDto
+import com.example.petcare.data.dto.fake.NotificationSettingDto
+import com.example.petcare.data.dto.fake.PetDto
+import com.example.petcare.data.dto.fake.PetMemberDto
+import com.example.petcare.data.dto.fake.PetShareCodeDto
+import com.example.petcare.data.dto.fake.TaskDto
+import com.example.petcare.data.dto.fake.UserDto
+import com.example.petcare.data.dto.fake.WalkDto
+import com.example.petcare.data.dto.fake.WalkTrackPointDto
 import com.example.petcare.domain.model.*
 
 // Extension functions for mapping DTOs to Domain models

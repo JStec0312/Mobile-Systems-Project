@@ -1,7 +1,6 @@
 package com.example.petcare.data.repository
 
 import com.example.petcare.common.taskStatusEnum
-import com.example.petcare.data.dto.TaskDto
 import com.example.petcare.domain.model.Task
 import com.example.petcare.domain.repository.ITaskRepository
 import com.google.firebase.auth.FirebaseAuth

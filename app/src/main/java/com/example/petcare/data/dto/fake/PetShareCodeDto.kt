@@ -1,4 +1,4 @@
-package com.example.petcare.data.dto
+package com.example.petcare.data.dto.fake
 
 data class PetShareCodeDto(
     val id: String,

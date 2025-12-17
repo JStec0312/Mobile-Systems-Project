@@ -2,6 +2,7 @@ package com.example.petcare.domain.use_case.delete_pet
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
+import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
@@ -15,7 +16,8 @@ import javax.inject.Inject
 class DeletePetUseCase  @Inject constructor(
     private val userProvider: IUserProvider,
     private val petProvider: IPetProvider,
-    private val petRepository: IPetRepository
+    private val petRepository: IPetRepository,
+    private val petMemberRepostiory: IPetMemberRepository
 ){
     operator fun invoke(
         petId: String,
@@ -27,6 +29,16 @@ class DeletePetUseCase  @Inject constructor(
                 emit(Resource.Error<Unit>("User not logged in"))
                 return@flow
             }
+            val pet = petRepository.getPetById(petId);
+            if (pet == null){
+                emit(Resource.Error<Unit>("Pet not found"))
+                return@flow
+            }
+            if (pet.ownerUserId != userId){
+                emit(Resource.Error<Unit>("You are not an owner of this pet"))
+                return@flow
+            }
+
             petRepository.deletePetById(
                 petId = petId,
                 userId = userId

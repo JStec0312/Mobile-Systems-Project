@@ -2,7 +2,7 @@ package com.example.petcare.data.fake_repos
 
 import com.example.petcare.common.medicationStatusEnum
 import com.example.petcare.common.utils.DateConverter
-import com.example.petcare.data.dto.MedicationEventDto
+import com.example.petcare.data.dto.fake.MedicationEventDto
 import com.example.petcare.data.mapper.toDomain
 import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.model.MedicationEvent
@@ -19,7 +19,7 @@ import java.util.UUID
 class FakeMedicationEventRepository: IMedicationEventRepository {
     private val medicationEvents = mutableListOf<MedicationEventDto>();
 
-    override fun createByMedication(medication: Medication) {
+    override suspend fun createByMedication(medication: Medication) {
 
         val startDateTime = DateTime(
             medication.from.year,
@@ -68,7 +68,7 @@ class FakeMedicationEventRepository: IMedicationEventRepository {
         }
     }
 
-    override fun getUpcomingMedicationEventsForUserInDateRange(
+    override suspend fun getUpcomingMedicationEventsForUserInDateRange(
         petIds: List<String>,
         startDate: Instant,
         endDate: Instant
@@ -80,6 +80,7 @@ class FakeMedicationEventRepository: IMedicationEventRepository {
         return upcomingEvents.map{evt -> evt.toDomain()}
 
     }
+
 
 
 }

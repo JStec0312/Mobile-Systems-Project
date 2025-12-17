@@ -1,4 +1,4 @@
-package com.example.petcare.data.dto
+package com.example.petcare.data.dto.fake
 
 data class WalkDto(
     val id: String,

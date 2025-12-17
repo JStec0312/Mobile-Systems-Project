@@ -20,9 +20,6 @@ class GetPetByIdUseCase @Inject constructor(
         emit(Resource.Loading<Pet>())
         try{
             val pet: Pet = petRepository.getPetById(petId)
-            //if (pet.ownerUserId != userProvider.getUserId()){
-            //    emit(Resource.Error<Pet>("You are not the owner of this pet"))
-            //}
             petProvider.setCurrentPet(pet)
             emit(Resource.Success<Pet>(pet))
         } catch(e: Failure){

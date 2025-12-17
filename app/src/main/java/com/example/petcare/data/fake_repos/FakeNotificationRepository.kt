@@ -1,12 +1,10 @@
 package com.example.petcare.data.fake_repos
 
-import android.app.Notification
 import com.example.petcare.common.notificationCategoryEnum
 import com.example.petcare.config.DeveloperSettings
-import com.example.petcare.data.dto.NotificationDto
-import com.example.petcare.data.dto.NotificationSettingDto
+import com.example.petcare.data.dto.fake.NotificationDto
+import com.example.petcare.data.dto.fake.NotificationSettingDto
 import com.example.petcare.data.mapper.toDomain
-import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.NotificationSettings
 
 import com.example.petcare.domain.repository.INotificationRepository
@@ -16,6 +14,7 @@ import java.util.UUID
 class FakeNotificationRepository: INotificationRepository {
     private val usersNotificationSettings = mutableListOf<NotificationSettingDto>();
     private val scheduledNotifications = mutableListOf<NotificationDto>();
+
     init{
         val fakeNotificationSettingMeds = NotificationSettingDto(
             id = UUID.randomUUID().toString(),

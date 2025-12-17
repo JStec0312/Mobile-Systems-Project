@@ -5,7 +5,7 @@ import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.config.DeveloperSettings
-import com.example.petcare.data.dto.TaskDto
+import com.example.petcare.data.dto.fake.TaskDto
 import com.example.petcare.data.mapper.toDomain
 import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.Task
@@ -19,7 +19,6 @@ import org.dmfs.rfc5545.recur.RecurrenceRule
 import timber.log.Timber
 import java.util.TimeZone
 import java.util.UUID
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 private const val RECURRENCE_WINDOW_DAYS = 60L
@@ -286,7 +285,7 @@ class FakeTaskRepository: ITaskRepository {
     private fun expandTasksForPetIds(
         petIds: List<String>
     ): List<Task> {
-        val nowMs = Clock.System.now().toEpochMilliseconds()
+        val nowMs = Clock.System.now().toEpochMilliseconds() - DAY_MS
         val fromMs = nowMs
         val toMs = nowMs + RECURRENCE_WINDOW_DAYS * DAY_MS
 

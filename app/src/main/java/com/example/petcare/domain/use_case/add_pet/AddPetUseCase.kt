@@ -6,8 +6,8 @@ import com.example.petcare.common.speciesEnum
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.domain.model.Pet
 import com.example.petcare.domain.model.PetMember
-import com.example.petcare.domain.providers.implementation.PetProvider
-import com.example.petcare.domain.providers.implementation.UserProvider
+import com.example.petcare.domain.providers.IPetProvider
+import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.domain.repository.IUserRepository
@@ -21,8 +21,8 @@ import java.util.UUID
 import javax.inject.Inject
 
 class AddPetUseCase @Inject constructor(
-    private val userProvider: UserProvider,
-    private val petProvider: PetProvider,
+    private val userProvider: IUserProvider,
+    private val petProvider: IPetProvider,
     private val petRepository: IPetRepository,
     private val petMemberRepository: IPetMemberRepository,
     private val userRepository: IUserRepository

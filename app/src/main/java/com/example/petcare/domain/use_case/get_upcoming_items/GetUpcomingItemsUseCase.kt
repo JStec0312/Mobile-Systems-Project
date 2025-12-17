@@ -18,7 +18,7 @@ class GetUpcomingItemsUseCase @Inject constructor(
     private val userProvider: IUserProvider,
     private val medicationEventRepository: IMedicationEventRepository
 ) {
-    operator fun invoke(
+    operator suspend fun invoke(
         from: Instant,
         to: Instant
     ): List<UpcomingItem>{

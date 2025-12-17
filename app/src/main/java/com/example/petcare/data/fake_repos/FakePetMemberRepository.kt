@@ -1,7 +1,7 @@
 package com.example.petcare.data.fake_repos
 
 import com.example.petcare.config.DeveloperSettings
-import com.example.petcare.data.dto.PetMemberDto
+import com.example.petcare.data.dto.fake.PetMemberDto
 import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.PetMember
 import com.example.petcare.domain.repository.IPetMemberRepository
@@ -22,6 +22,13 @@ class FakePetMemberRepository: IPetMemberRepository {
             id = UUID.randomUUID().toString(),
             createdAt = "2023-01-01T00:00:00Z",
         )
+        val androidTestPetMember = PetMemberDto(
+            petId = "pet123",
+            userId = "user123",
+            id = UUID.randomUUID().toString(),
+            createdAt = "2023-01-01T00:00:00Z",
+        )
+        petMembers.add(androidTestPetMember)
         petMembers.add(testPetMember)
         petMembers.add(testPetMember2)
     }
@@ -36,9 +43,4 @@ class FakePetMemberRepository: IPetMemberRepository {
     override fun isUserPetMember(userId: String, petId: String): Boolean {
         return petMembers.any { it.userId == userId && it.petId == petId }
     }
-
-
-
-
-
 }

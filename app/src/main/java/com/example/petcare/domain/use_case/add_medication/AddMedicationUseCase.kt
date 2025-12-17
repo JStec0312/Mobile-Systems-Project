@@ -7,6 +7,7 @@ import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IMedicationEventRepository
 import com.example.petcare.domain.repository.IMedicationRepository
+import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.exceptions.Failure
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,7 @@ class AddMedicationUseCase @Inject constructor(
     private val petProvider: IPetProvider,
     private val medicationRepository: IMedicationRepository,
     private val medicationEventRepository: IMedicationEventRepository,
+    private val petMemberRepository: IPetMemberRepository
 ){
     operator fun invoke(
         name: String,
@@ -33,6 +35,7 @@ class AddMedicationUseCase @Inject constructor(
         reccurenceString: String,
         times: List<Instant>
     ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
        val userId = userProvider.getUserId();
         if(userId == null){
             emit(Resource.Error("User not logged in"));
@@ -41,6 +44,10 @@ class AddMedicationUseCase @Inject constructor(
         val petId = petProvider.getCurrentPetId();
         if(petId == null){
             emit(Resource.Error("No pet selected"));
+            return@flow
+        }
+        if (!petMemberRepository.isUserPetMember(userId, petId)) {
+            emit(Resource.Error("User does not have permission to add medication for this pet"))
             return@flow
         }
         val medication = Medication(

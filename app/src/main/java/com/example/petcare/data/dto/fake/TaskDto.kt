@@ -1,4 +1,4 @@
-package com.example.petcare.data.dto
+package com.example.petcare.data.dto.fake
 
 import com.example.petcare.common.taskPriorityEnum
 import com.example.petcare.common.taskStatusEnum

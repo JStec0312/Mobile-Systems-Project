@@ -1,6 +1,5 @@
 package com.example.petcare.data.repository
 
-import com.example.petcare.data.dto.PetShareCodeDto
 import com.example.petcare.domain.model.PetShareCode
 import com.example.petcare.domain.repository.IPetShareCodeRepository
 import com.google.firebase.auth.FirebaseAuth

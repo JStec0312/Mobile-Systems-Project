@@ -15,7 +15,8 @@ import javax.inject.Inject
 class ChangeTaskStatusUseCase @Inject constructor(
     private val taskRepository: ITaskRepository,
     private val currentUserProvider: IUserProvider,
-    private val currentPetProvider: IPetProvider
+    private val currentPetProvider: IPetProvider,
+    private val petMemberRepository: IPetMemberRepository
 ){
     operator fun invoke(
         taskId: String,
@@ -28,7 +29,12 @@ class ChangeTaskStatusUseCase @Inject constructor(
                 emit(Resource.Error<Unit>("User not logged in"))
                 return@flow
             }
-
+            val task = taskRepository.getTaskById(taskId);
+            val isMember = petMemberRepository.isUserPetMember(userId, task.petId)
+            if (!isMember) {
+                emit(Resource.Error<Unit>("User does not have permission to change task status for this pet"))
+                return@flow
+            }
             taskRepository.updateTaskStatus(taskId, newStatus);
             emit(Resource.Success<Unit>(Unit))
         } catch(e: Failure){

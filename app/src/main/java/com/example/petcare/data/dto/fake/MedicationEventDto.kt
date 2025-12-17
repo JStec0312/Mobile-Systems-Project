@@ -1,6 +1,5 @@
-package com.example.petcare.data.dto
+package com.example.petcare.data.dto.fake
 import com.example.petcare.common.medicationStatusEnum
-import com.example.petcare.common.taskStatusEnum
 
 data class MedicationEventDto(
     val id: String,

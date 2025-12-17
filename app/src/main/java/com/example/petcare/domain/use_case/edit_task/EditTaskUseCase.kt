@@ -2,8 +2,8 @@ package com.example.petcare.domain.use_case.edit_task
 
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.model.Task
-import com.example.petcare.domain.providers.implementation.PetProvider
-import com.example.petcare.domain.providers.implementation.UserProvider
+import com.example.petcare.domain.providers.IPetProvider
+import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.repository.ITaskRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,8 +18,8 @@ import kotlinx.datetime.Instant
 
 class EditTaskUseCase  @Inject constructor(
     private val taskRepository: ITaskRepository,
-    private val userProvider: UserProvider,
-    private val petProvider: PetProvider,
+    private val userProvider: IUserProvider,
+    private val petProvider: IPetProvider,
     private val petMemberRepository: IPetMemberRepository
 ) {
     operator fun invoke(

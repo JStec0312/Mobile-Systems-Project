@@ -5,6 +5,7 @@ import com.example.petcare.common.taskPriorityEnum
 import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.common.utils.DateConverter
+import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IPetRepository
@@ -19,7 +20,8 @@ import javax.inject.Inject
 class GetTaskByIdUseCase @Inject constructor(
     private val userProvider: IUserProvider,
     private val petProvider: IPetProvider,
-    private val taskRepository: ITaskRepository
+    private val taskRepository: ITaskRepository,
+    private val petMemberRepository: IPetMemberRepository
 ) {
     operator fun invoke(
         taskId: String,
@@ -27,16 +29,27 @@ class GetTaskByIdUseCase @Inject constructor(
        emit(Resource.Loading())
          try {
              val userId: String? = userProvider.getUserId()
-                if (userId==null){
-                    emit(Resource.Error("User not logged in"))
+             if (userId==null){
+                 emit(Resource.Error("User not logged in"))
+                 return@flow
+             }
+             val task = taskRepository.getTaskById(taskId)
+             val isMember = petMemberRepository.isUserPetMember(
+                 userId = userId,
+                 petId = task.petId
+             )
+             if (!isMember) {
+                    emit(Resource.Error("User does not have permission to view this task"))
                     return@flow
-                }
-                val task = taskRepository.getTaskById(taskId)
-                emit(Resource.Success(task))
+             }
+             emit(Resource.Success(task))
+             return@flow
          } catch (e: Failure){
                 emit(Resource.Error(e.message));
+                return@flow
          } catch (e: GeneralFailure.TaskNotFound){
                 emit(Resource.Error("Task not found"));
+                return@flow
          }
     }
 }

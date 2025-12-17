@@ -1,6 +1,6 @@
 package com.example.petcare.data.fake_repos
 import com.example.petcare.config.DeveloperSettings
-import com.example.petcare.data.dto.UserDto
+import com.example.petcare.data.dto.fake.UserDto
 import com.example.petcare.data.mapper.toDomain
 import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.User

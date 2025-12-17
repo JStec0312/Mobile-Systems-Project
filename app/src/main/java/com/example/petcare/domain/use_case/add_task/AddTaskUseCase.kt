@@ -8,6 +8,7 @@ import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
+import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.repository.ITaskRepository
 import com.example.petcare.exceptions.Failure
 import com.example.petcare.exceptions.GeneralFailure
@@ -22,7 +23,8 @@ import kotlinx.datetime.LocalDate
 class AddTaskUseCase @Inject constructor(
     private val taskRepository: ITaskRepository,
     private val userProvider: IUserProvider,
-    private val petProvider: IPetProvider
+    private val petProvider: IPetProvider,
+    private val petMemberRepository: IPetMemberRepository,
 ) {
     operator fun invoke(
         petId: String?,
@@ -43,6 +45,10 @@ class AddTaskUseCase @Inject constructor(
             val userId = userProvider.getUserId();
             if (userId == null) {
                 emit(Resource.Error("User not logged in"))
+                return@flow
+            }
+            if (!petMemberRepository.isUserPetMember(userId, petId)) {
+                emit(Resource.Error("User does not have access to this pet"))
                 return@flow
             }
             val newTaskId = UUID.randomUUID().toString()

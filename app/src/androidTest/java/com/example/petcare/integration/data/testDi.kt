@@ -1,12 +1,15 @@
 package com.example.petcare.integration.data
 import android.content.Context
+import com.example.petcare.data.repository.MedicationEventRepository
 import com.example.petcare.data.repository.MedicationRepository
 import com.example.petcare.data.repository.NotificationRepository
+import com.example.petcare.data.repository.PetMemberRepository
 import com.example.petcare.data.repository.PetRepository
 import com.example.petcare.data.repository.PetShareCodeRepository
 import com.example.petcare.data.repository.TaskRepository
 import com.example.petcare.data.repository.UserRepository
 import com.example.petcare.data.repository.WalkRepository
+import com.example.petcare.data.repository.WalkTrackPointRepository
 import dagger.Module
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
@@ -16,16 +19,20 @@ import com.google.firebase.storage.FirebaseStorage
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import com.example.petcare.di.FirebaseModule
-import com.example.petcare.di.RepositoryModule
+import com.example.petcare.di.AppModule.FirebaseModule
+import com.example.petcare.di.AppModule.RepositoryModule
+import com.example.petcare.domain.repository.IMedicationEventRepository
 import com.example.petcare.domain.repository.IMedicationRepository
 import com.example.petcare.domain.repository.INotificationRepository
+import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.domain.repository.IPetShareCodeRepository
 import com.example.petcare.domain.repository.ITaskRepository
 import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.domain.repository.IWalkRepository
+import com.example.petcare.domain.repository.IWalkTrackPointRepository
 import com.google.firebase.firestore.firestoreSettings
+
 import dagger.hilt.testing.TestInstallIn
 import javax.inject.Singleton
 
@@ -140,4 +147,23 @@ object TrueRepositoryModule{
     fun provideWalkRepository(auth: FirebaseAuth, db: FirebaseFirestore): IWalkRepository{
         return WalkRepository(auth = auth, db = db)
     }
+
+    @Provides
+    @Singleton
+    fun providePetMemberRepository(auth: FirebaseAuth, db: FirebaseFirestore): IPetMemberRepository {
+        return PetMemberRepository(auth = auth, db = db)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMedicationEventRepository(auth: FirebaseAuth, db: FirebaseFirestore): IMedicationEventRepository{
+        return MedicationEventRepository(  db)
+    }
+    @Provides
+    @Singleton
+    fun provideWalkTrackPointRepository(): IWalkTrackPointRepository {
+        return WalkTrackPointRepository();
+    }
+
+
 }

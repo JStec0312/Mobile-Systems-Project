@@ -1,4 +1,4 @@
-Nov 18, 2025 12:54:30 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+Dec 17, 2025 11:08:53 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
 INFO: Started WebSocket server on ws://127.0.0.1:9150
 API endpoint: http://127.0.0.1:8080
 If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
@@ -12,7 +12,21 @@ If you are running a Firestore in Datastore Mode project, run:
 Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
 Dev App Server is now running.
 
-Nov 18, 2025 12:54:53 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Dec 17, 2025 11:09:02 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketChannelHandler initChannel
+INFO: Connected to new websocket client
+Dec 17, 2025 11:09:02 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Dec 17, 2025 11:09:02 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Multiple projectIds are not recommended in single project mode. Requested project ID demo-petcare, but the emulator is configured for petcare-a925c. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Multiple projectIds are not recommended in single project mode. Requested project ID demo-petcare, but the emulator is configured for petcare-a925c. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Dec 17, 2025 11:09:24 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Dec 17, 2025 11:09:26 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Dec 17, 2025 11:09:27 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Dec 17, 2025 11:09:28 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Dec 17, 2025 11:09:33 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Dec 17, 2025 11:09:53 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketChannelHandler channelClosed
+INFO: Websocket client disconnected

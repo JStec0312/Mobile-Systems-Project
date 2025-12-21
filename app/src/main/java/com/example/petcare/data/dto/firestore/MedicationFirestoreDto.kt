@@ -13,7 +13,7 @@ data class MedicationFirestoreDto(
     val createdAt: Timestamp = Timestamp.now(),
     val from: Timestamp = Timestamp.now(),
     val to: Timestamp = Timestamp.now(),
-    val reccurenceString: String = "",
+    val reccurenceString: String? = "",
     val times: List<String> = emptyList(),
 ) {
     companion object {

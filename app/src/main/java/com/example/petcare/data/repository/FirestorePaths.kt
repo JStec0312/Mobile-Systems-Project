@@ -17,6 +17,10 @@ object FirestorePaths {
     // walk subcollections
     const val WALK_TRACK_POINTS = "trackPoints"
 
+    const val TASKS = "tasks"
+    const val TASK_OCCURRENCE_OVERRIDES = "taskOccurrenceOverrides"
+    const val TASK_DELETED_OCCURRENCES = "taskDeletedOccurrences"
+
     // document builders
     fun userDoc(userId: String) = "$USERS/$userId"
     fun petDoc(petId: String) = "$PETS/$petId"
@@ -32,4 +36,13 @@ object FirestorePaths {
     fun walkDoc(walkId: String) = "$WALKS/$walkId"
     fun walkTrackPointDoc(walkId: String, pointId: String) =
         "${walkDoc(walkId)}/$WALK_TRACK_POINTS/$pointId"
+
+    fun taskDoc(taskId: String) = "$TASKS/$taskId"
+
+    fun taskOccurrenceOverrideDoc(seriesId: String, occurrenceAtMillis: Long) =
+        "$TASK_OCCURRENCE_OVERRIDES/${seriesId}_$occurrenceAtMillis"
+
+    fun taskDeletedOccurrenceDoc(seriesId: String, occurrenceAtMillis: Long) =
+        "$TASK_DELETED_OCCURRENCES/${seriesId}_$occurrenceAtMillis"
 }
+

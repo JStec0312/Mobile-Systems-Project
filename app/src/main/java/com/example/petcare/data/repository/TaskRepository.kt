@@ -8,44 +8,44 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.datetime.Instant
 
 class TaskRepository(auth: FirebaseAuth, db: FirebaseFirestore) : ITaskRepository {
-    override fun createTask(task: Task, rrule: String?) {
+    override suspend  fun createTask(task: Task, rrule: String?) {
 
     }
 
-    override fun getTasksByPetId(petId: String): List<Task> {
+    override suspend fun getTasksByPetId(petId: String): List<Task> {
         TODO("Not yet implemented")
     }
 
-    override fun updateTaskStatus(
+    override suspend fun updateTaskStatus(
         taskId: String,
         newStatus: taskStatusEnum
     ) {
         TODO("Not yet implemented")
     }
 
-    override fun getTasksByPetIds(petIds: List<String>): List<Task> {
+    override suspend fun getTasksByPetIds(petIds: List<String>): List<Task> {
         TODO("Not yet implemented")
     }
 
-    override fun getTaskById(taskId: String): Task {
+    override suspend fun getTaskById(taskId: String): Task {
         TODO("Not yet implemented")
     }
 
-    override fun deleteTaskById(
+    override suspend fun deleteTaskById(
         task: Task,
         deleteWholeSeries: Boolean
     ) {
         TODO("Not yet implemented")
     }
 
-    override fun updatateTask(
+    override suspend fun updatateTask(
         task: Task,
         updateWholeSeries: Boolean
     ) {
         TODO("Not yet implemented")
     }
 
-    override fun getTasksByPetIdsInDateRange(
+    override suspend  fun getTasksByPetIdsInDateRange(
         petIds: List<String>,
         from: Instant,
         to: Instant

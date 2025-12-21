@@ -1,5 +1,4 @@
 package com.example.petcare.domain.model
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 
@@ -14,6 +13,6 @@ data class Medication(
     val createdAt: LocalDate,
     val from: LocalDate,
     val to: LocalDate?,
-    val reccurenceString: String,
-    val times: List<Instant>
+    val reccurenceString: String?,
+    val times: List<LocalTime>
 )

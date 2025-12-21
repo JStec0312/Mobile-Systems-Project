@@ -32,15 +32,15 @@ class FakePetMemberRepository: IPetMemberRepository {
         petMembers.add(testPetMember)
         petMembers.add(testPetMember2)
     }
-    override fun addPetMember(petMemember: PetMember) {
+    override suspend fun addPetMember(petMemember: PetMember) {
         petMembers.add(petMemember.toDto())
     }
 
-    override fun getPetIdsByUserId(userId: String): List<String> {
+    override suspend fun getPetIdsByUserId(userId: String): List<String> {
         return petMembers.filter { it.userId == userId }.map { it.petId }
     }
 
-    override fun isUserPetMember(userId: String, petId: String): Boolean {
+    override suspend fun isUserPetMember(userId: String, petId: String): Boolean {
         return petMembers.any { it.userId == userId && it.petId == petId }
     }
 }

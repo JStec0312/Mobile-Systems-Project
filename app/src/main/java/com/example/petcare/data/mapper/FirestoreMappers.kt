@@ -1,6 +1,5 @@
 package com.example.petcare.data.mapper
 
-import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.data.dto.firestore.*
 import com.example.petcare.domain.model.*
 import com.google.firebase.Timestamp
@@ -57,7 +56,7 @@ fun MedicationFirestoreDto.toDomain(): Medication {
         to = this.to?.toKotlinLocalDateOrDefault(),
         reccurenceString = this.reccurenceString,
         // Note: MedicationFirestoreDto.times currently stores List<String> in the project; reuse DateConverter.stringToInstant
-        times = this.times.map { DateConverter.stringToInstant(it) }
+        times = this.times.map { LocalTime.parse(it)}
     )
 }
 
@@ -142,14 +141,6 @@ fun NotificationSettingFirestoreDto.toDomain(): NotificationSettings = Notificat
     enabled = this.enabled
 )
 
-fun NotificationFirestoreDto.toDomain(): Notification = Notification(
-    id = this.id,
-    userId = this.userId,
-    category = this.category,
-    title = this.title,
-    time = this.time,
-    type = this.type
-)
 
 // -------------------- MAPPERS: Domain -> Firestore DTO --------------------
 
@@ -175,7 +166,7 @@ fun Medication.toFirestoreDto(): MedicationFirestoreDto = MedicationFirestoreDto
     createdAt = this.createdAt.toTimestamp(),
     from = this.from.toTimestamp(),
     to = this.to?.toTimestamp()!!,
-    reccurenceString = this.reccurenceString,
+    reccurenceString =  this.reccurenceString,
     times = this.times.map { it.toString() }
 )
 
@@ -205,7 +196,7 @@ fun User.toFirestoreDto(): UserFirestoreDto = UserFirestoreDto(
     id = this.id
 )
 
-fun Task.toFirestoreDto(): TaskFirestoreDto = TaskFirestoreDto(
+fun Task.toFirestoreDto(rruleOverride: String?): TaskFirestoreDto = TaskFirestoreDto(
     id = this.id,
     seriesId = this.seriesId,
     petId = this.petId,
@@ -217,7 +208,8 @@ fun Task.toFirestoreDto(): TaskFirestoreDto = TaskFirestoreDto(
     priority = this.priority,
     createdAt = this.createdAt.toTimestamp(),
     date = this.date.toTimestamp(),
-    rrule = this.rrule
+    rrule = this.rrule,
+    isRecurring = (rruleOverride ?: this.rrule) != null
 )
 
 fun PetShareCode.toFirestoreDto(): PetShareCodeFirestoreDto = PetShareCodeFirestoreDto(
@@ -255,12 +247,5 @@ fun NotificationSettings.toFirestoreDto(): NotificationSettingFirestoreDto = Not
     enabled = this.enabled
 )
 
-fun Notification.toFirestoreDto(): NotificationFirestoreDto = NotificationFirestoreDto(
-    id = this.id,
-    userId = this.userId,
-    category = this.category,
-    title = this.title,
-    time = this.time,
-    type = this.type
-)
+
 

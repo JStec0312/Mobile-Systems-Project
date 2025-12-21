@@ -7,10 +7,10 @@ import com.example.petcare.exceptions.GeneralFailure
 interface IPetShareCodeRepository {
 
     @Throws (Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
-    fun getPetShareCodeByValue(shareCode: String): PetShareCode?
+    suspend fun getPetShareCodeByValue(shareCode: String): PetShareCode?
 
     @Throws (Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
-    fun deletePetShareCodeById(shareCodeId: String)
+    suspend fun deletePetShareCodeById(shareCodeId: String)
 
     @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
     suspend fun createPetShareCode(petShareCode: PetShareCode): PetShareCode

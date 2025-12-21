@@ -33,13 +33,13 @@ class FakeNotificationRepository: INotificationRepository {
         usersNotificationSettings.add(fakeNotificationSettingMeds);
         usersNotificationSettings.add(fakeNotificationSettingTasks);
     }
-    override fun createNotificationChannelForNewUser(userId: String) {
+    override suspend fun createNotificationChannelForNewUser(userId: String) {
         val newNotificationSetting = NotificationSettingDto(
             id = UUID.randomUUID().toString(),
             userId = userId,
             category = notificationCategoryEnum.meds,
             updatedAt = Clock.System.now().toString(),
-            enabled = true
+            enabled = false
         );
         val newNotificationSetting2 = NotificationSettingDto(
             id = UUID.randomUUID().toString(),
@@ -54,7 +54,7 @@ class FakeNotificationRepository: INotificationRepository {
 
     }
 
-    override fun toggleNotificationSettingsForUser(
+    override suspend fun toggleNotificationSettingsForUser(
         userId: String,
         category: notificationCategoryEnum,
     ) {
@@ -67,7 +67,7 @@ class FakeNotificationRepository: INotificationRepository {
         return
     }
 
-    override fun isCategoryEnabledForUser(
+    override suspend fun isCategoryEnabledForUser(
         userId: String,
         category: notificationCategoryEnum
     ): Boolean {
@@ -76,7 +76,7 @@ class FakeNotificationRepository: INotificationRepository {
         }
         return setting?.enabled ?: false;
     }
-    override fun getForUser(userId: String): List<NotificationSettings> {
+    override suspend fun getForUser(userId: String): List<NotificationSettings> {
         return  usersNotificationSettings.filter { it.userId == userId }.map{it.toDomain()}
     }
 

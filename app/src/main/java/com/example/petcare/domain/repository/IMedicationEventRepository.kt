@@ -12,4 +12,8 @@ interface IMedicationEventRepository {
         startDate: Instant,
         endDate: Instant,
     ) : List<MedicationEvent>
+
+    suspend fun markMedicationEventAsTaken(
+        medicationEventId: String,
+    )
 }

@@ -7,6 +7,7 @@ import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.INotificationRepository
 import com.example.petcare.exceptions.Failure
+import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -31,8 +32,11 @@ class EditNotificationSettingsUseCase @Inject constructor(
                 userId = userId,
                 newCategory = category
             );
+
             emit(Resource.Success<Unit>(Unit));
         } catch (e: Failure){
+            emit(Resource.Error<Unit>(e.message ?: "An unexpected error occurred"))
+        } catch (e: GeneralFailure){
             emit(Resource.Error<Unit>(e.message ?: "An unexpected error occurred"))
         }
     }

@@ -6,15 +6,16 @@ import com.example.petcare.exceptions.GeneralFailure
 
 interface IMedicationRepository {
     @Throws(Failure.ServerError::class, Failure.NetworkError::class, Failure.UnknownError::class)
-    fun createMedication(medication: Medication)
+    suspend fun createMedication(medication: Medication)
 
     @Throws(Failure.ServerError::class, Failure.NetworkError::class, Failure.UnknownError::class, GeneralFailure.MedicationNotFound::class)
-    fun deleteMedication(medicationId: String)
+    suspend fun deleteMedication(medicationId: String)
 
     @Throws(Failure.ServerError::class, Failure.NetworkError::class, Failure.UnknownError::class, GeneralFailure.MedicationNotFound::class, GeneralFailure.PetNotFound::class)
-    fun listMedicationsForPet(petId: String): List<Medication>
+    suspend fun listMedicationsForPet(petId: String): List<Medication>
 
     @Throws
-    fun getMedicationById(medicationId: String): Medication
+    suspend fun getMedicationById(medicationId: String): Medication
+
 
 }

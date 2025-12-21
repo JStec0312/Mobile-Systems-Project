@@ -1,5 +1,4 @@
 package com.example.petcare.domain.use_case.add_medication
-import androidx.compose.ui.geometry.Rect
 import com.example.petcare.common.Resource
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.domain.model.Medication
@@ -12,7 +11,6 @@ import com.example.petcare.exceptions.Failure
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import javax.inject.Inject
@@ -33,7 +31,7 @@ class AddMedicationUseCase @Inject constructor(
         from: LocalDate,
         to: LocalDate?,
         reccurenceString: String,
-        times: List<Instant>
+        times: List<LocalTime>
     ): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
        val userId = userProvider.getUserId();

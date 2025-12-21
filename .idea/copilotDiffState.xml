@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/app/src/androidTest/java/com/example/petcare/integration/data/test_utils/FirestoreTestUtils.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/androidTest/java/com/example/petcare/integration/data/test_utils/FirestoreTestUtils.kt" />
+              <option name="updatedContent" value="package com.example.petcare.integration.data.test_utils&#10;&#10;import com.example.petcare.data.repository.FirestorePaths&#10;import com.google.firebase.firestore.FirebaseFirestore&#10;import kotlinx.coroutines.tasks.await&#10;import kotlinx.coroutines.runBlocking&#10;&#10;object FirestoreTestUtils {&#10;    /**&#10;     * Clears test collections used by integration tests.&#10;     * Currently removes documents from: medications, medicationEvents, pets&#10;     */&#10;    fun clearFirestoreData(firestore: FirebaseFirestore) = runBlocking {&#10;        val collections = listOf(&#10;            FirestorePaths.MEDICATIONS,&#10;            FirestorePaths.MEDICATION_EVENTS,&#10;            FirestorePaths.PETS&#10;        )&#10;        for (colName in collections) {&#10;            val colRef = firestore.collection(colName)&#10;            val docs = colRef.get().await().documents&#10;            for (doc in docs) {&#10;                colRef.document(doc.id).delete().await()&#10;            }&#10;        }&#10;    }&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

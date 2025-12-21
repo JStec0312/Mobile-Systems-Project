@@ -13,10 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="firestore_emulator_can_write_and_read()">
+      <SelectionState runConfigName="getPetsByIds_returns_list()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="FirestoreEmulatorSmokeTest">
+      <SelectionState runConfigName="create_and_get_pet()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="create_and_get_by_value()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="get_by_value_returns_null_when_missing()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="deletePetShareCodeById_removes_document()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

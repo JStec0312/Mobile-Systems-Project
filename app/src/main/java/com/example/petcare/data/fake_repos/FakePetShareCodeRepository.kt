@@ -9,12 +9,12 @@ import com.example.petcare.domain.repository.IPetShareCodeRepository
 class FakePetShareCodeRepository: IPetShareCodeRepository {
     private val petShareCodes = mutableListOf<PetShareCodeDto>()
 
-    override fun getPetShareCodeByValue(shareCode: String): PetShareCode? {
+    override suspend fun getPetShareCodeByValue(shareCode: String): PetShareCode? {
         val petShareCode = petShareCodes.find { it.code == shareCode }
         return petShareCode?.toDomain()
     }
 
-    override fun deletePetShareCodeById(shareCodeId: String) {
+    override  suspend  fun deletePetShareCodeById(shareCodeId: String) {
         petShareCodes.removeIf { it.id == shareCodeId }
     }
 

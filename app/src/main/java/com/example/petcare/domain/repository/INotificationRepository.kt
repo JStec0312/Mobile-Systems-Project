@@ -5,10 +5,10 @@ import com.example.petcare.common.notificationCategoryEnum
 import com.example.petcare.domain.model.NotificationSettings
 
 interface INotificationRepository {
-    fun createNotificationChannelForNewUser(userId: String);
-    fun toggleNotificationSettingsForUser(userId: String, newCategory: notificationCategoryEnum);
-    fun isCategoryEnabledForUser(userId: String, category: notificationCategoryEnum): Boolean;
-    fun getForUser(userId: String): List<NotificationSettings>;
+    suspend fun createNotificationChannelForNewUser(userId: String);
+    suspend fun toggleNotificationSettingsForUser(userId: String, newCategory: notificationCategoryEnum);
+    suspend fun isCategoryEnabledForUser(userId: String, category: notificationCategoryEnum): Boolean;
+    suspend fun getForUser(userId: String): List<NotificationSettings>;
 
 
 }

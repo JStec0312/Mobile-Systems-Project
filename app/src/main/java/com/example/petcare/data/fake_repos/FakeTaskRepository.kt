@@ -80,7 +80,7 @@ class FakeTaskRepository: ITaskRepository {
         tasks.add(soonTask)
     }
 
-    override fun createTask(task: Task, rrule: String?) {
+    override suspend fun createTask(task: Task, rrule: String?) {
         if (task.title == "Network Error") {
             throw Failure.NetworkError()
         }
@@ -102,7 +102,7 @@ class FakeTaskRepository: ITaskRepository {
 
     }
 
-    override fun getTasksByPetId(petId: String): List<Task> {
+    override suspend fun getTasksByPetId(petId: String): List<Task> {
         if (petId == "Network Error") {
             throw Failure.NetworkError()
         }
@@ -115,7 +115,7 @@ class FakeTaskRepository: ITaskRepository {
 
         return expandTasksForPetIds(listOf(petId))
     }
-    override fun updateTaskStatus(taskId: String, newStatus: taskStatusEnum) {
+    override suspend fun updateTaskStatus(taskId: String, newStatus: taskStatusEnum) {
         if (taskId == "Network Error") {
             throw Failure.NetworkError()
         }
@@ -141,7 +141,7 @@ class FakeTaskRepository: ITaskRepository {
         recurringStatusOverrides[key] = newStatus
     }
 
-    override fun getTasksByPetIds(petIds: List<String>): List<Task> {
+    override suspend fun getTasksByPetIds(petIds: List<String>): List<Task> {
         if (petIds.contains("Network Error")) {
             throw Failure.NetworkError()
         }
@@ -155,7 +155,7 @@ class FakeTaskRepository: ITaskRepository {
         return expandTasksForPetIds(petIds)
     }
 
-    override fun getTaskById(taskId: String): Task {
+    override suspend fun getTaskById(taskId: String): Task {
         if (taskId == "Network Error") {
             throw Failure.NetworkError()
         }
@@ -172,7 +172,7 @@ class FakeTaskRepository: ITaskRepository {
         return task.toDomain()
     }
 
-    override fun deleteTaskById(task: Task, deleteWholeSeries: Boolean) {
+    override suspend fun deleteTaskById(task: Task, deleteWholeSeries: Boolean) {
         if (task.id == "Network Error") {
             throw Failure.NetworkError()
         }
@@ -203,7 +203,7 @@ class FakeTaskRepository: ITaskRepository {
     }
 
 
-    override fun updatateTask(
+    override suspend fun updatateTask(
         task: Task,
         updateWholeSeries: Boolean
     ) {
@@ -235,7 +235,7 @@ class FakeTaskRepository: ITaskRepository {
         }
     }
 
-    override fun getTasksByPetIdsInDateRange(
+    override suspend fun getTasksByPetIdsInDateRange(
         petIds: List<String>,
         from: Instant,
         to: Instant

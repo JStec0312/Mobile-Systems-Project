@@ -14,6 +14,7 @@ import com.example.petcare.data.dto.fake.UserDto
 import com.example.petcare.data.dto.fake.WalkDto
 import com.example.petcare.data.dto.fake.WalkTrackPointDto
 import com.example.petcare.domain.model.*
+import kotlinx.datetime.LocalTime
 
 // Extension functions for mapping DTOs to Domain models
 fun NotificationSettingDto.toDomain(): NotificationSettings {
@@ -85,7 +86,7 @@ fun MedicationDto.toDomain(): Medication {
         from = DateConverter.stringToLocalDate(this.from),
         to = DateConverter.stringToLocalDate(this.to),
         reccurenceString = this.reccurenceString,
-        times = this.times.map { it ->  DateConverter.stringToInstant(it)}
+        times = this.times.map { it -> LocalTime.parse(it) }
     )
 }
 

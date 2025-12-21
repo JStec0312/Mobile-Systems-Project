@@ -11,7 +11,7 @@ import com.example.petcare.exceptions.GeneralFailure
 class FakeMedicationRepository : IMedicationRepository {
     private val medications = mutableListOf<MedicationDto>()
 
-    override fun createMedication(medication: Medication) {
+    override suspend fun createMedication(medication: Medication) {
         if (medication.name == "Server error"){
             throw Failure.ServerError("Simulated server error")
         } else if (medication.name == "Network error"){
@@ -22,7 +22,7 @@ class FakeMedicationRepository : IMedicationRepository {
         medications.add(medication.toDto())
     }
 
-    override fun deleteMedication(medicationId: String) {
+    override suspend fun deleteMedication(medicationId: String) {
         val medication = medications.find { it.id == medicationId }
         if (medication == null){
             throw GeneralFailure.MedicationNotFound("Medication with id $medicationId not found")
@@ -30,7 +30,7 @@ class FakeMedicationRepository : IMedicationRepository {
         medications.remove(medication)
     }
 
-    override fun listMedicationsForPet(petId: String): List<Medication> {
+    override suspend fun listMedicationsForPet(petId: String): List<Medication> {
         val medsForPet = medications.filter { it.petId == petId }
         if (medsForPet.isEmpty()){
             throw GeneralFailure.MedicationNotFound("No medications found for pet")
@@ -47,7 +47,7 @@ class FakeMedicationRepository : IMedicationRepository {
         return medsForPet.map { it.toDomain() }
     }
 
-    override fun getMedicationById(medicationId: String): Medication {
+    override suspend fun getMedicationById(medicationId: String): Medication {
         val medication = medications.find { it.id == medicationId }
         if (medication == null) {
             throw GeneralFailure.MedicationNotFound("Medication with id $medicationId not found")

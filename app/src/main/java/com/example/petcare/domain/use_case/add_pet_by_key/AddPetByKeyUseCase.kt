@@ -9,6 +9,7 @@ import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.domain.repository.IPetShareCodeRepository
 import com.example.petcare.exceptions.Failure
+import com.example.petcare.exceptions.GeneralFailure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.UUID
@@ -50,7 +51,10 @@ class AddPetByKeyUseCase @Inject constructor(
             petShareCodeRepository.deletePetShareCodeById(petShareCode.id)
             emit(Resource.Success(Unit))
             return@flow
-        } catch (e: Failure) {
+        } catch (e: GeneralFailure){
+            emit(Resource.Error(e.message))
+            return@flow
+        }catch (e: Failure) {
             emit(Resource.Error(e.message))
             return@flow
         }

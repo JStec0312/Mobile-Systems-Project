@@ -5,13 +5,13 @@ import com.example.petcare.exceptions.Failure
 
 interface IPetMemberRepository {
     @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
-    fun addPetMember(petMemember: PetMember);
+    suspend  fun addPetMember(petMemember: PetMember);
 
     @Throws(Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
-    fun getPetIdsByUserId(userId: String): List<String>;
+    suspend  fun getPetIdsByUserId(userId: String): List<String>;
 
     @Throws (Failure.NetworkError::class, Failure.ServerError::class, Failure.UnknownError::class)
-    fun isUserPetMember(userId: String, petId: String): Boolean;
+    suspend  fun isUserPetMember(userId: String, petId: String): Boolean;
 
 
 }

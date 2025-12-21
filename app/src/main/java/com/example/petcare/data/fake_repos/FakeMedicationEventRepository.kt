@@ -7,6 +7,7 @@ import com.example.petcare.data.mapper.toDomain
 import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.model.MedicationEvent
 import com.example.petcare.domain.repository.IMedicationEventRepository
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -45,13 +46,7 @@ class FakeMedicationEventRepository: IMedicationEventRepository {
 
             if (nextDate > endDate) break
 
-            times.forEach { timeInstant ->
-
-                val localTime = timeInstant
-                    .toLocalDateTime(TimeZone.currentSystemDefault())
-                    .time
-
-                val distinctDateTime = LocalDateTime(nextDate, localTime)
+            times.forEach { time ->
 
                 val event = MedicationEventDto(
                     id = UUID.randomUUID().toString(),
@@ -59,7 +54,7 @@ class FakeMedicationEventRepository: IMedicationEventRepository {
                     takenAt = null,
                     status = medicationStatusEnum.planned,
                     notes = null,
-                    scheduledAt = distinctDateTime.toString(),
+                    scheduledAt = time.toString(),
                     petId = medication.petId,
                     title = medication.name
                 )
@@ -81,6 +76,16 @@ class FakeMedicationEventRepository: IMedicationEventRepository {
 
     }
 
+    override suspend fun markMedicationEventAsTaken(medicationEventId: String) {
+        val eventIdx = medicationEvents.indexOfFirst { it.id == medicationEventId }
+        if (eventIdx != -1){
+            val updatedEvent = medicationEvents[eventIdx].copy(
+                takenAt = Clock.System.now().toString(),
+                status = medicationStatusEnum.taken
+            )
+            medicationEvents[eventIdx] = updatedEvent
+        }
+    }
 
 
 }

@@ -18,6 +18,7 @@ data class TaskFirestoreDto(
     val createdAt: Timestamp? = null,
     val date: Timestamp? = null,
     val rrule: String? = null,
+    val isRecurring: Boolean = false,
 ) {
     companion object {
         const val FIELD_ID = "id"

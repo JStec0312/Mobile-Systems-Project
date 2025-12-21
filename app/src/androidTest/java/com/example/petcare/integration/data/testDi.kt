@@ -117,12 +117,12 @@ object TrueRepositoryModule{
     @Provides
     @Singleton
     fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetRepository {
-        return PetRepository(auth = auth, db = db);
+        return PetRepository(db = db);
     }
     @Provides
     @Singleton
     fun provideMedicationRepository(auth: FirebaseAuth, db: FirebaseFirestore): IMedicationRepository{
-        return MedicationRepository(auth = auth, db = db)
+        return MedicationRepository( db = db)
     }
     @Provides
     @Singleton
@@ -133,7 +133,7 @@ object TrueRepositoryModule{
     @Provides
     @Singleton
     fun providePetShareCodeRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetShareCodeRepository {
-        return PetShareCodeRepository(auth = auth, db = db)
+        return PetShareCodeRepository(db = db)
     }
 
     @Provides

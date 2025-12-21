@@ -1,5 +1,6 @@
 package com.example.petcare.data.repository
 
+import com.example.petcare.common.medicationStatusEnum
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.data.dto.fake.MedicationEventDto
 import com.example.petcare.data.dto.firestore.MedicationEventFirestoreDto
@@ -9,6 +10,7 @@ import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.model.MedicationEvent
 import com.example.petcare.domain.repository.IMedicationEventRepository
 import com.example.petcare.exceptions.Failure
+import com.example.petcare.exceptions.GeneralFailure
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -18,8 +20,8 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import org.dmfs.rfc5545.DateTime
 import org.dmfs.rfc5545.recur.RecurrenceRule
@@ -56,12 +58,8 @@ class MedicationEventRepository @Inject constructor(
                     nextInstance.dayOfMonth
                 );
                 if (nextDate > endDate) break
-                for (timeInstant in times){
-                    val localTime = timeInstant
-                        .toLocalDateTime(timeZone)
-                        .time
-
-                    val localDateTime = LocalDateTime(nextDate, localTime)
+                for (time in times){
+                    val localDateTime = LocalDateTime(nextDate.year, nextDate.monthNumber, nextDate.dayOfMonth, time.hour, time.minute, time.second)
                     val scheduledInstant = localDateTime.toInstant(timeZone)
                     val scheduledMs = scheduledInstant.toEpochMilliseconds()
                     val docId = "${medication.id}_$scheduledMs"
@@ -70,10 +68,20 @@ class MedicationEventRepository @Inject constructor(
                     if (exists) {
                         continue
                     }
-                    val dto = medication.toFirestoreDto();
+                    val dto = MedicationEventFirestoreDto(
+                        id = docId,
+                        petId = medication.petId,
+                        medicationId = medication.id,
+                        title = medication.name,
+                        scheduledAt = scheduledInstant.toFirebaseTimestamp(),
+                        takenAt = null,
+                        status = medicationStatusEnum.planned,
+                        notes = "",
+
+                    )
                     batch.set(docRef, dto);
                     writes++;
-                    if (writes == MAX_BATCH_WRITES){
+                    if (writes >= MAX_BATCH_WRITES){
                         batch.commit().await()
                         writes = 0;
                         batch = firestore.batch();
@@ -83,8 +91,8 @@ class MedicationEventRepository @Inject constructor(
             if (writes > 0){
                 batch.commit().await()
             }
-        } catch (e: FirebaseFirestoreException){
-            throw Failure.ServerError();
+        } catch (t: Throwable){
+            throw FirestoreThrowable.map(t, "createByMedication");
         }
     }
 
@@ -114,15 +122,33 @@ class MedicationEventRepository @Inject constructor(
 
                 for (doc in snap.documents) {
                     val dto = doc.toObject(MedicationEventFirestoreDto::class.java) ?: continue
-                    // jesli Twoj mapper bierze id z pola, OK; jak nie, mozesz przekazac doc.id
                     out.add(dto.toDomain())
                 }
             }
-        } catch (e: FirebaseFirestoreException) {
-            throw e
+        } catch (t: Throwable) {
+            throw FirestoreThrowable.map(t, "getUpcomingMedicationEventsForUserInDateRange")
         }
 
         return out.sortedBy { it.scheduledAt }
+    }
+
+    override suspend fun markMedicationEventAsTaken(medicationEventId: String) {
+        try {
+            val docRef = col.document(medicationEventId)
+            val snapshot = docRef.get().await()
+            if (!snapshot.exists()) {
+                throw GeneralFailure.MedicationNotFound("Medication event with id $medicationEventId not found")
+            }
+            val takenAt = Instant.fromEpochMilliseconds(System.currentTimeMillis())
+            docRef.update(
+                mapOf(
+                    MedicationEventFirestoreDto.FIELD_TAKEN_AT to takenAt.toFirebaseTimestamp(),
+                    MedicationEventFirestoreDto.FIELD_TAKEN_AT to takenAt.toFirebaseTimestamp()
+                )
+            ).await()
+        } catch (t: Throwable) {
+            throw FirestoreThrowable.map(t, "markMedicationEventAsTaken")
+        }
     }
 }
 

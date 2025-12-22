@@ -15,6 +15,16 @@ import com.example.petcare.data.fake_repos.FakeTaskRepository
 import com.example.petcare.data.fake_repos.FakeUserRepository
 import com.example.petcare.data.fake_repos.FakeWalkRepository
 import com.example.petcare.data.fake_repos.FakeWalkTrackPointRepository
+import com.example.petcare.data.repository.MedicationEventRepository
+import com.example.petcare.data.repository.MedicationRepository
+import com.example.petcare.data.repository.NotificationRepository
+import com.example.petcare.data.repository.PetMemberRepository
+import com.example.petcare.data.repository.PetRepository
+import com.example.petcare.data.repository.PetShareCodeRepository
+import com.example.petcare.data.repository.TaskRepository
+import com.example.petcare.data.repository.UserRepository
+import com.example.petcare.data.repository.WalkRepository
+import com.example.petcare.data.repository.WalkTrackPointRepository
 import com.example.petcare.domain.device_api.ILocationClient
 import dagger.Module
 import dagger.Provides
@@ -56,8 +66,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserProvider(sharedPreferences: SharedPreferences): IUserProvider {
-        return UserProvider(sharedPreferences);
+    fun provideUserProvider(auth: FirebaseAuth): IUserProvider {
+        return UserProvider(auth = auth);
     }
 
     @Provides
@@ -79,15 +89,14 @@ object AppModule {
         @Provides
         @Singleton
         fun provideUserRepository(auth: FirebaseAuth, db: FirebaseFirestore): IUserRepository {
-            //return UserRepository(auth = auth, db = db);
-            return FakeUserRepository();
+            return UserRepository(auth = auth, db = db);
         }
 
         @Provides
         @Singleton
         fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore): IPetRepository {
-            //return PetRepository(auth = auth, db = db);
-            return FakePetRepository();
+            return PetRepository( db = db);
+            //return FakePetRepository();
         }
 
         @Provides
@@ -96,8 +105,8 @@ object AppModule {
             auth: FirebaseAuth,
             db: FirebaseFirestore
         ): IMedicationRepository {
-            //return MedicationRepository(auth = auth, db = db)
-            return FakeMedicationRepository()
+            return MedicationRepository( db = db)
+            //return FakeMedicationRepository()
         }
 
         @Provides
@@ -106,8 +115,8 @@ object AppModule {
             auth: FirebaseAuth,
             db: FirebaseFirestore
         ): INotificationRepository {
-            //return NotificationSettingsRepository(auth = auth, db = db)
-            return FakeNotificationRepository();
+            return NotificationRepository( auth = auth, db = db)
+            //return FakeNotificationRepository();
         }
 
         @Provides
@@ -116,22 +125,22 @@ object AppModule {
             auth: FirebaseAuth,
             db: FirebaseFirestore
         ): IPetShareCodeRepository {
-            //return PetShareCodeRepository(auth = auth, db = db)
-            return FakePetShareCodeRepository();
+            return PetShareCodeRepository( db = db)
+            //return FakePetShareCodeRepository();
         }
 
         @Provides
         @Singleton
         fun provideTaskRepository(auth: FirebaseAuth, db: FirebaseFirestore): ITaskRepository {
-            //return TaskRepository(auth = auth, db = db)
-            return FakeTaskRepository();
+            return TaskRepository( db = db)
+
         }
 
         @Provides
         @Singleton
         fun provideWalkRepository(auth: FirebaseAuth, db: FirebaseFirestore): IWalkRepository {
-            //return WalkRepository(auth = auth, db = db)
-            return FakeWalkRepository();
+            return WalkRepository(auth = auth, db = db)
+            //return FakeWalkRepository();
         }
 
         @Provides
@@ -140,15 +149,15 @@ object AppModule {
             auth: FirebaseAuth,
             db: FirebaseFirestore
         ): IPetMemberRepository {
-            //return PetMemberRepository(db= db, auth= auth);
-            return FakePetMemberRepository();
+            return PetMemberRepository(db = db, auth = auth);
+            //return FakePetMemberRepository();
         }
 
         @Provides
         @Singleton
-        fun provideWalkTrackPointRepository(): IWalkTrackPointRepository {
-            //return WalkTrackPointRepository();
-            return FakeWalkTrackPointRepository();
+        fun provideWalkTrackPointRepository(db: FirebaseFirestore): IWalkTrackPointRepository {
+            return WalkTrackPointRepository(db = db);
+            //return FakeWalkTrackPointRepository();
         }
 
         @Provides
@@ -157,8 +166,8 @@ object AppModule {
             auth: FirebaseAuth,
             db: FirebaseFirestore,
         ): com.example.petcare.domain.repository.IMedicationEventRepository {
-            //return MedicationEventRepository(auth = auth, db = db, petProvider = petProvider)
-            return FakeMedicationEventRepository()
+            return MedicationEventRepository(firestore = db)
+           // return FakeMedicationEventRepository()
         }
     }
 
@@ -169,16 +178,7 @@ object AppModule {
         @Provides
         @Singleton
         fun provideFirebaseApp(@ApplicationContext ctx: Context): FirebaseApp {
-            FirebaseApp.getApps(ctx).firstOrNull()?.let { return it }
-
-            val options = FirebaseOptions.Builder()
-                .setProjectId("demo-petcare")
-                .setApplicationId("1:123:android:demo")
-                .setStorageBucket("demo-petcare.appspot.com")
-                .build()
-
-            return FirebaseApp.initializeApp(ctx, options)
-                ?: error("FirebaseApp.initializeApp returned null")
+            return FirebaseApp.getInstance()
         }
 
         @Provides

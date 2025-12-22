@@ -154,7 +154,7 @@ class MedicationEventRepository @Inject constructor(
 
 
 
-private fun Instant.toFirebaseTimestamp(): Timestamp {
+fun Instant.toFirebaseTimestamp(): Timestamp {
     val ms = this.toEpochMilliseconds()
     return Timestamp(ms / 1000, ((ms % 1000) * 1_000_000).toInt())
 }

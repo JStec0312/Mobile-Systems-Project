@@ -18,13 +18,15 @@ data class TaskFirestoreDto(
     val createdAt: Timestamp? = null,
     val date: Timestamp? = null,
     val rrule: String? = null,
-    val isRecurring: Boolean = false,
-) {
+    var isRecurring: Boolean = false,
+    ) {
     companion object {
         const val FIELD_ID = "id"
         const val FIELD_PET_ID = "petId"
         const val FIELD_SERIES_ID = "seriesId"
         const val FIELD_DATE = "date"
         const val FIELD_CREATED_AT = "createdAt"
+        const val FIELD_STATUS = "status"
+        const val FIELD_IS_RECURRING = "recurring"
     }
 }

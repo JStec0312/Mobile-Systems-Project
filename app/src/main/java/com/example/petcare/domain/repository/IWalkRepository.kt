@@ -7,8 +7,8 @@ import kotlin.jvm.Throws
 
 interface IWalkRepository {
     @Throws (Failure.ServerError::class, Failure.NetworkError::class, Failure.UnknownError::class )
-    fun createWalk(walk: Walk);
-    fun setWalkAsEnded(walkId: String, totalDistanceMeters: Float, totalSteps: Int, endTime: Instant);
+    suspend fun createWalk(walk: Walk);
+    suspend fun setWalkAsEnded(walkId: String, totalDistanceMeters: Float, totalSteps: Int, endTime: Instant);
 
 
 }

@@ -1,5 +1,6 @@
 package com.example.petcare.data.mapper
 
+import com.example.petcare.common.taskTypeEnum
 import com.example.petcare.data.dto.firestore.*
 import com.example.petcare.domain.model.*
 import com.google.firebase.Timestamp
@@ -90,19 +91,19 @@ fun UserFirestoreDto.toDomain(): User = User(
     id = this.id
 )
 
-fun TaskFirestoreDto.toDomain(): Task {
+fun TaskFirestoreDto.toDomain(docId: String): Task {
     return Task(
-        id = this.id,
-        seriesId = this.seriesId,
-        petId = this.petId,
-        type = this.type,
-        title = this.title,
-        notes = this.notes,
-        priority = this.priority,
-        status = this.status,
-        createdAt = this.createdAt?.toKotlinLocalDateOrDefault() ?: LocalDate(1970, 1, 1),
-        date = this.date?.toKotlinInstantOrNull() ?: Instant.DISTANT_PAST,
-        rrule = this.rrule
+        id = docId,
+        seriesId = seriesId,
+        petId = requireNotNull(petId),
+        type = type,
+        title = title,
+        notes = notes,
+        status = status,
+        priority = priority,
+        createdAt = createdAt?.toKotlinLocalDate() ?: LocalDate(1970, 1, 1),
+        date = date?.toKotlinInstant() ?: Instant.DISTANT_PAST,
+        rrule = rrule
     )
 }
 
@@ -196,21 +197,22 @@ fun User.toFirestoreDto(): UserFirestoreDto = UserFirestoreDto(
     id = this.id
 )
 
-fun Task.toFirestoreDto(rruleOverride: String?): TaskFirestoreDto = TaskFirestoreDto(
-    id = this.id,
-    seriesId = this.seriesId,
-    petId = this.petId,
-    type = this.type,
-    title = this.title,
-    description = null,
-    notes = this.notes,
-    status = this.status,
-    priority = this.priority,
-    createdAt = this.createdAt.toTimestamp(),
-    date = this.date.toTimestamp(),
-    rrule = this.rrule,
-    isRecurring = (rruleOverride ?: this.rrule) != null
-)
+fun Task.toFirestoreDto(rruleOverride: String?): TaskFirestoreDto =
+    TaskFirestoreDto(
+        id = this.id,
+        seriesId = this.seriesId,
+        petId = this.petId,
+        type = this.type,
+        title = this.title,
+        description = null,
+        notes = this.notes,
+        status = this.status,
+        priority = this.priority,
+        createdAt = this.createdAt.toTimestamp(),
+        date = this.date.toTimestamp(),
+        rrule = rruleOverride ?: this.rrule,
+        isRecurring = (rruleOverride ?: this.rrule) != null
+    )
 
 fun PetShareCode.toFirestoreDto(): PetShareCodeFirestoreDto = PetShareCodeFirestoreDto(
     id = this.id,

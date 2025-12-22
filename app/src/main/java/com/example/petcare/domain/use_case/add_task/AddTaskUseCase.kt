@@ -19,6 +19,7 @@ import kotlinx.datetime.Instant
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.datetime.LocalDate
+import timber.log.Timber
 
 class AddTaskUseCase @Inject constructor(
     private val taskRepository: ITaskRepository,
@@ -72,9 +73,11 @@ class AddTaskUseCase @Inject constructor(
             taskRepository.createTask(task, rrule);
             emit(Resource.Success(task))
         } catch (e: Failure){
+            Timber.tag("AddTaskUseCase").e(e, "Error adding task")
             emit(Resource.Error("An error occurred: ${e.message}"))
         } catch (e: GeneralFailure){
             emit(Resource.Error("An error occurred: ${e.message}"))
+            Timber.tag("AddTaskUseCase").e(e, "Error adding task")
         }
     }
 }

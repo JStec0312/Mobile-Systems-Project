@@ -15,6 +15,7 @@ import com.example.petcare.data.fake_repos.FakeTaskRepository
 import com.example.petcare.data.fake_repos.FakeUserRepository
 import com.example.petcare.data.fake_repos.FakeWalkRepository
 import com.example.petcare.data.fake_repos.FakeWalkTrackPointRepository
+import com.example.petcare.data.remote.OpenAiVetGateway
 import com.example.petcare.data.repository.MedicationEventRepository
 import com.example.petcare.data.repository.MedicationRepository
 import com.example.petcare.data.repository.NotificationRepository
@@ -35,6 +36,7 @@ import com.example.petcare.domain.providers.IUserProvider
 import com.example.petcare.domain.providers.implementation.UserProvider
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.implementation.PetProvider
+import com.example.petcare.domain.remote.IVetAiGateway
 import com.example.petcare.domain.repository.IMedicationRepository
 import com.example.petcare.domain.repository.INotificationRepository
 import com.example.petcare.domain.repository.IPetMemberRepository
@@ -55,6 +57,8 @@ import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.EntryPoint
 
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.ktor.client.HttpClient
+
 // JEZELI USUNIESZ MI CHOCIAZ JEDEN KOMENTARZ TO CIE ZABIJE
 @Module
 @InstallIn(SingletonComponent::class)
@@ -203,6 +207,7 @@ object AppModule {
 
             return auth
         }
+
     }
 
     @Module
@@ -224,6 +229,22 @@ object AppModule {
                 context = ctx,
                 client = fusedLocationProviderClient
             )
+        }
+    }
+
+    @Module
+    @InstallIn(SingletonComponent::class)
+    object RemoteDataModule{
+        @Provides
+        @Singleton
+        fun provideHttpClient(): HttpClient{
+            return HttpClient();
+        }
+
+        @Provides
+        @Singleton
+        fun provideVetAiGateway(httpClient: HttpClient): IVetAiGateway{
+            return OpenAiVetGateway(httpClient);
         }
     }
 }

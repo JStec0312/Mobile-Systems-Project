@@ -1,17 +1,8 @@
 package com.example.petcare.presentation.medication
 
+import android.content.Intent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,48 +10,74 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.petcare.domain.model.Medication
 import com.example.petcare.presentation.common.BaseScreen
 import com.example.petcare.presentation.theme.PetCareTheme
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
-// Model danych
-data class FakeMedication(
-    val name: String,
-    val description: String,
-    val isActive: Boolean
-)
+@Composable
+fun MedicationHistoryRoute(
+    viewModel: MedicationViewModel = hiltViewModel(),
+    onAddMedicationClick: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.loadMedications()
+    }
+
+    // Obsługa Exportu (Tekst/CSV)
+    LaunchedEffect(true) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is MedicationUiEvent.ShareReport -> {
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, event.reportContent)
+                        putExtra(Intent.EXTRA_SUBJECT, "Pet Medication History")
+                        type = "text/plain" // Bezpieczny typ, otwiera notatniki/maile
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, "Export History via")
+                    context.startActivity(shareIntent)
+                }
+            }
+        }
+    }
+
+    MedicationHistoryScreen(
+        state = state,
+        onAddMedicationClick = onAddMedicationClick,
+        onExportClick = viewModel::onExportClick
+    )
+}
 
 @Composable
 fun MedicationHistoryScreen(
-    onAddMedicationClick: () -> Unit = {},
-    // Parametr do testowania pustej listy w Preview (domyślnie false, czyli pokazuje dane)
-    forceEmptyState: Boolean = false
+    state: MedicationState,
+    onAddMedicationClick: () -> Unit,
+    onExportClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-
-    // Logika do testowania: jeśli forceEmptyState = true, lista jest pusta.
-    val medicationList = if (forceEmptyState) emptyList() else listOf(
-        FakeMedication("Heartgard Plus", "Heartworm Prevention", true),
-        FakeMedication("Rimadyl", "Anti-inflammatory", true),
-        FakeMedication("Apoquel", "Allergy Relief", true),
-        FakeMedication("Antibiotics", "Infection Treatment", false)
-    )
 
     BaseScreen {
         Column(
@@ -72,7 +89,7 @@ fun MedicationHistoryScreen(
         ) {
             Spacer(modifier = Modifier.height(30.dp))
 
-            // 1. SUMMARY CARDS
+            // Karta: ACTIVE MEDICATIONS
             Card(
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
@@ -90,8 +107,7 @@ fun MedicationHistoryScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Wyświetlanie licznika (0 jeśli lista pusta)
-                    val activeCount = medicationList.count { it.isActive }
+                    val activeCount = state.medications.count { it.active }
                     Text(
                         text = "$activeCount medications active",
                         color = Color.White,
@@ -103,6 +119,7 @@ fun MedicationHistoryScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Karta: UPCOMING DOSES
             Card(
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -120,25 +137,28 @@ fun MedicationHistoryScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    if (medicationList.isEmpty()) {
-                        // Jeśli nie ma leków, nie ma też dawek
-                        Text(
-                            text = "-",
-                            color = MaterialTheme.colorScheme.tertiary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
-                        )
+                    if (state.upcomingDoses.isEmpty()) {
+                        Text("-", color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold)
                     } else {
-                        UpcomingDoseRow(medName = "Heartgard Plus", date = "2024-02-15")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        UpcomingDoseRow(medName = "Rimadyl", date = "2024-01-21")
+                        state.upcomingDoses.forEach { dose ->
+                            val timeStr = "${dose.time.hour.toString().padStart(2,'0')}:${dose.time.minute.toString().padStart(2,'0')}"
+                            val info = "${dose.medicationName}: ${dose.dayLabel} $timeStr"
+
+                            Text(
+                                text = info,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 2. PRZYCISK ADD
+            // ADD BUTTON
             Button(
                 onClick = onAddMedicationClick,
                 modifier = Modifier
@@ -158,53 +178,47 @@ fun MedicationHistoryScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // 3. LISTA WSZYSTKICH LEKÓW
+            // LIST HEADER
             Row(modifier = Modifier.fillMaxWidth().padding(start = 8.dp, bottom = 8.dp)) {
                 Text(
                     text = "ALL MEDICATIONS",
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.SemiBold, // Zgodne z Dashboardem
+                    fontWeight = FontWeight.SemiBold,
                     fontSize = 18.sp
                 )
             }
 
-            // --- TUTAJ JEST ZMIANA (Obsługa pustej listy) ---
-            if (medicationList.isEmpty()) {
-                // Pusty stan - Biały kafel z komunikatem (Styl jak w Dashboard)
+            // LIST CONTENT
+            if (state.isLoading) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)
+            } else if (state.medications.isEmpty()) {
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp), // Stała wysokość, żeby ładnie wyglądało
+                    modifier = Modifier.fillMaxWidth().height(150.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             text = "No medications added yet",
                             color = MaterialTheme.colorScheme.secondary,
-                            fontWeight = FontWeight.Bold, // Zgodne z Dashboardem
+                            fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center
                         )
                     }
                 }
             } else {
-                // Lista leków
-                medicationList.forEach { med ->
+                state.medications.forEach { med ->
                     MedicationItem(med = med)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
-            // ------------------------------------------------
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 4. EXPORT (Pokazujemy tylko jeśli są dane, albo zawsze - zależy od decyzji. Zostawiam zawsze)
+            // EXPORT BUTTON
             Button(
-                onClick = { /* TODO */ },
+                onClick = onExportClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -223,34 +237,13 @@ fun MedicationHistoryScreen(
                     fontWeight = FontWeight.SemiBold
                 )
             }
-
             Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }
 
-// --- POMOCNICZE ---
-
 @Composable
-fun UpcomingDoseRow(medName: String, date: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = "$medName: ",
-            color = MaterialTheme.colorScheme.tertiary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 15.sp
-        )
-        Text(
-            text = date,
-            color = Color.Red.copy(alpha = 0.7f),
-            fontWeight = FontWeight.Medium,
-            fontSize = 15.sp
-        )
-    }
-}
-
-@Composable
-fun MedicationItem(med: FakeMedication) {
+fun MedicationItem(med: Medication) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -269,13 +262,19 @@ fun MedicationItem(med: FakeMedication) {
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
-                Text(
-                    text = med.description,
-                    color = Color.Gray,
-                    fontSize = 13.sp
-                )
+                val details = listOfNotNull(med.form, med.dose)
+                    .filter { it.isNotBlank() }
+                    .joinToString(", ")
+
+                if (details.isNotEmpty()) {
+                    Text(
+                        text = details,
+                        color = Color.Gray,
+                        fontSize = 13.sp
+                    )
+                }
             }
-            StatusChip(isActive = med.isActive)
+            StatusChip(isActive = med.active)
         }
     }
 }
@@ -296,20 +295,26 @@ fun StatusChip(isActive: Boolean) {
     }
 }
 
-// PODGLĄD 1: Z DANYMI
-@Preview(showBackground = true, name = "With Data")
+@Preview(showBackground = true)
 @Composable
 fun MedicationHistoryPreview() {
-    PetCareTheme {
-        MedicationHistoryScreen(forceEmptyState = false)
-    }
-}
+    val sampleMed = Medication(
+        id = "1", petId = "1", name = "Apap", form = "Tablet", dose = "1 tab",
+        notes = "", active = true,
+        createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        from = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        to = null, reccurenceString = "", times = listOf(LocalTime(8, 0))
+    )
+    val sampleDose = UpcomingDoseUiModel("Apap", LocalTime(8, 0), "Today")
 
-// PODGLĄD 2: PUSTA LISTA (Sprawdź czy wygląda jak w Dashboard!)
-@Preview(showBackground = true, name = "Empty State")
-@Composable
-fun MedicationHistoryEmptyPreview() {
     PetCareTheme {
-        MedicationHistoryScreen(forceEmptyState = true)
+        MedicationHistoryScreen(
+            state = MedicationState(
+                medications = listOf(sampleMed),
+                upcomingDoses = listOf(sampleDose)
+            ),
+            onAddMedicationClick = {},
+            onExportClick = {}
+        )
     }
 }

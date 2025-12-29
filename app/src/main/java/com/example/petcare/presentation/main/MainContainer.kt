@@ -396,7 +396,7 @@ fun MainContainer(
                     AboutScreen()
                 }
                 composable("medication_history") {
-                    com.example.petcare.presentation.medication.MedicationHistoryScreen(
+                    com.example.petcare.presentation.medication.MedicationHistoryRoute(
                         onAddMedicationClick = {
                             mainNavController.navigate("add_medication")
                         }
@@ -404,7 +404,7 @@ fun MainContainer(
                 }
 
                 composable("add_medication") {
-                    com.example.petcare.presentation.add_medication.AddMedicationScreen(
+                    com.example.petcare.presentation.add_medication.AddMedicationRoute(
                         onNavigateBack = {
                             mainNavController.popBackStack()
                         }

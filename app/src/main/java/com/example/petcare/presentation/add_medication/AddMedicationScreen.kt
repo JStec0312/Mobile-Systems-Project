@@ -1,129 +1,175 @@
 package com.example.petcare.presentation.add_medication
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.petcare.R
 import com.example.petcare.presentation.common.BaseScreen
 import com.example.petcare.presentation.theme.PetCareTheme
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.util.Calendar
 
-enum class MedicationForm {
-    TABLET, CAPSULE, SYRUP, INJECTION, DROPS, OINTMENT, OTHER
-}
+@Composable
+fun AddMedicationRoute(
+    viewModel: AddMedicationViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
-enum class MedRecurrenceType {
-    DAILY, WEEKLY, MONTHLY, AS_NEEDED
+    LaunchedEffect(state.isSuccessful) {
+        if (state.isSuccessful) {
+            Toast.makeText(context, "Medication added successfully", Toast.LENGTH_SHORT).show()
+            viewModel.onSuccessShown()
+            onNavigateBack()
+        }
+    }
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onErrorShown()
+        }
+    }
+
+    AddMedicationScreen(
+        state = state,
+        onNameChange = viewModel::onNameChange,
+        onFormChange = viewModel::onFormChange,
+        onDoseChange = viewModel::onDoseChange,
+        onNotesChange = viewModel::onNotesChange,
+        onStartDateChange = viewModel::onStartDateChange,
+        onEndDateChange = viewModel::onEndDateChange,
+        onReminderTimeChange = viewModel::onReminderTimeChange,
+        onReminderEnabledChange = viewModel::onReminderEnabledChange,
+        onRecurrenceToggled = viewModel::onRecurrenceToggled,
+        onRecurrenceTypeChange = viewModel::onRecurrenceTypeChange,
+        onIntervalChange = viewModel::onIntervalChange,
+        onDaySelected = viewModel::onDaySelected,
+        onSaveClick = viewModel::onSaveClick,
+        onNavigateBack = onNavigateBack
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMedicationScreen(
-    onNavigateBack: () -> Unit = {}
+    state: AddMedicationState,
+    onNameChange: (String) -> Unit,
+    onFormChange: (MedicationForm) -> Unit,
+    onDoseChange: (String) -> Unit,
+    onNotesChange: (String) -> Unit,
+    onStartDateChange: (LocalDate) -> Unit,
+    onEndDateChange: (LocalDate?) -> Unit,
+    onReminderTimeChange: (LocalTime) -> Unit,
+    onReminderEnabledChange: (Boolean) -> Unit,
+    onRecurrenceToggled: (Boolean) -> Unit,
+    onRecurrenceTypeChange: (MedRecurrenceType) -> Unit,
+    onIntervalChange: (String) -> Unit,
+    onDaySelected: (DayOfWeek) -> Unit,
+    onSaveClick: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
-    val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val calendar = Calendar.getInstance()
 
-    // --- STAN ---
-    var name by remember { mutableStateOf("") }
-    var dosage by remember { mutableStateOf("") }
-    var instructions by remember { mutableStateOf("") }
-    var selectedForm by remember { mutableStateOf<MedicationForm?>(null) }
+    // --- SETUP KALENDARZA (Date Picker) ---
+    var showDatePicker by remember { mutableStateOf(false) }
+    var isSelectingStartDate by remember { mutableStateOf(true) }
+    val datePickerState = rememberDatePickerState()
 
-    // Daty
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
-    var endDate by remember { mutableStateOf<LocalDate?>(null) } // Nowe: End Date
-    var selectedTime by remember { mutableStateOf<LocalTime?>(null) }
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val selectedMillis = datePickerState.selectedDateMillis
+                        if (selectedMillis != null) {
+                            val date = Instant.fromEpochMilliseconds(selectedMillis)
+                                .toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-    // Powtarzalność
-    var recurrenceType by remember { mutableStateOf(MedRecurrenceType.DAILY) }
-    var repeatInterval by remember { mutableStateOf(1) }
+                            if (isSelectingStartDate) {
+                                onStartDateChange(date)
+                            } else {
+                                onEndDateChange(date)
+                            }
+                        }
+                        showDatePicker = false
+                    }
+                ) { Text("OK", color = Color.Black) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("Cancel", color = Color.Black) }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 
-    // Przypomnienia (Nowe, z Mocka)
-    var isReminderEnabled by remember { mutableStateOf(true) }
+    // --- SETUP ZEGARA (Nowy, ładny Material 3 Time Picker) ---
+    var showTimePicker by remember { mutableStateOf(false) }
+    val timePickerState = rememberTimePickerState(
+        initialHour = calendar.get(Calendar.HOUR_OF_DAY),
+        initialMinute = calendar.get(Calendar.MINUTE),
+        is24Hour = true
+    )
+
+    if (showTimePicker) {
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onReminderTimeChange(LocalTime(timePickerState.hour, timePickerState.minute))
+                        showTimePicker = false
+                    }
+                ) { Text("OK", color = Color.Black) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) { Text("Cancel", color = Color.Black) }
+            },
+            text = {
+                // Wyśrodkowanie zegara
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    TimePicker(state = timePickerState)
+                }
+            },
+            containerColor = Color.White // Białe tło jak w kalendarzu
+        )
+    }
 
     // Dropdowny
     var formExpanded by remember { mutableStateOf(false) }
     var recurrenceExpanded by remember { mutableStateOf(false) }
 
-    // Kalendarze
-    val calendar = Calendar.getInstance()
-
-    // Helper do daty
-    fun showDatePicker(onDateSelected: (LocalDate) -> Unit) {
-        DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth -> onDateSelected(LocalDate(year, month + 1, dayOfMonth)) },
-            calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
-    }
-
-    val timePickerDialog = TimePickerDialog(
-        context,
-        { _, hourOfDay, minute -> selectedTime = LocalTime(hourOfDay, minute) },
-        calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true
-    )
-
-    // STYL PÓL (Identyczny jak w AddTask)
     val customColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = MaterialTheme.colorScheme.secondary,
         unfocusedBorderColor = Color.Transparent,
@@ -135,6 +181,11 @@ fun AddMedicationScreen(
         unfocusedTextColor = MaterialTheme.colorScheme.secondary,
         unfocusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
         focusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
+        disabledContainerColor = Color.White,
+        disabledBorderColor = Color.Transparent,
+        disabledTextColor = MaterialTheme.colorScheme.secondary,
+        disabledLabelColor = Color(0xFFBDADD5),
+        disabledPlaceholderColor = Color(0xFFBDADD5)
     )
 
     BaseScreen {
@@ -158,29 +209,25 @@ fun AddMedicationScreen(
             ) {
                 Spacer(modifier = Modifier.height(80.dp))
 
-                // Kontener dla pól (używamy paddingu zamiast sztywnej szerokości, żeby naprawić wygląd)
                 Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)) {
 
-                    // 1. NAME
                     OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
+                        value = state.name,
+                        onValueChange = onNameChange,
                         label = { Text("Medication Name") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = customColors,
                         singleLine = true
                     )
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 2. FORM
                     ExposedDropdownMenuBox(
                         expanded = formExpanded,
                         onExpandedChange = { formExpanded = !formExpanded },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         OutlinedTextField(
-                            value = selectedForm?.name?.lowercase()?.replaceFirstChar { it.uppercase() } ?: "",
+                            value = state.form?.name?.lowercase()?.replaceFirstChar { it.uppercase() } ?: "",
                             onValueChange = {},
                             readOnly = true,
                             placeholder = { Text("Select form") },
@@ -197,194 +244,202 @@ fun AddMedicationScreen(
                             MedicationForm.values().forEach { form ->
                                 DropdownMenuItem(
                                     text = { Text(form.name.lowercase().replaceFirstChar { it.uppercase() }) },
-                                    onClick = { selectedForm = form; formExpanded = false }
+                                    onClick = { onFormChange(form); formExpanded = false }
                                 )
                             }
                         }
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 3. DOSAGE
                     OutlinedTextField(
-                        value = dosage,
-                        onValueChange = { dosage = it },
+                        value = state.dose,
+                        onValueChange = onDoseChange,
                         label = { Text("Dosage (e.g. 1 tablet)") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = customColors,
                         singleLine = true
                     )
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 4. FREQUENCY (Przeniesione wyżej, jak w Mocku)
+                    // REPEAT MEDICATION CARD
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(6.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Frequency", fontSize = 14.sp, color = MaterialTheme.colorScheme.secondary)
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            ExposedDropdownMenuBox(
-                                expanded = recurrenceExpanded,
-                                onExpandedChange = { recurrenceExpanded = !recurrenceExpanded },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                OutlinedTextField(
-                                    value = recurrenceType.name.lowercase().replace("as_needed", "as needed").replaceFirstChar { it.uppercase() },
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    modifier = Modifier.fillMaxWidth().menuAnchor(),
-                                    colors = customColors,
-                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = recurrenceExpanded) }
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                Text("Repeat medication?", fontSize = 16.sp, color = MaterialTheme.colorScheme.secondary)
+                                Switch(
+                                    checked = state.isRecurring,
+                                    onCheckedChange = onRecurrenceToggled,
+                                    colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = MaterialTheme.colorScheme.secondary)
                                 )
-                                ExposedDropdownMenu(
-                                    expanded = recurrenceExpanded,
-                                    onDismissRequest = { recurrenceExpanded = false },
-                                    modifier = Modifier.background(Color.White)
-                                ) {
-                                    MedRecurrenceType.values().forEach { option ->
-                                        DropdownMenuItem(
-                                            text = { Text(option.name.lowercase().replace("as_needed", "as needed").replaceFirstChar { it.uppercase() }) },
-                                            onClick = { recurrenceType = option; recurrenceExpanded = false }
-                                        )
-                                    }
-                                }
                             }
 
-                            // Jeśli wybrano "Daily", "Weekly" itp - pokaż interwał
-                            if (recurrenceType != MedRecurrenceType.AS_NEEDED) {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text("Every", color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(end = 8.dp))
-                                    TextField(
-                                        value = repeatInterval.toString(),
-                                        onValueChange = { repeatInterval = it.filter { c -> c.isDigit() }.toIntOrNull() ?: 1 },
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        singleLine = true,
-                                        textStyle = LocalTextStyle.current.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary, textAlign = TextAlign.Center),
-                                        modifier = Modifier.width(50.dp),
-                                        colors = TextFieldDefaults.colors(
-                                            focusedContainerColor = Color.Transparent,
-                                            unfocusedContainerColor = Color.Transparent,
-                                            focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
-                                            unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary
-                                        )
+                            if (state.isRecurring) {
+                                Spacer(modifier = Modifier.height(10.dp))
+                                ExposedDropdownMenuBox(
+                                    expanded = recurrenceExpanded,
+                                    onExpandedChange = { recurrenceExpanded = !recurrenceExpanded },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    OutlinedTextField(
+                                        value = state.recurrenceType.name.lowercase().replace("as_needed", "as needed").replaceFirstChar { it.uppercase() },
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+                                        colors = customColors,
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = recurrenceExpanded) }
                                     )
-                                    val unit = when (recurrenceType) {
-                                        MedRecurrenceType.DAILY -> "days"
-                                        MedRecurrenceType.WEEKLY -> "weeks"
-                                        MedRecurrenceType.MONTHLY -> "months"
-                                        else -> ""
+                                    ExposedDropdownMenu(
+                                        expanded = recurrenceExpanded,
+                                        onDismissRequest = { recurrenceExpanded = false },
+                                        modifier = Modifier.background(Color.White)
+                                    ) {
+                                        MedRecurrenceType.values().forEach { option ->
+                                            DropdownMenuItem(
+                                                text = { Text(option.name.lowercase().replace("as_needed", "as needed").replaceFirstChar { it.uppercase() }) },
+                                                onClick = { onRecurrenceTypeChange(option); recurrenceExpanded = false }
+                                            )
+                                        }
                                     }
-                                    Text(" $unit", color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(start = 8.dp))
+                                }
+
+                                if (state.recurrenceType != MedRecurrenceType.AS_NEEDED) {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("Every", color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(end = 8.dp))
+                                        TextField(
+                                            value = state.repeatInterval.toString(),
+                                            onValueChange = onIntervalChange,
+                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                            singleLine = true,
+                                            modifier = Modifier.width(50.dp),
+                                            colors = TextFieldDefaults.colors(
+                                                focusedContainerColor = Color.Transparent,
+                                                unfocusedContainerColor = Color.Transparent,
+                                                focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                                                unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                                                focusedTextColor = MaterialTheme.colorScheme.secondary,
+                                                unfocusedTextColor = MaterialTheme.colorScheme.secondary
+                                            )
+                                        )
+                                        val unit = when (state.recurrenceType) {
+                                            MedRecurrenceType.DAILY -> "days"
+                                            MedRecurrenceType.WEEKLY -> "weeks"
+                                            MedRecurrenceType.MONTHLY -> "months"
+                                            else -> ""
+                                        }
+                                        Text(" $unit", color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(start = 8.dp))
+                                    }
+
+                                    if (state.recurrenceType == MedRecurrenceType.WEEKLY) {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            val days = listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
+                                            days.forEach { day ->
+                                                val isSelected = state.selectedDays.contains(day)
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(32.dp)
+                                                        .clip(CircleShape)
+                                                        .clickable { onDaySelected(day) }
+                                                        .background(if(isSelected) MaterialTheme.colorScheme.secondary else Color.Transparent)
+                                                        .border(1.dp, if(isSelected) Color.Transparent else MaterialTheme.colorScheme.secondary, CircleShape),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = day.name.take(1),
+                                                        color = if(isSelected) Color.White else MaterialTheme.colorScheme.secondary,
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 5. START DATE & END DATE (Duration z Mocka)
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // Start Date
                         OutlinedTextField(
-                            value = selectedDate?.toString() ?: "",
+                            value = state.startDate.toString(),
                             onValueChange = {},
                             readOnly = true,
-                            modifier = Modifier.weight(1f).clickable { showDatePicker { selectedDate = it } },
+                            modifier = Modifier.weight(1f).clickable {
+                                isSelectingStartDate = true
+                                showDatePicker = true
+                            },
                             label = { Text("Start Date") },
                             colors = customColors,
-                            placeholder = { Text("YYYY-MM-DD") },
                             trailingIcon = {
-                                IconButton(onClick = { showDatePicker { selectedDate = it } }) {
-                                    Image(painter = painterResource(id = R.drawable.calendar), contentDescription = null, modifier = Modifier.size(20.dp))
+                                IconButton(onClick = {
+                                    isSelectingStartDate = true
+                                    showDatePicker = true
+                                }) {
+                                    Icon(painterResource(id = R.drawable.calendar), contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(24.dp))
                                 }
-                            },
-                            singleLine = true
+                            }
                         )
-
-                        // End Date (Opcjonalne)
                         OutlinedTextField(
-                            value = endDate?.toString() ?: "",
+                            value = state.endDate?.toString() ?: "",
                             onValueChange = {},
                             readOnly = true,
-                            modifier = Modifier.weight(1f).clickable { showDatePicker { endDate = it } },
-                            label = { Text("End Date") }, // W mocku to "Duration / End Date"
-                            colors = customColors,
-                            placeholder = { Text("Optional") },
-                            trailingIcon = {
-                                IconButton(onClick = { showDatePicker { endDate = it } }) {
-                                    Image(painter = painterResource(id = R.drawable.calendar), contentDescription = null, modifier = Modifier.size(20.dp))
-                                }
+                            modifier = Modifier.weight(1f).clickable {
+                                isSelectingStartDate = false
+                                showDatePicker = true
                             },
-                            singleLine = true
+                            label = { Text("End Date") },
+                            placeholder = { Text("Optional") },
+                            colors = customColors,
+                            trailingIcon = {
+                                IconButton(onClick = {
+                                    isSelectingStartDate = false
+                                    showDatePicker = true
+                                }) {
+                                    Icon(painterResource(id = R.drawable.calendar), contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(24.dp))
+                                }
+                            }
                         )
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 6. REMINDER SETTINGS (Zgodnie z Mockiem)
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(6.dp)
-                    ) {
+                    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color.White)) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                                 Text("Enable reminders", fontSize = 16.sp, color = MaterialTheme.colorScheme.secondary)
                                 Switch(
-                                    checked = isReminderEnabled,
-                                    onCheckedChange = { isReminderEnabled = it },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = Color.White,
-                                        checkedTrackColor = MaterialTheme.colorScheme.secondary,
-                                        uncheckedThumbColor = Color.White,
-                                        uncheckedTrackColor = Color(0xFFBDADD5),
-                                        uncheckedBorderColor = Color.Transparent
-                                    )
+                                    checked = state.isReminderEnabled,
+                                    onCheckedChange = onReminderEnabledChange,
+                                    colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = MaterialTheme.colorScheme.secondary)
                                 )
                             }
-
-                            // Pokaż wybór godziny tylko jeśli przypomnienia włączone
-                            if (isReminderEnabled) {
-                                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFF0F0F0))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
+                            if (state.isReminderEnabled) {
+                                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text("Reminder time", color = MaterialTheme.colorScheme.secondary)
-
+                                    // Kliknięcie tutaj otwiera teraz nowy TimePicker
                                     Box(
-                                        modifier = Modifier
-                                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
-                                            .clickable { timePickerDialog.show() }
-                                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                                        modifier = Modifier.background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)).clickable { showTimePicker = true }.padding(horizontal = 12.dp, vertical = 8.dp)
                                     ) {
-                                        Text(
-                                            text = selectedTime?.let { "${it.hour}:${it.minute.toString().padStart(2, '0')}" } ?: "Select Time",
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.secondary
-                                        )
+                                        Text(text = state.reminderTime?.let { "${it.hour}:${it.minute.toString().padStart(2, '0')}" } ?: "Select Time", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
                                     }
                                 }
                             }
                         }
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 7. INSTRUCTIONS
                     OutlinedTextField(
-                        value = instructions,
-                        onValueChange = { instructions = it },
+                        value = state.notes,
+                        onValueChange = onNotesChange,
                         singleLine = false,
                         maxLines = 3,
                         modifier = Modifier.fillMaxWidth().height(100.dp),
@@ -392,29 +447,28 @@ fun AddMedicationScreen(
                         colors = customColors,
                     )
                 }
-
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // BUTTONS
                 Button(
-                    onClick = { /* TODO: Save */ },
+                    onClick = onSaveClick,
                     modifier = Modifier.height(60.dp).width(300.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("ADD MEDICATION", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    if (state.isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text("ADD MEDICATION", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    }
                 }
-
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Cancel button (w stylu tekstu, żeby nie przytłaczał)
                 Text(
                     text = "CANCEL",
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable { onNavigateBack() }
                 )
-
                 Spacer(modifier = Modifier.height(60.dp))
             }
         }
@@ -425,6 +479,12 @@ fun AddMedicationScreen(
 @Composable
 fun AddMedicationPreview() {
     PetCareTheme {
-        AddMedicationScreen()
+        AddMedicationScreen(
+            state = AddMedicationState(),
+            onNameChange = {}, onFormChange = {}, onDoseChange = {}, onNotesChange = {},
+            onStartDateChange = {}, onEndDateChange = {}, onReminderTimeChange = {},
+            onReminderEnabledChange = {}, onRecurrenceToggled = {}, onRecurrenceTypeChange = {},
+            onIntervalChange = {}, onDaySelected = {}, onSaveClick = {}, onNavigateBack = {}
+        )
     }
 }

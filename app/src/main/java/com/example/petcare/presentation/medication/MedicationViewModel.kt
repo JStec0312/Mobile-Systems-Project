@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.providers.IPetProvider
+import com.example.petcare.domain.use_case.delete_medication.DeleteMedicationUseCase
 import com.example.petcare.domain.use_case.list_medications.ListMedicationsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -20,11 +21,13 @@ import javax.inject.Inject
 
 sealed class MedicationUiEvent {
     data class ShareReport(val reportContent: String) : MedicationUiEvent()
+    data class ShowMessage(val message: String) : MedicationUiEvent()
 }
 
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
     private val listMedicationsUseCase: ListMedicationsUseCase,
+    private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val petProvider: IPetProvider
 ) : ViewModel() {
 
@@ -65,6 +68,40 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
+    fun deleteMedication(medicationId: String) {
+        viewModelScope.launch {
+            val previousList = _state.value.medications
+
+            _state.update { currentState ->
+                val updatedList = currentState.medications.filter { it.id != medicationId }
+                currentState.copy(
+                    medications = updatedList,
+                    upcomingDoses = calculateUpcomingDoses(updatedList) // Od razu przeliczamy dawki
+                )
+            }
+
+            deleteMedicationUseCase(medicationId).collect { result ->
+                when(result) {
+                    is Resource.Success -> {
+                        _uiEvent.send(MedicationUiEvent.ShowMessage("Medication removed successfully"))
+                    }
+                    is Resource.Error -> {
+                        _state.update { currentState ->
+                            currentState.copy(
+                                medications = previousList,
+                                upcomingDoses = calculateUpcomingDoses(previousList)
+                            )
+                        }
+                        _uiEvent.send(MedicationUiEvent.ShowMessage(result.message ?: "Failed to delete medication"))
+                    }
+                    is Resource.Loading -> {
+
+                    }
+                }
+            }
+        }
+    }
+
     fun onExportClick() {
         val meds = _state.value.medications
         if (meds.isEmpty()) return
@@ -75,22 +112,13 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
-    // Prosta generacja CSV
     private fun generateCsvReport(meds: List<Medication>): String {
         val sb = StringBuilder()
         sb.append("Name,Form,Dose,Status,Start Date,End Date,Notes\n")
-
         meds.forEach { med ->
             val cleanNotes = med.notes?.replace(",", " ") ?: ""
             val status = if (med.active) "Active" else "Completed"
-
-            sb.append("${med.name},")
-            sb.append("${med.form ?: ""},")
-            sb.append("${med.dose ?: ""},")
-            sb.append("$status,")
-            sb.append("${med.from},")
-            sb.append("${med.to ?: "Ongoing"},")
-            sb.append("$cleanNotes\n")
+            sb.append("${med.name},${med.form ?: ""},${med.dose ?: ""},$status,${med.from},${med.to ?: "Ongoing"},$cleanNotes\n")
         }
         return sb.toString()
     }
@@ -108,7 +136,6 @@ class MedicationViewModel @Inject constructor(
                 list.add(UpcomingDoseUiModel(med.name, time, "Tomorrow"))
             }
         }
-        return list.sortedWith(compareBy({ it.dayLabel == "Tomorrow" }, { it.time }))
-            .take(5)
+        return list.sortedWith(compareBy({ it.dayLabel == "Tomorrow" }, { it.time })).take(5)
     }
 }

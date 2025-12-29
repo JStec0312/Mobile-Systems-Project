@@ -399,7 +399,15 @@ fun MainContainer(
                     com.example.petcare.presentation.medication.MedicationHistoryRoute(
                         onAddMedicationClick = {
                             mainNavController.navigate("add_medication")
+                        },
+                        onNavigateToDetails = { medicationId ->
+                            mainNavController.navigate("medication_details/$medicationId")
+                        },
+                        onNavigateToEdit = { medicationId ->
+                            mainNavController.navigate("medication_edit/$medicationId")
                         }
+
+
                     )
                 }
 
@@ -408,6 +416,23 @@ fun MainContainer(
                         onNavigateBack = {
                             mainNavController.popBackStack()
                         }
+                    )
+                }
+                composable(
+                    route = "medication_details/{medicationId}",
+                    arguments = listOf(navArgument("medicationId") { type = NavType.StringType })
+                ) {
+                    com.example.petcare.presentation.medication_details.MedicationDetailsRoute(
+                        onNavigateBack = { mainNavController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = "medication_edit/{medicationId}",
+                    arguments = listOf(navArgument("medicationId") { type = NavType.StringType })
+                ) {
+                    com.example.petcare.presentation.edit_medication.EditMedicationRoute(
+                        onNavigateBack = { mainNavController.popBackStack() }
                     )
                 }
             }

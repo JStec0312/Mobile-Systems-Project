@@ -150,6 +150,10 @@ class MedicationEventRepository @Inject constructor(
             throw FirestoreThrowable.map(t, "markMedicationEventAsTaken")
         }
     }
+
+    override suspend fun updateMedicationEventsForMedication(medication: Medication) {
+        TODO("Not yet implemented")
+    }
 }
 
 

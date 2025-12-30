@@ -29,7 +29,7 @@ class AddMedicationUseCase @Inject constructor(
         dose: String?,
         notes: String?,
         from: LocalDate,
-        to: LocalDate?,
+        to: LocalDate,
         reccurenceString: String,
         times: List<LocalTime>
     ): Flow<Resource<Unit>> = flow {
@@ -46,6 +46,10 @@ class AddMedicationUseCase @Inject constructor(
         }
         if (!petMemberRepository.isUserPetMember(userId, petId)) {
             emit(Resource.Error("User does not have permission to add medication for this pet"))
+            return@flow
+        }
+        if (from > to) {
+            emit(Resource.Error("Invalid date range: 'from' date is after 'to' date"))
             return@flow
         }
         val medication = Medication(

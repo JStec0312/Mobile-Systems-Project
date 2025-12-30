@@ -61,4 +61,12 @@ class FakeMedicationRepository : IMedicationRepository {
         }
         return medication.toDomain()
     }
+
+    override suspend fun updateMedication(medication: Medication) {
+        val index = medications.indexOfFirst { it.id == medication.id }
+        if (index == -1) {
+            throw GeneralFailure.MedicationNotFound("Medication with id ${medication.id} not found")
+        }
+        medications[index] = medication.toDto()
+    }
 }

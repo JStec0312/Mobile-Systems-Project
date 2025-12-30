@@ -69,4 +69,8 @@ class MedicationRepository( db: FirebaseFirestore) : IMedicationRepository {
             throw FirestoreThrowable.map(t, "getMedicationById")
         }
     }
+
+    override suspend fun updateMedication(medication: Medication) {
+        TODO("Not yet implemented")
+    }
 }

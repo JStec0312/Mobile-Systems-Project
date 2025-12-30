@@ -11,6 +11,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.dmfs.rfc5545.DateTime
@@ -85,6 +86,12 @@ class FakeMedicationEventRepository: IMedicationEventRepository {
             )
             medicationEvents[eventIdx] = updatedEvent
         }
+    }
+
+    override suspend fun updateMedicationEventsForMedication(medication: Medication) {
+        // For simplicity, we'll just remove existing events and recreate them
+        medicationEvents.removeAll { it.medicationId == medication.id }
+        createByMedication(medication)
     }
 
 

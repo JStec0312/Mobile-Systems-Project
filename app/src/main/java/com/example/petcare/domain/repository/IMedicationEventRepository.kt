@@ -16,4 +16,8 @@ interface IMedicationEventRepository {
     suspend fun markMedicationEventAsTaken(
         medicationEventId: String,
     )
+
+    suspend fun updateMedicationEventsForMedication(
+        medication: Medication
+    )
 }

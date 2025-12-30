@@ -17,5 +17,6 @@ interface IMedicationRepository {
     @Throws
     suspend fun getMedicationById(medicationId: String): Medication
 
+    suspend fun updateMedication(medication: Medication)
 
 }

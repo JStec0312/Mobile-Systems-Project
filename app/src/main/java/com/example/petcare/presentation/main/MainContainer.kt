@@ -102,6 +102,8 @@ fun MainContainer(
         currentRoute?.startsWith("task_details") == true -> "TASK DETAILS"
         currentRoute?.startsWith("edit_task") == true -> "EDIT TASK"
         currentRoute == "calendar" -> "CALENDAR"
+        currentRoute == "medication_history" -> "MEDICATION"
+        currentRoute == "add_medication" -> "ADD MEDICATION"
          else -> ""
     }
 
@@ -281,7 +283,9 @@ fun MainContainer(
                         onNavigateToTasks = {
                             mainNavController.navigate("all_tasks/$petId")
                         },
-                        onNavigateToMedicationHistory = {},
+                        onNavigateToMedicationHistory = {
+                            mainNavController.navigate("medication_history")
+                        },
                         onNavigateToChat = {},
                         onNavigateToWalk = {
                             mainNavController.navigate("walk")
@@ -390,6 +394,46 @@ fun MainContainer(
                 }
                 composable("about") {
                     AboutScreen()
+                }
+                composable("medication_history") {
+                    com.example.petcare.presentation.medication.MedicationHistoryRoute(
+                        onAddMedicationClick = {
+                            mainNavController.navigate("add_medication")
+                        },
+                        onNavigateToDetails = { medicationId ->
+                            mainNavController.navigate("medication_details/$medicationId")
+                        },
+                        onNavigateToEdit = { medicationId ->
+                            mainNavController.navigate("medication_edit/$medicationId")
+                        }
+
+
+                    )
+                }
+
+                composable("add_medication") {
+                    com.example.petcare.presentation.add_medication.AddMedicationRoute(
+                        onNavigateBack = {
+                            mainNavController.popBackStack()
+                        }
+                    )
+                }
+                composable(
+                    route = "medication_details/{medicationId}",
+                    arguments = listOf(navArgument("medicationId") { type = NavType.StringType })
+                ) {
+                    com.example.petcare.presentation.medication_details.MedicationDetailsRoute(
+                        onNavigateBack = { mainNavController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = "medication_edit/{medicationId}",
+                    arguments = listOf(navArgument("medicationId") { type = NavType.StringType })
+                ) {
+                    com.example.petcare.presentation.edit_medication.EditMedicationRoute(
+                        onNavigateBack = { mainNavController.popBackStack() }
+                    )
                 }
             }
         }

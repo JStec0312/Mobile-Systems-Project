@@ -15,6 +15,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.tasks.await
+import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -152,8 +153,114 @@ class MedicationEventRepository @Inject constructor(
     }
 
     override suspend fun updateMedicationEventsForMedication(medication: Medication) {
-        TODO("Not yet implemented")
+        val endDate: LocalDate? = medication.to
+        if (endDate == null) {
+            return
+        }
+
+        val nowInstant = Clock.System.now()
+        val nowDate = nowInstant.toLocalDateTime(timeZone).date
+        val nowTs = nowInstant.toFirebaseTimestamp()
+
+        try {
+            var batch = firestore.batch()
+            var writes = 0
+            val MAX_BATCH_WRITES = 500
+
+            val existingSnap = col
+                .whereEqualTo(MedicationEventFirestoreDto.FIELD_MEDICATION_ID, medication.id)
+                .whereGreaterThanOrEqualTo(MedicationEventFirestoreDto.FIELD_SCHEDULED_AT, nowTs)
+                .get()
+                .await()
+
+            for (doc in existingSnap.documents) {
+                batch.delete(doc.reference)
+                writes++
+                if (writes >= MAX_BATCH_WRITES) {
+                    batch.commit().await()
+                    batch = firestore.batch()
+                    writes = 0
+                }
+            }
+            if (writes > 0) {
+                batch.commit().await()
+            }
+            if (endDate < nowDate) {
+                return
+            }
+            val startDate = if (medication.from > nowDate) medication.from else nowDate
+
+            val startDateTime = DateTime(
+                startDate.year,
+                startDate.monthNumber - 1,
+                startDate.dayOfMonth
+            )
+            val rule = RecurrenceRule(medication.reccurenceString)
+            val iterator = rule.iterator(startDateTime)
+            val times = medication.times
+
+            batch = firestore.batch()
+            writes = 0
+
+            while (iterator.hasNext()) {
+                val nextInstance = iterator.next()
+                val nextDate = LocalDate(
+                    nextInstance.year,
+                    nextInstance.month + 1,
+                    nextInstance.dayOfMonth
+                )
+
+                if (nextDate > endDate) break
+
+                for (time in times) {
+                    val localDateTime = LocalDateTime(
+                        nextDate.year,
+                        nextDate.monthNumber,
+                        nextDate.dayOfMonth,
+                        time.hour,
+                        time.minute,
+                        time.second
+                    )
+
+                    val scheduledInstant = localDateTime.toInstant(timeZone)
+
+                    // safety: jakby cos wyszlo przed "teraz", to pomijamy
+                    if (scheduledInstant < nowInstant) continue
+
+                    val scheduledMs = scheduledInstant.toEpochMilliseconds()
+                    val docId = "${medication.id}_$scheduledMs"
+                    val docRef = col.document(docId)
+
+                    val dto = MedicationEventFirestoreDto(
+                        id = docId,
+                        petId = medication.petId,
+                        medicationId = medication.id,
+                        title = medication.name,
+                        scheduledAt = scheduledInstant.toFirebaseTimestamp(),
+                        takenAt = null,
+                        status = medicationStatusEnum.planned,
+                        notes = ""
+                    )
+
+                    batch.set(docRef, dto)
+                    writes++
+                    if (writes >= MAX_BATCH_WRITES) {
+                        batch.commit().await()
+                        batch = firestore.batch()
+                        writes = 0
+                    }
+                }
+            }
+
+            if (writes > 0) {
+                batch.commit().await()
+            }
+
+        } catch (t: Throwable) {
+            throw FirestoreThrowable.map(t, "updateMedicationEventsForMedication")
+        }
     }
+
 }
 
 

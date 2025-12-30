@@ -71,6 +71,16 @@ class MedicationRepository( db: FirebaseFirestore) : IMedicationRepository {
     }
 
     override suspend fun updateMedication(medication: Medication) {
-        TODO("Not yet implemented")
+        try {
+            val firestoreDto = medication.toFirestoreDto();
+            val docRef = col.document(medication.id)
+            val snapshot = docRef.get().await()
+            if (!snapshot.exists()) {
+                throw GeneralFailure.MedicationNotFound("Medication with id ${medication.id} not found")
+            }
+            docRef.set(firestoreDto).await()
+        } catch (t: Throwable) {
+            throw FirestoreThrowable.map(t, "updateMedication")
+        }
     }
 }

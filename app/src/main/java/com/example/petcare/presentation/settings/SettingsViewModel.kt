@@ -32,15 +32,22 @@ class SettingsViewModel @Inject constructor(
     private fun loadSettings() {
         viewModelScope.launch {
             val currentPetIdString = petProvider.getCurrentPetId()
+
             val petUuid = try {
-                if (currentPetIdString != null) UUID.fromString(currentPetIdString) else UUID.randomUUID()
+                if (currentPetIdString != null) {
+                    UUID.fromString(currentPetIdString)
+                } else {
+                    UUID.randomUUID()
+                }
             } catch (e: Exception) {
                 UUID.randomUUID()
             }
 
             getNotificationSettingsUseCase(petId = petUuid).collect { result ->
                 when (result) {
-                    is Resource.Loading -> _state.update { it.copy(isLoading = true) }
+                    is Resource.Loading -> {
+                        _state.update { it.copy(isLoading = true, error = null) }
+                    }
                     is Resource.Success -> {
                         _state.update {
                             it.copy(
@@ -49,8 +56,10 @@ class SettingsViewModel @Inject constructor(
                             )
                         }
                     }
-                    is Resource.Error -> _state.update {
-                        it.copy(isLoading = false, error = result.message)
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(isLoading = false, error = result.message ?: "Unknown error")
+                        }
                     }
                 }
             }
@@ -59,7 +68,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onToggleNotification(category: notificationCategoryEnum) {
         viewModelScope.launch {
-            editNotificationSettingsUseCase(category).collect { result ->
+            editNotificationSettingsUseCase(category = category).collect { result ->
                 when(result) {
                     is Resource.Success -> {
                         loadSettings()
@@ -68,7 +77,6 @@ class SettingsViewModel @Inject constructor(
                         loadSettings()
                     }
                     is Resource.Loading -> {
-                        // Można dodać loader na konkretnym switchu, ale na razie pominimy
                     }
                 }
             }

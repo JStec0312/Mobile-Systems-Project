@@ -260,11 +260,6 @@ class MedicationEventRepository @Inject constructor(
             throw FirestoreThrowable.map(t, "updateMedicationEventsForMedication")
         }
     }
-<<<<<<< Updated upstream
-
-=======
-<<<<<<< Updated upstream
-=======
 
     override suspend fun deleteMedicationEventsForMedication(medicationId: String) {
         try {
@@ -283,8 +278,6 @@ class MedicationEventRepository @Inject constructor(
         }
     }
 
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 }
 
 

@@ -42,6 +42,7 @@ class  GetTasksUseCase @Inject constructor(
             }
 
             val tasks = petRepository.getTasksByPetId(petId)
+
             emit(Resource.Success<List<Task>>(tasks))
         } catch (e: Failure){
             emit(Resource.Error<List<Task>>("An error occurred: ${e.message}"))

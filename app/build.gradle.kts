@@ -26,7 +26,10 @@ android {
             localProperties.load(FileInputStream(localPropertiesFile))
         }
         val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
+        val openAiApiKey = localProperties.getProperty("OPENAI_API_KEY")
+        manifestPlaceholders["OPENAI_API_KEY"] = openAiApiKey;
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey;
+        buildConfigField("String", "OPENAI_API_KEY", "\"$openAiApiKey\"")
         buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
         buildFeatures{
             compose = true
@@ -130,4 +133,12 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.compiler)
+
+    // --- HTTP client ---
+    implementation("io.ktor:ktor-client-core:2.3.3")
+    implementation("io.ktor:ktor-client-okhttp:2.3.3")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.3")
+
+    //--DOTENV--
+
 }

@@ -1,5 +1,6 @@
 package com.example.petcare.integration.data
 import android.content.Context
+import com.example.petcare.data.remote.OpenAiVetGateway
 import com.example.petcare.data.repository.MedicationEventRepository
 import com.example.petcare.data.repository.MedicationRepository
 import com.example.petcare.data.repository.NotificationRepository
@@ -21,6 +22,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import com.example.petcare.di.AppModule.FirebaseModule
 import com.example.petcare.di.AppModule.RepositoryModule
+import com.example.petcare.domain.remote.IVetAiGateway
 import com.example.petcare.domain.repository.IMedicationEventRepository
 import com.example.petcare.domain.repository.IMedicationRepository
 import com.example.petcare.domain.repository.INotificationRepository
@@ -32,8 +34,10 @@ import com.example.petcare.domain.repository.IUserRepository
 import com.example.petcare.domain.repository.IWalkRepository
 import com.example.petcare.domain.repository.IWalkTrackPointRepository
 import com.google.firebase.firestore.firestoreSettings
+import dagger.hilt.InstallIn
 
 import dagger.hilt.testing.TestInstallIn
+import io.ktor.client.HttpClient
 import javax.inject.Singleton
 
 
@@ -139,7 +143,7 @@ object TrueRepositoryModule{
     @Provides
     @Singleton
     fun provideTaskRepository(auth: FirebaseAuth, db: FirebaseFirestore): ITaskRepository{
-        return TaskRepository(auth = auth, db = db)
+        return TaskRepository(db = db)
     }
 
     @Provides
@@ -161,8 +165,8 @@ object TrueRepositoryModule{
     }
     @Provides
     @Singleton
-    fun provideWalkTrackPointRepository(): IWalkTrackPointRepository {
-        return WalkTrackPointRepository();
+    fun provideWalkTrackPointRepository(db: FirebaseFirestore): IWalkTrackPointRepository {
+        return WalkTrackPointRepository(db = db);
     }
 
 

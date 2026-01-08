@@ -11,6 +11,7 @@ import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
@@ -63,6 +64,7 @@ class SignUpUseCase @Inject constructor(
             return@flow
         } catch(e: Failure) {
             emit(Resource.Error<Unit>(e.message))
+            Timber.d("SignUpUseCase invoke: Failure during sign up: ${e.message}")
             return@flow
         }
         emit(Resource.Success(Unit))

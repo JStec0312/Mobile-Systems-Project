@@ -10,12 +10,12 @@ import kotlinx.datetime.Instant
 
 class FakeWalkRepository: IWalkRepository {
     private val walks = mutableListOf<WalkDto>();
-    override fun createWalk(walk: Walk) {
+    override suspend fun createWalk(walk: Walk) {
         val walkDto = walk.toDto()
         walks.add(walk.toDto())
     }
 
-    override fun setWalkAsEnded(
+    override suspend fun setWalkAsEnded(
         walkId: String,
         totalDistanceMeters: Float,
         totalSteps: Int,

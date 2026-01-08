@@ -29,12 +29,16 @@ class AddMedicationUseCase @Inject constructor(
         dose: String?,
         notes: String?,
         from: LocalDate,
-        to: LocalDate,
+        to: LocalDate?,
         reccurenceString: String,
         times: List<LocalTime>
     ): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading())
        val userId = userProvider.getUserId();
+        if (to == null){
+            emit(Resource.Error("End date must be provided"));
+            return@flow
+        }
         if(userId == null){
             emit(Resource.Error("User not logged in"));
             return@flow

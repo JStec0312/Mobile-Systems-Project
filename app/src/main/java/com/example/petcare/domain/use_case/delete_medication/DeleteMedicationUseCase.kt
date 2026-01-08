@@ -2,6 +2,7 @@ package com.example.petcare.domain.use_case.delete_medication
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.IUserProvider
+import com.example.petcare.domain.repository.IMedicationEventRepository
 import com.example.petcare.domain.repository.IMedicationRepository
 import com.example.petcare.domain.repository.IPetMemberRepository
 import com.example.petcare.exceptions.Failure
@@ -16,7 +17,8 @@ class DeleteMedicationUseCase @Inject constructor(
     private val userProvider: IUserProvider,
     private val petProvider: IPetProvider,
     private val medicationRepository: IMedicationRepository,
-    private val petMemberRepository: IPetMemberRepository
+    private val petMemberRepository: IPetMemberRepository,
+    private val medicationEventRepository: IMedicationEventRepository
 ){
     operator fun invoke(
         medicationId: String,
@@ -35,6 +37,8 @@ class DeleteMedicationUseCase @Inject constructor(
                 return@flow
             }
             medicationRepository.deleteMedication(medicationId)
+            medicationEventRepository.deleteMedicationEventsForMedication(medicationId)
+
             emit(Resource.Success<Unit>(Unit))
         } catch (e: Failure){
             emit(Resource.Error<Unit>(e.message))

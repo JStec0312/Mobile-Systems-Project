@@ -94,5 +94,9 @@ class FakeMedicationEventRepository: IMedicationEventRepository {
         createByMedication(medication)
     }
 
+    override suspend fun deleteMedicationEventsForMedication(medicationId: String) {
+        medicationEvents.removeAll { it.medicationId == medicationId }
+    }
+
 
 }

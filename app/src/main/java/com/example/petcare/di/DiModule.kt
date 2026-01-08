@@ -15,17 +15,6 @@ import com.example.petcare.data.fake_repos.FakeTaskRepository
 import com.example.petcare.data.fake_repos.FakeUserRepository
 import com.example.petcare.data.fake_repos.FakeWalkRepository
 import com.example.petcare.data.fake_repos.FakeWalkTrackPointRepository
-import com.example.petcare.data.remote.OpenAiVetGateway
-import com.example.petcare.data.repository.MedicationEventRepository
-import com.example.petcare.data.repository.MedicationRepository
-import com.example.petcare.data.repository.NotificationRepository
-import com.example.petcare.data.repository.PetMemberRepository
-import com.example.petcare.data.repository.PetRepository
-import com.example.petcare.data.repository.PetShareCodeRepository
-import com.example.petcare.data.repository.TaskRepository
-import com.example.petcare.data.repository.UserRepository
-import com.example.petcare.data.repository.WalkRepository
-import com.example.petcare.data.repository.WalkTrackPointRepository
 import com.example.petcare.domain.device_api.ILocationClient
 import dagger.Module
 import dagger.Provides
@@ -33,10 +22,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import com.example.petcare.domain.providers.IUserProvider
-import com.example.petcare.domain.providers.implementation.UserProvider
+import com.example.petcare.data.providers_impl.FakeUserProvider
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.providers.implementation.PetProvider
-import com.example.petcare.domain.remote.IVetAiGateway
 import com.example.petcare.domain.repository.IMedicationRepository
 import com.example.petcare.domain.repository.INotificationRepository
 import com.example.petcare.domain.repository.IPetMemberRepository
@@ -55,11 +43,24 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.EntryPoint
-
+import com.example.petcare.config.Settings
+import com.example.petcare.data.repository.MedicationEventRepository
+import com.example.petcare.data.repository.MedicationRepository
+import com.example.petcare.data.repository.NotificationRepository
+import com.example.petcare.data.repository.PetMemberRepository
+import com.example.petcare.data.repository.PetRepository
+import com.example.petcare.data.repository.PetShareCodeRepository
+import com.example.petcare.data.repository.TaskRepository
+import com.example.petcare.data.repository.WalkRepository
+import com.example.petcare.data.repository.WalkTrackPointRepository
+import com.example.petcare.domain.providers.implementation.UserProvider
+import com.example.petcare.domain.repository.IMedicationEventRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.ktor.client.HttpClient
-
 // JEZELI USUNIESZ MI CHOCIAZ JEDEN KOMENTARZ TO CIE ZABIJE
+const val mode = Settings.MODE // "PROD" albo "DEV"  albo DEV-FIREBASE
+val modeUpper = mode.uppercase()
+private val useFirebase = modeUpper != "DEV"
+private val useEmulator = modeUpper == "DEV-FIREBASE"
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -70,9 +71,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserProvider(auth: FirebaseAuth): IUserProvider {
-        return UserProvider(auth = auth);
+    fun provideUserProvider(
+        sharedPreferences: SharedPreferences,
+        auth: FirebaseAuth
+    ): IUserProvider {
+        return if (useFirebase) {
+            UserProvider(auth = auth)
+        } else {
+            FakeUserProvider(sharedPreferences)
+        }
     }
+
 
     @Provides
     @Singleton
@@ -86,128 +95,135 @@ object AppModule {
     interface WorkerFactoryEntryPoint {
         fun workerFactory(): HiltWorkerFactory
     }
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    object RepositoryModule {
+    @Module @InstallIn(SingletonComponent::class) object RepositoryModule {
         @Provides
         @Singleton
-        fun provideUserRepository(auth: FirebaseAuth, db: FirebaseFirestore): IUserRepository {
-            return UserRepository(auth = auth, db = db);
-        }
-
-        @Provides
-        @Singleton
-        fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore): IPetRepository {
-            return PetRepository( db = db);
-            //return FakePetRepository();
-        }
+        fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore): IPetRepository =
+            if (useFirebase) PetRepository(db = db) else FakePetRepository()
 
         @Provides
         @Singleton
         fun provideMedicationRepository(
             auth: FirebaseAuth,
             db: FirebaseFirestore
-        ): IMedicationRepository {
-            return MedicationRepository( db = db)
-            //return FakeMedicationRepository()
-        }
+        ): IMedicationRepository =
+            if (useFirebase) MedicationRepository(db = db) else FakeMedicationRepository()
 
         @Provides
         @Singleton
         fun provideNotificationSettingsRepository(
             auth: FirebaseAuth,
             db: FirebaseFirestore
-        ): INotificationRepository {
-            return NotificationRepository( auth = auth, db = db)
-            //return FakeNotificationRepository();
-        }
+        ): INotificationRepository =
+            if (useFirebase) NotificationRepository(
+                auth = auth,
+                db = db
+            ) else FakeNotificationRepository()
 
         @Provides
         @Singleton
         fun providePetShareCodeRepository(
             auth: FirebaseAuth,
             db: FirebaseFirestore
-        ): IPetShareCodeRepository {
-            return PetShareCodeRepository( db = db)
-            //return FakePetShareCodeRepository();
-        }
+        ): IPetShareCodeRepository =
+            if (useFirebase) PetShareCodeRepository(db = db) else FakePetShareCodeRepository()
 
         @Provides
         @Singleton
-        fun provideTaskRepository(auth: FirebaseAuth, db: FirebaseFirestore): ITaskRepository {
-            return TaskRepository( db = db)
-
-        }
+        fun provideTaskRepository(auth: FirebaseAuth, db: FirebaseFirestore): ITaskRepository =
+            if (useFirebase) TaskRepository(db = db) else FakeTaskRepository()
 
         @Provides
         @Singleton
-        fun provideWalkRepository(auth: FirebaseAuth, db: FirebaseFirestore): IWalkRepository {
-            return WalkRepository(auth = auth, db = db)
-            //return FakeWalkRepository();
-        }
+        fun provideWalkRepository(auth: FirebaseAuth, db: FirebaseFirestore): IWalkRepository =
+            if (useFirebase) WalkRepository(auth = auth, db = db) else FakeWalkRepository()
 
         @Provides
         @Singleton
         fun providePetMemberRepository(
             auth: FirebaseAuth,
             db: FirebaseFirestore
-        ): IPetMemberRepository {
-            return PetMemberRepository(db = db, auth = auth);
-            //return FakePetMemberRepository();
-        }
+        ): IPetMemberRepository =
+            if (useFirebase) PetMemberRepository(
+                db = db,
+                auth = auth
+            ) else FakePetMemberRepository()
 
         @Provides
         @Singleton
-        fun provideWalkTrackPointRepository(db: FirebaseFirestore): IWalkTrackPointRepository {
-            return WalkTrackPointRepository(db = db);
-            //return FakeWalkTrackPointRepository();
-        }
+        fun provideWalkTrackPointRepository(db: FirebaseFirestore): IWalkTrackPointRepository =
+            if (useFirebase) WalkTrackPointRepository(db = db) else FakeWalkTrackPointRepository()
 
         @Provides
         @Singleton
         fun provideMedicationEventRepository(
             auth: FirebaseAuth,
-            db: FirebaseFirestore,
-        ): com.example.petcare.domain.repository.IMedicationEventRepository {
-            return MedicationEventRepository(firestore = db)
-           // return FakeMedicationEventRepository()
-        }
-    }
+            db: FirebaseFirestore
+        ): IMedicationEventRepository =
+            if (useFirebase) MedicationEventRepository(firestore = db) else FakeMedicationEventRepository()
 
+        @Provides
+        @Singleton
+        fun provideUserRepository(auth: FirebaseAuth, db: FirebaseFirestore): IUserRepository =
+            if (useFirebase) com.example.petcare.data.repository.UserRepository(
+                auth = auth,
+                db = db
+            ) else FakeUserRepository()
+    }
     @Module
     @InstallIn(SingletonComponent::class)
-    object FirebaseModule {;
+    object FirebaseModule {
 
         @Provides
         @Singleton
         fun provideFirebaseApp(@ApplicationContext ctx: Context): FirebaseApp {
-            return FirebaseApp.getInstance()
+            FirebaseApp.getApps(ctx).firstOrNull()?.let { return it }
+
+            return if (useEmulator) {
+                val options = FirebaseOptions.Builder()
+                    .setProjectId("demo-petcare")
+                    .setApplicationId("1:123:android:demo")
+                    .setStorageBucket("demo-petcare.appspot.com")
+                    .build()
+
+                FirebaseApp.initializeApp(ctx, options)
+                    ?: error("FirebaseApp.initializeApp returned null")
+            } else {
+                // PROD i DEV (jesli DEV, i tak repo fake, ale niech app sie nie wywala)
+                FirebaseApp.initializeApp(ctx)
+                    ?: error("FirebaseApp.initializeApp returned null (check google-services.json)")
+            }
         }
 
         @Provides
         @Singleton
         fun provideFirestore(app: FirebaseApp): FirebaseFirestore {
             val db = FirebaseFirestore.getInstance(app)
+            if (useEmulator) {
+                db.useEmulator("10.0.2.2", 8080)
+            }
             return db
-        }
-
-        @Provides
-        @Singleton
-        fun provideFirebaseStorage(app: FirebaseApp): FirebaseStorage {
-            val storage = FirebaseStorage.getInstance(app)
-
-            return storage
         }
 
         @Provides
         @Singleton
         fun provideFirebaseAuth(app: FirebaseApp): FirebaseAuth {
             val auth = FirebaseAuth.getInstance(app)
-
+            if (useEmulator) {
+                auth.useEmulator("10.0.2.2", 9099)
+            }
             return auth
         }
 
+        @Provides
+        @Singleton
+        fun provideFirebaseStorage(app: FirebaseApp): FirebaseStorage {
+            val storage = FirebaseStorage.getInstance(app)
+            if (useEmulator) {
+                storage.useEmulator("10.0.2.2", 9199)
+            }
+            return storage
+        }
     }
 
     @Module
@@ -231,20 +247,5 @@ object AppModule {
             )
         }
     }
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    object RemoteDataModule{
-        @Provides
-        @Singleton
-        fun provideHttpClient(): HttpClient{
-            return HttpClient();
-        }
-
-        @Provides
-        @Singleton
-        fun provideVetAiGateway(httpClient: HttpClient): IVetAiGateway{
-            return OpenAiVetGateway(httpClient);
-        }
-    }
 }
+

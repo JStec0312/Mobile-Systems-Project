@@ -260,7 +260,31 @@ class MedicationEventRepository @Inject constructor(
             throw FirestoreThrowable.map(t, "updateMedicationEventsForMedication")
         }
     }
+<<<<<<< Updated upstream
 
+=======
+<<<<<<< Updated upstream
+=======
+
+    override suspend fun deleteMedicationEventsForMedication(medicationId: String) {
+        try {
+            val existingSnap = col
+                .whereEqualTo(MedicationEventFirestoreDto.FIELD_MEDICATION_ID, medicationId)
+                .get()
+                .await()
+
+            val batch = firestore.batch()
+            for (doc in existingSnap.documents) {
+                batch.delete(doc.reference)
+            }
+            batch.commit().await()
+        } catch (t: Throwable) {
+            throw FirestoreThrowable.map(t, "deleteMedicationEventsForMedication")
+        }
+    }
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 }
 
 

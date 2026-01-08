@@ -20,4 +20,7 @@ interface IMedicationEventRepository {
     suspend fun updateMedicationEventsForMedication(
         medication: Medication
     )
+    suspend fun deleteMedicationEventsForMedication(
+        medicationId: String
+    )
 }

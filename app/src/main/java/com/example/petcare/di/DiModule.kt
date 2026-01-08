@@ -56,6 +56,11 @@ import com.example.petcare.data.repository.WalkTrackPointRepository
 import com.example.petcare.domain.providers.implementation.UserProvider
 import com.example.petcare.domain.repository.IMedicationEventRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+
+//import io.ktor.client.HttpClient
+//import com.example.petcare.data.remote.OpenAiVetGateway
+//import com.example.petcare.domain.remote.IVetAiGateway
+
 // JEZELI USUNIESZ MI CHOCIAZ JEDEN KOMENTARZ TO CIE ZABIJE
 const val mode = Settings.MODE // "PROD" albo "DEV"  albo DEV-FIREBASE
 val modeUpper = mode.uppercase()
@@ -89,6 +94,20 @@ object AppModule {
         return PetProvider();
 
     }
+
+//    @Provides
+//    @Singleton
+//    fun provideHttpClient(): HttpClient {
+//        return HttpClient() // Podstawowy klient Ktor
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun provideVetAiGateway(
+//        impl: OpenAiVetGateway // Hilt znajdzie to dzięki @Inject w OpenAiVetGateway
+//    ): IVetAiGateway {
+//        return impl
+//    }
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)

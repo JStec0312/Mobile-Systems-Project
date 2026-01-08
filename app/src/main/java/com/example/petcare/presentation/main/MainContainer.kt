@@ -67,6 +67,8 @@ import com.example.petcare.presentation.all_tasks.AllTasksViewModel
 import com.example.petcare.presentation.calendar.CalendarRoute
 import com.example.petcare.presentation.edit_task.EditTaskRoute
 import com.example.petcare.presentation.task_details.TaskDetailsRoute
+import com.example.petcare.presentation.ai_chat.AIChatRoute
+import com.example.petcare.presentation.settings.SettingsRoute
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,6 +106,8 @@ fun MainContainer(
         currentRoute == "calendar" -> "CALENDAR"
         currentRoute == "medication_history" -> "MEDICATION"
         currentRoute == "add_medication" -> "ADD MEDICATION"
+        currentRoute == "ai_chat" -> "VET AI"
+        currentRoute == "settings" -> "SETTINGS"
          else -> ""
     }
 
@@ -286,7 +290,9 @@ fun MainContainer(
                         onNavigateToMedicationHistory = {
                             mainNavController.navigate("medication_history")
                         },
-                        onNavigateToChat = {},
+                        onNavigateToChat = {
+                            mainNavController.navigate("ai_chat")
+                        },
                         onNavigateToWalk = {
                             mainNavController.navigate("walk")
                         }
@@ -434,6 +440,12 @@ fun MainContainer(
                     com.example.petcare.presentation.edit_medication.EditMedicationRoute(
                         onNavigateBack = { mainNavController.popBackStack() }
                     )
+                }
+                composable("ai_chat") {
+                    AIChatRoute()
+                }
+                composable("settings") {
+                    SettingsRoute()
                 }
             }
         }

@@ -9,9 +9,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,53 +27,20 @@ class AddMedicationViewModel @Inject constructor(
     private val _state = MutableStateFlow(AddMedicationState())
     val state = _state.asStateFlow()
 
-    fun onNameChange(newValue: String) {
-        _state.update { it.copy(name = newValue) }
-    }
-
-    fun onFormChange(newForm: MedicationForm) {
-        _state.update { it.copy(form = newForm) }
-    }
-
-    fun onDoseChange(newDose: String) {
-        _state.update { it.copy(dose = newDose) }
-    }
-
-    fun onNotesChange(newNotes: String) {
-        _state.update { it.copy(notes = newNotes) }
-    }
-
-    fun onStartDateChange(newDate: LocalDate) {
-        _state.update { it.copy(startDate = newDate) }
-    }
-
-    fun onEndDateChange(newDate: LocalDate?) {
-        _state.update { it.copy(endDate = newDate) }
-    }
-
-    fun onReminderTimeChange(newTime: LocalTime) {
-        _state.update { it.copy(reminderTime = newTime) }
-    }
-
-    fun onReminderEnabledChange(isEnabled: Boolean) {
-        _state.update { it.copy(isReminderEnabled = isEnabled) }
-    }
-
-    fun onRecurrenceToggled(isEnabled: Boolean) {
-        _state.update { it.copy(isRecurring = isEnabled) }
-    }
-
-    fun onRecurrenceTypeChange(newType: MedRecurrenceType) {
-        _state.update { it.copy(recurrenceType = newType) }
-    }
+    fun onNameChange(newValue: String) { _state.update { it.copy(name = newValue) } }
+    fun onFormChange(newForm: MedicationForm) { _state.update { it.copy(form = newForm) } }
+    fun onDoseChange(newDose: String) { _state.update { it.copy(dose = newDose) } }
+    fun onNotesChange(newNotes: String) { _state.update { it.copy(notes = newNotes) } }
+    fun onStartDateChange(newDate: LocalDate) { _state.update { it.copy(startDate = newDate) } }
+    fun onEndDateChange(newDate: LocalDate?) { _state.update { it.copy(endDate = newDate) } }
+    fun onReminderTimeChange(newTime: LocalTime) { _state.update { it.copy(reminderTime = newTime) } }
+    fun onReminderEnabledChange(isEnabled: Boolean) { _state.update { it.copy(isReminderEnabled = isEnabled) } }
+    fun onRecurrenceToggled(isEnabled: Boolean) { _state.update { it.copy(isRecurring = isEnabled) } }
+    fun onRecurrenceTypeChange(newType: MedRecurrenceType) { _state.update { it.copy(recurrenceType = newType) } }
 
     fun onIntervalChange(newInterval: String) {
-        val interval = newInterval.filter { it.isDigit() }.toIntOrNull() ?: 0
-        if (interval > 0) {
-            _state.update { it.copy(repeatInterval = interval) }
-        } else if (newInterval.isEmpty()) {
-            _state.update { it.copy(repeatInterval = 0) }
-        }
+        val interval = newInterval.filter { it.isDigit() }.toIntOrNull() ?: 1
+        _state.update { it.copy(repeatInterval = interval) }
     }
 
     fun onDaySelected(day: DayOfWeek) {
@@ -90,22 +62,23 @@ class AddMedicationViewModel @Inject constructor(
             _state.update { it.copy(error = "Medication name cannot be empty") }
             return
         }
-        if (currentState.isRecurring && currentState.repeatInterval < 1) {
-            _state.update { it.copy(error = "Repeat interval must be at least 1") }
-            return
-        }
 
+        // Generowanie RRule dla backendu
         val rruleString = if (currentState.isRecurring) {
             buildRrule(currentState)
         } else {
-            ""
+            "" // Pusty string dla braku powtarzania
         }
 
+        // Backend oczekuje List<LocalTime>. UI ma jedno, więc pakujemy w listę.
         val timesList = if (currentState.isReminderEnabled && currentState.reminderTime != null) {
             listOf(currentState.reminderTime)
         } else {
             emptyList()
         }
+
+        // Backend UseCase wymaga daty 'to'. Jeśli user dał null (ongoing), dajemy +5 lat.
+        val validEndDate = currentState.endDate ?: currentState.startDate.plus(5, DateTimeUnit.YEAR)
 
         viewModelScope.launch {
             addMedicationUseCase(
@@ -114,7 +87,7 @@ class AddMedicationViewModel @Inject constructor(
                 dose = currentState.dose,
                 notes = currentState.notes,
                 from = currentState.startDate,
-                to = currentState.endDate,
+                to = validEndDate,
                 reccurenceString = rruleString,
                 times = timesList
             ).collect { result ->
@@ -147,24 +120,17 @@ class AddMedicationViewModel @Inject constructor(
             sb.append(";INTERVAL=${state.repeatInterval}")
         }
 
-        if (state.recurrenceType == MedRecurrenceType.WEEKLY) {
+        if (state.recurrenceType == MedRecurrenceType.WEEKLY && state.selectedDays.isNotEmpty()) {
             val daysString = state.selectedDays
                 .sorted()
                 .joinToString(",") { day ->
                     day.name.take(2).uppercase()
                 }
-            if (daysString.isNotEmpty()) {
-                sb.append(";BYDAY=$daysString")
-            }
+            sb.append(";BYDAY=$daysString")
         }
         return sb.toString()
     }
 
-    fun onErrorShown() {
-        _state.update { it.copy(error = null) }
-    }
-
-    fun onSuccessShown() {
-        _state.update { it.copy(isSuccessful = false) }
-    }
+    fun onErrorShown() { _state.update { it.copy(error = null) } }
+    fun onSuccessShown() { _state.update { it.copy(isSuccessful = false) } }
 }

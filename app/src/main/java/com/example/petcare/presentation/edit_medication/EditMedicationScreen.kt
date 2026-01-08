@@ -1,6 +1,7 @@
 package com.example.petcare.presentation.edit_medication
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,8 +37,10 @@ import com.example.petcare.presentation.theme.PetCareTheme
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.util.Calendar
 
 @Composable
 fun EditMedicationRoute(
@@ -70,12 +73,13 @@ fun EditMedicationRoute(
         onNotesChange = viewModel::onNotesChange,
         onStartDateChange = viewModel::onStartDateChange,
         onEndDateChange = viewModel::onEndDateChange,
-        // Przekazujemy nowe funkcje
+        // NAPRAWA: Używamy poprawnych nazw funkcji z VM
+        onReminderTimeChange = viewModel::onReminderTimeChange,
+        onReminderEnabledChange = viewModel::onReminderEnabledChange,
         onRecurrenceToggled = viewModel::onRecurrenceToggled,
         onRecurrenceTypeChange = viewModel::onRecurrenceTypeChange,
         onIntervalChange = viewModel::onIntervalChange,
         onDaySelected = viewModel::onDaySelected,
-        // ---
         onSaveClick = viewModel::onSaveClick,
         onBackClick = onNavigateBack
     )
@@ -91,25 +95,34 @@ fun EditMedicationScreen(
     onNotesChange: (String) -> Unit,
     onStartDateChange: (LocalDate) -> Unit,
     onEndDateChange: (LocalDate?) -> Unit,
-
-    // Nowe parametry dla powtarzania
+    // Poprawione parametry
+    onReminderTimeChange: (LocalTime) -> Unit,
+    onReminderEnabledChange: (Boolean) -> Unit,
     onRecurrenceToggled: (Boolean) -> Unit,
     onRecurrenceTypeChange: (MedRecurrenceType) -> Unit,
     onIntervalChange: (String) -> Unit,
     onDaySelected: (DayOfWeek) -> Unit,
-
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     var formExpanded by remember { mutableStateOf(false) }
-    var recurrenceExpanded by remember { mutableStateOf(false) } // Stan dropdownu powtarzania
+    var recurrenceExpanded by remember { mutableStateOf(false) }
 
-    // --- SETUP KALENDARZA (Date Picker) ---
+    // Date Picker
     var showDatePicker by remember { mutableStateOf(false) }
     var isSelectingStartDate by remember { mutableStateOf(true) }
     val datePickerState = rememberDatePickerState()
+
+    // Time Picker
+    var showTimePicker by remember { mutableStateOf(false) }
+    val calendar = Calendar.getInstance()
+    val timePickerState = rememberTimePickerState(
+        initialHour = state.reminderTime?.hour ?: calendar.get(Calendar.HOUR_OF_DAY),
+        initialMinute = state.reminderTime?.minute ?: calendar.get(Calendar.MINUTE),
+        is24Hour = true
+    )
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -121,12 +134,7 @@ fun EditMedicationScreen(
                         if (selectedMillis != null) {
                             val date = Instant.fromEpochMilliseconds(selectedMillis)
                                 .toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-                            if (isSelectingStartDate) {
-                                onStartDateChange(date)
-                            } else {
-                                onEndDateChange(date)
-                            }
+                            if (isSelectingStartDate) onStartDateChange(date) else onEndDateChange(date)
                         }
                         showDatePicker = false
                     }
@@ -135,9 +143,24 @@ fun EditMedicationScreen(
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) { Text("Cancel", color = Color.Black) }
             }
-        ) {
-            DatePicker(state = datePickerState)
-        }
+        ) { DatePicker(state = datePickerState) }
+    }
+
+    if (showTimePicker) {
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onReminderTimeChange(LocalTime(timePickerState.hour, timePickerState.minute))
+                    showTimePicker = false
+                }) { Text("OK", color = Color.Black) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) { Text("Cancel", color = Color.Black) }
+            },
+            text = { Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { TimePicker(state = timePickerState) } },
+            containerColor = Color.White
+        )
     }
 
     val customColors = OutlinedTextFieldDefaults.colors(
@@ -163,42 +186,28 @@ fun EditMedicationScreen(
             Image(
                 painter = painterResource(id = R.drawable.paw_prints),
                 contentDescription = "",
-                modifier = Modifier
-                    .scale(scaleX = -1f, scaleY = -1f)
-                    .align(Alignment.TopStart)
-                    .offset(x = 120.dp, y = 150.dp)
-                    .size(500.dp)
+                modifier = Modifier.scale(scaleX = -1f, scaleY = -1f).align(Alignment.TopStart).offset(x = 120.dp, y = 150.dp).size(500.dp)
             )
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(bottom = 32.dp)
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
+                modifier = Modifier.padding(bottom = 32.dp).fillMaxSize().verticalScroll(scrollState)
             ) {
                 Spacer(modifier = Modifier.height(80.dp))
 
-                // NAME
+                // Name
                 OutlinedTextField(
                     value = state.name,
                     onValueChange = onNameChange,
                     label = { Text("Medication Name") },
                     modifier = Modifier.width(280.dp),
                     colors = customColors,
-                    trailingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.pen),
-                            contentDescription = "Edit",
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
-                    },
+                    trailingIcon = { Icon(painterResource(id = R.drawable.pen), "Edit", Modifier.size(20.dp), tint = MaterialTheme.colorScheme.secondary) },
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // FORM DROPDOWN
+                // Form
                 ExposedDropdownMenuBox(
                     expanded = formExpanded,
                     onExpandedChange = { formExpanded = !formExpanded },
@@ -230,26 +239,19 @@ fun EditMedicationScreen(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // DOSE
+                // Dose
                 OutlinedTextField(
                     value = state.dose,
                     onValueChange = onDoseChange,
                     label = { Text("Dosage") },
                     modifier = Modifier.width(280.dp),
                     colors = customColors,
-                    trailingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.pen),
-                            contentDescription = "Edit",
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
-                    },
+                    trailingIcon = { Icon(painterResource(id = R.drawable.pen), "Edit", Modifier.size(20.dp), tint = MaterialTheme.colorScheme.secondary) },
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- SEKCJA REPEAT MEDICATION (Nowość) ---
+                // Recurrence Section
                 Card(
                     modifier = Modifier.width(280.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -355,75 +357,62 @@ fun EditMedicationScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                // -------------------------------------
 
                 // DATES
                 Row(modifier = Modifier.width(280.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // START DATE
                     OutlinedTextField(
                         value = state.startDate.toString(),
                         onValueChange = {},
                         readOnly = true,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable {
-                                isSelectingStartDate = true
-                                showDatePicker = true
-                            },
+                        modifier = Modifier.weight(1f).clickable { isSelectingStartDate = true; showDatePicker = true },
                         label = { Text("Start") },
                         colors = customColors,
                         placeholder = { Text("YYYY-MM-DD", color = Color(0xFFBDADD5)) },
-                        trailingIcon = {
-                            IconButton(onClick = {
-                                isSelectingStartDate = true
-                                showDatePicker = true
-                            }) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.calendar),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        },
+                        trailingIcon = { IconButton(onClick = { isSelectingStartDate = true; showDatePicker = true }) { Image(painterResource(id = R.drawable.calendar), null, Modifier.size(24.dp)) } },
                         singleLine = true
                     )
-                    // END DATE
                     OutlinedTextField(
                         value = state.endDate?.toString() ?: "",
                         onValueChange = {},
                         readOnly = true,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable {
-                                isSelectingStartDate = false
-                                showDatePicker = true
-                            },
+                        modifier = Modifier.weight(1f).clickable { isSelectingStartDate = false; showDatePicker = true },
                         label = { Text("End") },
                         placeholder = { Text("Optional") },
                         colors = customColors,
-                        trailingIcon = {
-                            IconButton(onClick = {
-                                isSelectingStartDate = false
-                                showDatePicker = true
-                            }) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.calendar),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        },
+                        trailingIcon = { IconButton(onClick = { isSelectingStartDate = false; showDatePicker = true }) { Image(painterResource(id = R.drawable.calendar), null, Modifier.size(24.dp)) } },
                         singleLine = true
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // REMINDERS
+                Card(modifier = Modifier.width(280.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text("Enable reminders", fontSize = 16.sp, color = MaterialTheme.colorScheme.secondary)
+                            Switch(
+                                checked = state.isReminderEnabled,
+                                onCheckedChange = onReminderEnabledChange,
+                                colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = MaterialTheme.colorScheme.secondary)
+                            )
+                        }
+                        if (state.isReminderEnabled) {
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text("Reminder time", color = MaterialTheme.colorScheme.secondary)
+                                Box(
+                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)).clickable { showTimePicker = true }.padding(horizontal = 12.dp, vertical = 8.dp)
+                                ) {
+                                    Text(text = state.reminderTime?.let { "${it.hour}:${it.minute.toString().padStart(2, '0')}" } ?: "Select Time", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
                 // NOTES
-                Box(
-                    modifier = Modifier
-                        .width(280.dp)
-                        .height(150.dp)
-                ) {
+                Box(modifier = Modifier.width(280.dp).height(150.dp)) {
                     OutlinedTextField(
                         value = state.notes,
                         onValueChange = onNotesChange,
@@ -432,63 +421,38 @@ fun EditMedicationScreen(
                         modifier = Modifier.fillMaxSize(),
                         label = { Text("Notes") },
                         colors = customColors,
-                        trailingIcon = {
-                            Spacer(modifier = Modifier.size(24.dp))
-                        }
+                        trailingIcon = { Spacer(modifier = Modifier.size(24.dp)) }
                     )
                     IconButton(
                         onClick = {},
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 8.dp, end = 0.dp)
+                        modifier = Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = 0.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.pen),
-                            contentDescription = "Edit notes",
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
+                        Icon(painterResource(id = R.drawable.pen), "Edit notes", Modifier.size(20.dp), tint = MaterialTheme.colorScheme.secondary)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // SAVE BUTTON
                 Button(
                     onClick = onSaveClick,
-                    modifier = Modifier
-                        .height(76.dp)
-                        .width(300.dp),
+                    modifier = Modifier.height(76.dp).width(300.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     if (state.isLoading) {
                         CircularProgressIndicator(color = Color.White)
                     } else {
-                        Text(
-                            text = "SAVE CHANGES",
-                            color = Color.White,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 28.sp
-                        )
+                        Text("SAVE CHANGES", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 28.sp)
                     }
                 }
-
                 Spacer(modifier = Modifier.height(60.dp))
             }
 
-            // CLOSE BUTTON
             IconButton(
                 onClick = onBackClick,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
+                modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.cross),
-                    contentDescription = "Back",
-                    modifier = Modifier.size(24.dp)
-                )
+                Image(painterResource(id = R.drawable.cross), "Back", Modifier.size(24.dp))
             }
         }
     }
@@ -509,6 +473,7 @@ fun EditMedicationPreview() {
             ),
             onNameChange = {}, onFormChange = {}, onDoseChange = {}, onNotesChange = {},
             onStartDateChange = {}, onEndDateChange = {},
+            onReminderTimeChange = {}, onReminderEnabledChange = {},
             onRecurrenceToggled = {}, onRecurrenceTypeChange = {}, onIntervalChange = {}, onDaySelected = {},
             onSaveClick = {}, onBackClick = {}
         )

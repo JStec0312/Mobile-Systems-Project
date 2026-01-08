@@ -12,7 +12,7 @@ data class PetFirestoreDto (
     val breed: String? = null,
     val sex : sexEnum = sexEnum.unknown,
     val birthDate: Timestamp? = null,
-    val avatarThumbUrl : String? = null,
+    var avatarThumbUrl : String? = null,
     val createdAt: Timestamp? = null,
 ) {
     companion object {

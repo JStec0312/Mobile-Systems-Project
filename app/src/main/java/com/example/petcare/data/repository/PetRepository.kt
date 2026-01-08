@@ -9,16 +9,35 @@ import com.example.petcare.domain.repository.IPetRepository
 import com.example.petcare.exceptions.GeneralFailure
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storageMetadata
 import kotlinx.coroutines.tasks.await
 
-class PetRepository( db: FirebaseFirestore) : IPetRepository {
+class PetRepository( private  val db: FirebaseFirestore, private  val storage: FirebaseStorage) : IPetRepository {
     private final var col = db.collection(FirestorePaths.PETS)
+
     override suspend fun createPet(
         pet: Pet,
         avatarByteArray: ByteArray?
     ): Pet {
         try{
+            val avatarPath: String? = if (avatarByteArray != null) {
+                val ref = storage.reference
+                    .child("pets")
+                    .child(pet.id)
+                    .child("avatar.jpg")
+
+                val metadata = storageMetadata {
+                    contentType = "image/jpeg" // jak nie wiesz, to przynajmniej ustaw cos sensownego
+                }
+
+                ref.putBytes(avatarByteArray, metadata).await()
+
+                ref.path
+            } else null
+
             val petDto = pet.toFirestoreDto();
+            petDto.avatarThumbUrl = avatarPath;
             col.document(pet.id).set(petDto).await();
             return petDto.toDomain();
         } catch (t: Throwable){

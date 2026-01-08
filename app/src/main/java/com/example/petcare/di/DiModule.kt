@@ -98,8 +98,8 @@ object AppModule {
     @Module @InstallIn(SingletonComponent::class) object RepositoryModule {
         @Provides
         @Singleton
-        fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore): IPetRepository =
-            if (useFirebase) PetRepository(db = db) else FakePetRepository()
+        fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore, storage: FirebaseStorage): IPetRepository =
+            if (useFirebase) PetRepository(db = db, storage = storage) else FakePetRepository()
 
         @Provides
         @Singleton

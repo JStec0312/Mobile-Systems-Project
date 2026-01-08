@@ -65,6 +65,10 @@ import com.example.petcare.domain.remote.IVetAiGateway
 const val mode = Settings.MODE // "PROD" albo "DEV"  albo DEV-FIREBASE
 val modeUpper = mode.uppercase()
 private val useFirebase = modeUpper != "DEV"
+private fun host() = "10.0.2.2"
+private const val FIRESTORE_PORT = 8080;
+private const val AUTH_PORT = 9099;
+private const val STORAGE_PORT = 9199;
 private val useEmulator = modeUpper == "DEV-FIREBASE"
 @Module
 @InstallIn(SingletonComponent::class)
@@ -200,13 +204,14 @@ object AppModule {
 
             return if (useEmulator) {
                 val options = FirebaseOptions.Builder()
-                    .setProjectId("demo-petcare")
-                    .setApplicationId("1:123:android:demo")
-                    .setStorageBucket("demo-petcare.appspot.com")
+                    .setProjectId("demo-petcare")                  // dowolny string
+                    .setApplicationId("1:123:android:demo")        // dowolny string
+                    .setStorageBucket("demo-petcare.appspot.com")  // dowolny string
+                    .setApiKey("fake-api-key")                     // KLUCZ: musi być jakikolwiek niepusty
                     .build()
 
                 FirebaseApp.initializeApp(ctx, options)
-                    ?: error("FirebaseApp.initializeApp returned null")
+                    ?: error("FirebaseApp.initializeApp returned null even with explicit options")
             } else {
                 // PROD i DEV (jesli DEV, i tak repo fake, ale niech app sie nie wywala)
                 FirebaseApp.initializeApp(ctx)
@@ -219,7 +224,7 @@ object AppModule {
         fun provideFirestore(app: FirebaseApp): FirebaseFirestore {
             val db = FirebaseFirestore.getInstance(app)
             if (useEmulator) {
-                db.useEmulator("10.0.2.2", 8080)
+                db.useEmulator(host(), FIRESTORE_PORT)
             }
             return db
         }
@@ -229,7 +234,7 @@ object AppModule {
         fun provideFirebaseAuth(app: FirebaseApp): FirebaseAuth {
             val auth = FirebaseAuth.getInstance(app)
             if (useEmulator) {
-                auth.useEmulator("10.0.2.2", 9099)
+                auth.useEmulator(host(), AUTH_PORT)
             }
             return auth
         }
@@ -239,7 +244,7 @@ object AppModule {
         fun provideFirebaseStorage(app: FirebaseApp): FirebaseStorage {
             val storage = FirebaseStorage.getInstance(app)
             if (useEmulator) {
-                storage.useEmulator("10.0.2.2", 9199)
+                storage.useEmulator(host(), STORAGE_PORT)
             }
             return storage
         }

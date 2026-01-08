@@ -22,19 +22,15 @@ class PetRepository( private  val db: FirebaseFirestore, private  val storage: F
     ): Pet {
         try{
             val avatarPath: String? = if (avatarByteArray != null) {
-                val ref = storage.reference
-                    .child("pets")
-                    .child(pet.id)
-                    .child("avatar.jpg")
+                val path = "pets/${pet.id}/avatar.jpg"
+                val ref = storage.reference.child(path)
 
-                val metadata = storageMetadata {
-                    contentType = "image/jpeg" // jak nie wiesz, to przynajmniej ustaw cos sensownego
-                }
-
+                val metadata = storageMetadata { contentType = "image/jpeg" }
                 ref.putBytes(avatarByteArray, metadata).await()
 
-                ref.path
+                ref.downloadUrl.await().toString()
             } else null
+
 
             val petDto = pet.toFirestoreDto();
             petDto.avatarThumbUrl = avatarPath;

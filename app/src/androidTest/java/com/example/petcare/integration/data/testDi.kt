@@ -120,8 +120,8 @@ object TrueRepositoryModule{
 
     @Provides
     @Singleton
-    fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IPetRepository {
-        return PetRepository(db = db);
+    fun providePetRepository(auth: FirebaseAuth, db: FirebaseFirestore, storage: FirebaseStorage) : IPetRepository {
+        return PetRepository(db = db,storage  );
     }
     @Provides
     @Singleton

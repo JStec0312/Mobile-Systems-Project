@@ -7,6 +7,7 @@ import com.example.petcare.common.Resource
 import com.example.petcare.common.taskStatusEnum
 import com.example.petcare.domain.model.Task
 import com.example.petcare.domain.use_case.change_task_status.ChangeTaskStatusUseCase
+import com.example.petcare.domain.use_case.generate_pet_share_code.GeneratePetShareCodeUseCase
 import com.example.petcare.domain.use_case.get_pet_by_id.GetPetByIdUseCase
 import com.example.petcare.domain.use_case.get_tasks.GetTasksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +28,8 @@ class PetDashboardViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getTasksUseCase: GetTasksUseCase,
     private val getPetByIdUseCase: GetPetByIdUseCase,
-    private val changeTaskStatusUseCase: ChangeTaskStatusUseCase
+    private val changeTaskStatusUseCase: ChangeTaskStatusUseCase,
+    private val generatePetShareCodeUseCase: GeneratePetShareCodeUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(PetDashboardState())
     val state = _state.asStateFlow()
@@ -111,6 +113,46 @@ class PetDashboardViewModel @Inject constructor(
 
     fun onTaskCancelled(task: Task) {
         updateTaskStatus(task.id, taskStatusEnum.cancelled)
+    }
+
+    fun generateShareCode() {
+        val petId = state.value.pet?.id ?: return
+        viewModelScope.launch {
+            generatePetShareCodeUseCase(petId).collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _state.update {
+                            it.copy(
+                                shareCode = result.data?.code,
+                                isSharingLoading = false,
+                                isShareCodeDialogVisible = true
+                            )
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(
+                                error = result.message ?: "Failed to generate share code",
+                                isSharingLoading = false
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _state.update { it.copy(isSharingLoading = true) }
+                    }
+                }
+            }
+        }
+    }
+
+    fun dismissShareDialog() {
+        _state.update { it.copy(isShareCodeDialogVisible = false, shareCode = null) }
+    }
+
+    fun onErrorShown() {
+        _state.update { it.copy(error = null) }
     }
 
     private fun updateTaskStatus(taskId: String, newStatus: taskStatusEnum) {

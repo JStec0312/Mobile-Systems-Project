@@ -1,5 +1,6 @@
 package com.example.petcare.presentation.dashboard
 
+import android.widget.Toast
 import com.example.petcare.presentation.theme.PetCareTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,18 +24,25 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,7 +51,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -69,6 +80,8 @@ import kotlinx.datetime.toJavaInstant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+
+
 @Composable
 fun PetDashboardRoute(
     viewModel: PetDashboardViewModel = hiltViewModel(),
@@ -78,6 +91,14 @@ fun PetDashboardRoute(
     onNavigateToWalk: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onErrorShown()
+        }
+    }
 
     PetDashboardScreen(
         state = state,
@@ -86,7 +107,9 @@ fun PetDashboardRoute(
         onMedicationHistory = onNavigateToMedicationHistory,
         onChatWithVet = onNavigateToChat,
         onWalkClick = onNavigateToWalk,
-        onTaskCancelled = viewModel::onTaskCancelled
+        onTaskCancelled = viewModel::onTaskCancelled,
+        onGenerateShareCode = viewModel::generateShareCode,
+        onDismissShareDialog = viewModel::dismissShareDialog
     )
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,7 +121,9 @@ fun PetDashboardScreen(
     onMedicationHistory: () -> Unit,
     onChatWithVet: () -> Unit,
     onWalkClick: () -> Unit,
-    onTaskCancelled: (Task) -> Unit
+    onTaskCancelled: (Task) -> Unit,
+    onGenerateShareCode: () -> Unit = {},
+    onDismissShareDialog: () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
 
@@ -140,7 +165,7 @@ fun PetDashboardScreen(
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Button(
-                                onClick = { /*TODO*/ },
+                                onClick = onGenerateShareCode,
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                                 shape = RoundedCornerShape(8.dp),
                                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
@@ -392,8 +417,78 @@ fun PetDashboardScreen(
             }
         }
     }
+    if(state.isShareCodeDialogVisible && state.shareCode != null) {
+        SharePetDialog(code = state.shareCode, onDismiss = onDismissShareDialog)
+    }
 }
 
+@Composable
+fun SharePetDialog(
+    code: String,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.background,
+        confirmButton = {
+            Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) { Text("CLOSE") }
+        },
+        title = {
+            Text(
+                text = "Share Your Pet",
+                fontWeight = FontWeight.Black,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Give this code to someone you want to share care with:")
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Surface(
+                    color =  Color(0x277A6BBC),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth().height(100.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = code,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 22.sp,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            IconButton(onClick = {
+                                clipboardManager.setText(AnnotatedString(code))
+                                Toast.makeText(context, "Code copied!", Toast.LENGTH_SHORT).show()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = "Copy code",
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    )
+
+}
 
 @Composable
 fun TaskItem(
@@ -571,5 +666,19 @@ fun PetDashboardScreenPreview2() {
             onWalkClick = {},
             onTaskCancelled = {}
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SharePetDialogPreview() {
+    com.example.petcare.presentation.theme.PetCareTheme {
+        // Box jest potrzebny, żeby preview miało tło, na którym widać dialog
+        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            SharePetDialog(
+                code = "A1B2C3D4",
+                onDismiss = {}
+            )
+        }
     }
 }

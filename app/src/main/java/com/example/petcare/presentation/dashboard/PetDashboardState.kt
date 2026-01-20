@@ -7,6 +7,10 @@ data class PetDashboardState(
     val pet: Pet? = null,
     val tasks: List<Task> = emptyList(),
 
+    val shareCode: String? = null,
+    val isShareCodeDialogVisible: Boolean = false,
+    val isSharingLoading: Boolean = false,
+
     val isLoading: Boolean = false,
     val error: String? = null,
 )

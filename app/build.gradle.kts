@@ -89,6 +89,7 @@ dependencies {
 
     // --- HILT ---
     implementation(libs.hilt.android)
+    implementation(libs.androidx.material3)
     kapt(libs.hilt.compiler)
     implementation("androidx.hilt:hilt-work:1.3.0")
     kapt("androidx.hilt:hilt-compiler:1.3.0")

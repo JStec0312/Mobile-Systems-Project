@@ -154,7 +154,7 @@ fun AIChatScreen(
                     TextField(
                         value = state.inputText,
                         onValueChange = onMessageChange,
-                        placeholder = { Text("Ask me anything...", color = Color.Gray) },
+                        placeholder = { Text("Ask me anything...", color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)) },
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(24.dp)),

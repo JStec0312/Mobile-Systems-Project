@@ -140,6 +140,8 @@ dependencies {
     implementation("io.ktor:ktor-client-okhttp:2.3.3")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.3")
 
-    //--DOTENV--
+    // -- PDF --
+    implementation("com.github.librepdf:openpdf:1.3.39")
+
 
 }

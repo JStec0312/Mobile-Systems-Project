@@ -59,7 +59,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 
 import io.ktor.client.HttpClient
 import com.example.petcare.data.remote.OpenAiVetGateway
+import com.example.petcare.domain.pdf.MedicationPdfGenerator
 import com.example.petcare.domain.remote.IVetAiGateway
+import com.example.petcare.domain.repository.IMedicationPdfGenerator
 
 // JEZELI USUNIESZ MI CHOCIAZ JEDEN KOMENTARZ TO CIE ZABIJE
 const val mode = Settings.MODE // "PROD" albo "DEV"  albo DEV-FIREBASE
@@ -192,6 +194,10 @@ object AppModule {
                 auth = auth,
                 db = db
             ) else FakeUserRepository()
+
+        @Provides
+        @Singleton
+        fun provideMedicationPdfGenerator(): IMedicationPdfGenerator = MedicationPdfGenerator();
     }
     @Module
     @InstallIn(SingletonComponent::class)

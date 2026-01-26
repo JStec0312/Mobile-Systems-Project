@@ -10,6 +10,7 @@ import com.example.petcare.common.speciesEnum
 import com.example.petcare.domain.use_case.add_pet.AddPetUseCase
 import com.example.petcare.domain.use_case.add_pet_by_key.AddPetByKeyUseCase
 import com.example.petcare.domain.use_case.get_pet_by_id.GetPetByIdUseCase
+import com.example.petcare.domain.use_case.get_pet_by_key.GetPetByKeyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +28,7 @@ import timber.log.Timber
 class AddPetViewModel @Inject constructor(
     private val addPetUseCase: AddPetUseCase,
     private val addPetByKeyUseCase: AddPetByKeyUseCase,
-    private val getPetByIdUseCase: GetPetByIdUseCase,
+    private val getPetByShareCodeUseCase: GetPetByKeyUseCase,
     private val application: Application
 ) : ViewModel() {
     private val _state = MutableStateFlow(AddPetState())
@@ -109,13 +110,13 @@ class AddPetViewModel @Inject constructor(
     }
 
     fun onSearchClick() {
-        val id = _state.value.petIdToAdd.trim()
-        if (id.isBlank()) {
+        val code = _state.value.petIdToAdd.trim()
+        if (code.isBlank()) {
             _state.update { it.copy(error = "Please enter an ID") }
             return
         }
         viewModelScope.launch {
-            getPetByIdUseCase(id).collect { result ->
+            getPetByShareCodeUseCase(code).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _state.update { it.copy(isLoading = true, error = null) }

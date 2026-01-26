@@ -161,7 +161,7 @@ fun MedicationHistoryScreen(
         }
     }
 
-    BaseScreen {
+    BaseScreen(isLoading = state.isLoading) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

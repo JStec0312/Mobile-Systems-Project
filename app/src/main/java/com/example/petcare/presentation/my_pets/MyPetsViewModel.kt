@@ -57,6 +57,7 @@ class MyPetsViewModel @Inject constructor(
     }
 
     fun onSearchQueryChange(query: String) {
+        _state.update { it.copy(searchQuery = query) }
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(300L)

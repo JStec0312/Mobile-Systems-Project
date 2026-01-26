@@ -166,7 +166,7 @@ fun AddTaskScreen(
         true
     )
 
-    BaseScreen {
+    BaseScreen(isLoading = state.isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = R.drawable.paw_prints),

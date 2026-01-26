@@ -23,6 +23,7 @@ import com.example.petcare.R
 @Composable
 fun BaseScreen(
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -39,6 +40,9 @@ fun BaseScreen(
                 .offset(x = 220.dp, y = 50.dp)
         )
         content()
+        if(isLoading) {
+            LoadingOverlay()
+        }
     }
 }
 

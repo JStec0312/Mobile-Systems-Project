@@ -57,7 +57,7 @@ fun MedicationDetailsScreen(
     state: MedicationDetailsState,
     onBackClick: () -> Unit,
 ) {
-    BaseScreen {
+    BaseScreen(isLoading = state.isLoading) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Tło z łapkami
             Image(

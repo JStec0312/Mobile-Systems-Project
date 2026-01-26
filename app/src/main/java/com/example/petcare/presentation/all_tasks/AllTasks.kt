@@ -200,7 +200,7 @@ fun AllTasksScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedTaskForMenu by remember { mutableStateOf<Task?>(null) }
 
-    BaseScreen {
+    BaseScreen(isLoading = isLoading) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

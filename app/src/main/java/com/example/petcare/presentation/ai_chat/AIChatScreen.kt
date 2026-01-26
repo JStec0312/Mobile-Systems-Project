@@ -62,7 +62,7 @@ fun AIChatScreen(
         }
     }
 
-    BaseScreen {
+    BaseScreen() {
         Box(modifier = Modifier.fillMaxSize()) {
             // TŁO (Łapki)
             Image(

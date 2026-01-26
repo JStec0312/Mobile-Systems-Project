@@ -127,7 +127,7 @@ fun PetDashboardScreen(
 ) {
     val scrollState = rememberScrollState()
 
-    BaseScreen {
+    BaseScreen(isLoading = state.isLoading) {
         if (state.pet == null && state.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.secondary)

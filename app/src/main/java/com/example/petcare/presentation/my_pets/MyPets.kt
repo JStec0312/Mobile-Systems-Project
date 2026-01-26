@@ -80,7 +80,7 @@ fun MyPetsScreen(
     onSearchQueryChange: (String) -> Unit,
     onEditPetClick: (String) -> Unit
 ) {
-    BaseScreen {
+    BaseScreen(isLoading = state.isLoading) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -93,7 +93,7 @@ fun MyPetsScreen(
 
             ) {
                 OutlinedTextField(
-                    value = "",
+                    value = state.searchQuery,
                     onValueChange = onSearchQueryChange,
                     placeholder = {
                         Text(
@@ -115,6 +115,8 @@ fun MyPetsScreen(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF605397),
                         unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        focusedTextColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedTextColor = MaterialTheme.colorScheme.secondary
                     ),
                     singleLine = true
                 )

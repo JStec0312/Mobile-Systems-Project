@@ -175,7 +175,7 @@ fun AddPetScreen(
         }
     }
 
-    BaseScreen {
+    BaseScreen(isLoading = state.isLoading) {
         if (state.foundPet != null) {
             PetConfirmationScreen(
                 pet = state.foundPet,

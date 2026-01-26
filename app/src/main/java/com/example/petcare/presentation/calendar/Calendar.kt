@@ -253,7 +253,7 @@ fun CalendarScreen(
         }
     }
 
-    BaseScreen {
+    BaseScreen(isLoading = state.isLoading) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = Color.Transparent,

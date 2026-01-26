@@ -227,7 +227,7 @@ fun EditPetScreen(
     var expanded by remember { mutableStateOf(false) }
     val options = listOf("Male", "Female", "Unknown")
 
-    BaseScreen {
+    BaseScreen(isLoading = state.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

@@ -69,6 +69,7 @@ import com.example.petcare.presentation.edit_task.EditTaskRoute
 import com.example.petcare.presentation.task_details.TaskDetailsRoute
 import com.example.petcare.presentation.ai_chat.AIChatRoute
 import com.example.petcare.presentation.settings.SettingsRoute
+import timber.log.Timber
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,8 +83,9 @@ fun MainContainer(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        viewModel.logoutChannel.collect {
-            drawerState.close()
+        viewModel.logoutEvent.collect {
+            Timber.d("DEBUG: wylogowanie w UI")
+            scope.launch { drawerState.close() }
             onNavigateToLogin()
         }
     }

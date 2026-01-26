@@ -76,7 +76,7 @@ fun AppNavigation() {
                 },
                 onNavigateToMyPets = {
                     navController.navigate(Routes.MAIN_APP) {
-                        popUpTo(Routes.SIGN_IN_SCREEN) {
+                        popUpTo(0) {
                             inclusive = true
                         }
                     }

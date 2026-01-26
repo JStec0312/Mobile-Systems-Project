@@ -8,6 +8,7 @@ import com.example.petcare.exceptions.AuthFailure
 import com.example.petcare.exceptions.Failure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import javax.inject.Inject
 
 class SignInUseCase  @Inject constructor(
@@ -26,7 +27,7 @@ class SignInUseCase  @Inject constructor(
         }
         try{
             val user: User = userRepository.signInWithEmailAndPassword(email, password)
-            userProvider.setUserId(user.id)
+            //userProvider.setUserId(user.id)
             emit(Resource.Success<User>(user))
             return@flow
         }  catch(e: AuthFailure.InvalidCredentials){
@@ -43,6 +44,10 @@ class SignInUseCase  @Inject constructor(
             return@flow
         } catch(e: Failure.UnknownError){
             emit(Resource.Error<User>(e.message))
+            return@flow
+        } catch (e: Exception){
+            emit(Resource.Error<User>("An unexpected error occurred: ${e.message}"))
+            Timber.d("Login unexpected error: ${e.message}")
             return@flow
         }
 

@@ -50,7 +50,9 @@ import com.example.petcare.presentation.common.BaseScreen
 import com.example.petcare.presentation.theme.PetCareTheme
 
 @Composable
-fun AboutScreen() {
+fun AboutScreen(
+    onPrivacyPolicyClick: () -> Unit // Parametr przekazany
+) {
     val scrollState = rememberScrollState()
 
     BaseScreen {
@@ -128,7 +130,7 @@ fun AboutScreen() {
             Spacer(modifier = Modifier.height(14.dp))
 
             Button(
-                onClick = { /* jakis plik */ },
+                onClick = onPrivacyPolicyClick, // Użycie parametru
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp),
@@ -227,6 +229,8 @@ fun TeamMemberItem(name: String, email: String) {
 @Composable
 fun AboutScreenPreview() {
     PetCareTheme {
-        AboutScreen()
+        AboutScreen(
+            onPrivacyPolicyClick = {}
+        )
     }
 }

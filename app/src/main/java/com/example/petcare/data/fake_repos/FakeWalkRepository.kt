@@ -2,6 +2,7 @@ package com.example.petcare.data.fake_repos
 
 import com.example.petcare.common.utils.DateConverter
 import com.example.petcare.data.dto.fake.WalkDto
+import com.example.petcare.data.mapper.toDomain
 import com.example.petcare.data.mapper.toDto
 import com.example.petcare.domain.model.Walk
 import com.example.petcare.domain.repository.IWalkRepository
@@ -39,5 +40,11 @@ class FakeWalkRepository: IWalkRepository {
         walks[walkIndex].endedAt = endTime.toString();
 
 
+    }
+
+    override suspend fun getWalksByPetId(petId: String): List<Walk> {
+        return walks
+            .filter { it.petId == petId }
+            .map { it.toDomain() }
     }
 }

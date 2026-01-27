@@ -69,6 +69,8 @@ import com.example.petcare.presentation.edit_task.EditTaskRoute
 import com.example.petcare.presentation.task_details.TaskDetailsRoute
 import com.example.petcare.presentation.ai_chat.AIChatRoute
 import com.example.petcare.presentation.settings.SettingsRoute
+import com.example.petcare.presentation.walk_history.WalkHistoryRoute
+import com.example.petcare.presentation.walk_stats.WalkStatsRoute
 import timber.log.Timber
 
 
@@ -98,7 +100,7 @@ fun MainContainer(
         currentRoute == "add_pet" -> "NEW PET"
         currentRoute?.startsWith("edit_pet") == true  -> "EDIT PET"
         currentRoute?.startsWith("dashboard") == true -> "DASHBOARD"
-        currentRoute == "walk" -> "WALK TRACKER"
+        currentRoute?.startsWith("walk") == true -> "WALK TRACKER"
         currentRoute?.startsWith("all_tasks") == true -> "TASKS"
         currentRoute == "help" -> "HELP"
         currentRoute == "about" -> "ABOUT"
@@ -110,6 +112,8 @@ fun MainContainer(
         currentRoute == "add_medication" -> "ADD MEDICATION"
         currentRoute == "ai_chat" -> "VET AI"
         currentRoute == "settings" -> "SETTINGS"
+        currentRoute?.startsWith("walk_stats") == true -> "WALK STATS"
+        currentRoute?.startsWith("walk_history") == true -> "WALK HISTORY"
          else -> ""
     }
 
@@ -173,7 +177,6 @@ fun MainContainer(
                         HorizontalDivider(color = Color(0xFFEBE6FF))
                     }
                     DrawerItem("My Pets", R.drawable.paw, "my_pets")
-                    DrawerItem("My Profile", R.drawable.profile, "profile")
                     DrawerItem("Calendar", R.drawable.calendar, "calendar")
                     DrawerItem("Settings", R.drawable.settings, "settings")
                     DrawerItem("Help", R.drawable.info, "help")
@@ -296,13 +299,19 @@ fun MainContainer(
                             mainNavController.navigate("ai_chat")
                         },
                         onNavigateToWalk = {
-                            mainNavController.navigate("walk")
+                            mainNavController.navigate("walk/$petId")
                         }
                     )
                 }
-                composable("walk") {
+                composable(
+                    route = "walk/{petId}",
+                    arguments = listOf(navArgument("petId") {type = NavType.StringType})
+                ) { backStackEntry ->
+                    val petId = backStackEntry.arguments?.getString("petId") ?: ""
                     WalkRoute(
-                        onNavigateToStats = { },
+                        onNavigateToStats = {
+                            mainNavController.navigate("walk_stats/$petId")
+                        },
                         onStopClick = {
                             mainNavController.popBackStack()
                         }
@@ -448,6 +457,25 @@ fun MainContainer(
                 }
                 composable("settings") {
                     SettingsRoute()
+                }
+                composable(
+                    route = "walk_stats/{petId}",
+                    arguments = listOf(navArgument("petId") {type = NavType.StringType})
+                ) { navBackStackEntry ->
+                    val petId = navBackStackEntry.arguments?.getString("petId") ?: ""
+                    WalkStatsRoute(
+                        onNavigateToHistory = { mainNavController.navigate("walk_history/$petId")}
+                    )
+                }
+                composable(
+                    route = "walk_history/{petId}",
+                    arguments = listOf(navArgument("petId") {type = NavType.StringType})
+                ) {
+                    WalkHistoryRoute(
+                        onNavigateBack = {
+                            mainNavController.popBackStack()
+                        }
+                    )
                 }
             }
         }

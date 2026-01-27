@@ -318,34 +318,6 @@ fun PetDashboardScreen(
                         fontSize = 24.sp
                     )
                 }
-                Spacer(modifier = Modifier.height(10.dp))
-                Card(
-                    modifier = Modifier.padding(16.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "TIPS",
-                                color = MaterialTheme.colorScheme.secondary,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "tu beda jakies tipy o pogodzie czy o czyms tam ale to potem",
-                                color = MaterialTheme.colorScheme.secondary,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = onMedicationHistory,

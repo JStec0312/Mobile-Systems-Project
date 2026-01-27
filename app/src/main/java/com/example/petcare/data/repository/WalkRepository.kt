@@ -1,11 +1,14 @@
 package com.example.petcare.data.repository
 
+import com.example.petcare.data.dto.firestore.WalkFirestoreDto
+import com.example.petcare.data.mapper.toDomain
 import com.example.petcare.data.mapper.toFirestoreDto
 import com.example.petcare.domain.model.Walk
 import com.example.petcare.domain.repository.IWalkRepository
 import com.example.petcare.exceptions.GeneralFailure
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestoreSettings
 import kotlinx.coroutines.tasks.await
 import kotlinx.datetime.Instant
 
@@ -36,12 +39,16 @@ class WalkRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IWalkRepositor
             if (updatedWalk == null){
                 throw GeneralFailure.DataCorruption("Walk data is null");
             }
+            val startSeconds = updatedWalk.startedAt.seconds
+            val endSeconds = endTime.epochSeconds
+            val calculatedDuration = (endSeconds - startSeconds).toInt()
+            val finalDuration = if(calculatedDuration < 0) 0 else calculatedDuration
             val endWalk = updatedWalk.copy(
                 endedAt = endTime.toFirebaseTimestamp(),
                 distanceMeters = totalDistanceMeters.toInt(),
                 steps = totalSteps,
                 pending = false,
-                durationSec = ((endTime.epochSeconds) - (updatedWalk!!.startedAt.seconds)).toInt()
+                durationSec = finalDuration
             )
             col.document(walkId).set(endWalk).await();
         } catch (t: Throwable){
@@ -49,5 +56,15 @@ class WalkRepository(auth: FirebaseAuth, db: FirebaseFirestore) : IWalkRepositor
         }
     }
 
-
+    override suspend fun getWalksByPetId(petId: String): List<Walk> {
+        return try {
+            col.whereEqualTo("petId", petId)
+                .get()
+                .await()
+                .toObjects(WalkFirestoreDto::class.java)
+                .map { it.toDomain() }
+        } catch (t: Throwable) {
+            throw FirestoreThrowable.map(t, "getWalksByPetId");
+        }
+    }
 }

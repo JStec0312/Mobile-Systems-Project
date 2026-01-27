@@ -10,5 +10,6 @@ interface IWalkRepository {
     suspend fun createWalk(walk: Walk);
     suspend fun setWalkAsEnded(walkId: String, totalDistanceMeters: Float, totalSteps: Int, endTime: Instant);
 
-
+    @Throws(Failure.ServerError::class, Failure.NetworkError::class, Failure.UnknownError::class)
+    suspend fun getWalksByPetId(petId: String): List<Walk>
 }

@@ -36,6 +36,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import timber.log.Timber
 
 @Composable
 fun MedicationHistoryRoute(
@@ -74,6 +75,7 @@ fun MedicationHistoryRoute(
                         context.startActivity(shareIntent)
 
                     } catch (e: Exception) {
+                        Timber.d("Error sharing PDF: ${e.message}");
                         Toast.makeText(context, "Error sharing file: ${e.message}", Toast.LENGTH_LONG).show()
                     }
                 }

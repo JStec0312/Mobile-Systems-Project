@@ -10,6 +10,7 @@ import com.example.petcare.exceptions.Failure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.LocalDate
+import timber.log.Timber
 import javax.inject.Inject
 
 class MedHistoryToPdfUseCase @Inject constructor(
@@ -57,6 +58,10 @@ class MedHistoryToPdfUseCase @Inject constructor(
 
         } catch (e: Failure){
             emit(Resource.Error("An error occurred: ${e.message}"))
+            return@flow
+        } catch (e: Exception){
+            emit(Resource.Error("An unexpected error occurred: ${e.message}"))
+            Timber.d("MedHistoryToPdfUseCase unexpected error: ${e.message}")
             return@flow
         }
 

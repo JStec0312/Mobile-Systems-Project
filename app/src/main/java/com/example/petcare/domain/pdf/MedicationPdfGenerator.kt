@@ -1,17 +1,11 @@
 package com.example.petcare.domain.pdf
 
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
 import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.repository.IMedicationPdfGenerator
 import java.io.ByteArrayOutputStream
-import com.lowagie.text.Document
-import com.lowagie.text.PageSize
-import com.lowagie.text.Paragraph
-import com.lowagie.text.Font
-import com.lowagie.text.Phrase
-import com.lowagie.text.pdf.PdfWriter
-import com.lowagie.text.pdf.PdfPTable
-import com.lowagie.text.pdf.PdfPCell
-
 
 class MedicationPdfGenerator : IMedicationPdfGenerator {
 
@@ -19,54 +13,144 @@ class MedicationPdfGenerator : IMedicationPdfGenerator {
         petName: String,
         medications: List<Medication>
     ): ByteArray {
-
+        val doc = PdfDocument()
         val output = ByteArrayOutputStream()
-        val document = Document(PageSize.A4)
-        PdfWriter.getInstance(document, output)
 
-        document.open()
+        val pageWidth = 595  // ~A4 at 72dpi
+        val pageHeight = 842
+        val margin = 32
 
-        document.add(
-            Paragraph(
-                "Medication history – $petName",
-                Font(Font.HELVETICA, 18f, Font.BOLD)
+        val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = 18f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        }
+        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = 10f
+        }
+        val headerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = 10f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        }
+        val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            strokeWidth = 1f
+        }
+
+        val cols = listOf("Name", "Dose", "From", "To", "Notes")
+        val colWidths = intArrayOf(160, 70, 70, 70, 161) // suma ~531 (pageWidth - 2*margin = 531)
+
+        val rowHeight = 18
+        val headerHeight = 20
+
+        var pageNumber = 1
+        var y = margin
+
+        fun newPage(): PdfDocument.Page {
+            val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber++).create()
+            return doc.startPage(pageInfo)
+        }
+
+        var page = newPage()
+        var canvas = page.canvas
+
+        // Title
+        canvas.drawText("Medication history - $petName", margin.toFloat(), (y + 20).toFloat(), titlePaint)
+        y += 40
+
+        fun drawHeader() {
+            var x = margin
+            val top = y
+            val bottom = y + headerHeight
+
+            // outer line top
+            canvas.drawLine(margin.toFloat(), top.toFloat(), (pageWidth - margin).toFloat(), top.toFloat(), linePaint)
+
+            cols.forEachIndexed { i, c ->
+                val left = x
+                val right = x + colWidths[i]
+
+                // vertical lines
+                canvas.drawLine(left.toFloat(), top.toFloat(), left.toFloat(), bottom.toFloat(), linePaint)
+
+                // header text
+                canvas.drawText(c, (left + 4).toFloat(), (top + 14).toFloat(), headerPaint)
+
+                x = right
+            }
+
+            // last vertical + bottom line
+            canvas.drawLine((pageWidth - margin).toFloat(), top.toFloat(), (pageWidth - margin).toFloat(), bottom.toFloat(), linePaint)
+            canvas.drawLine(margin.toFloat(), bottom.toFloat(), (pageWidth - margin).toFloat(), bottom.toFloat(), linePaint)
+
+            y += headerHeight
+        }
+
+        fun ensureSpace(rowsNeeded: Int) {
+            val neededPx = headerHeight + rowsNeeded * rowHeight + margin
+            if (y + neededPx > pageHeight) {
+                doc.finishPage(page)
+                page = newPage()
+                canvas = page.canvas
+                y = margin
+
+                canvas.drawText("Medication history - $petName", margin.toFloat(), (y + 20).toFloat(), titlePaint)
+                y += 40
+            }
+        }
+
+        val meds = medications.sortedBy { it.from }
+
+        drawHeader()
+
+        meds.forEach { med ->
+            ensureSpace(rowsNeeded = 1)
+
+            val values = listOf(
+                med.name,
+                med.dose ?: "-",
+                med.from.toString(),
+                med.to?.toString() ?: "-",      // <-- nie rob !!, bo poleci
+                med.notes ?: ""
             )
-        )
 
-        document.add(Paragraph(" "))
+            var x = margin
+            val top = y
+            val bottom = y + rowHeight
 
-        val table = PdfPTable(5).apply {
-            widthPercentage = 100f
-            setWidths(floatArrayOf(3f, 2f, 2f, 2f, 3f))
+            canvas.drawLine(margin.toFloat(), top.toFloat(), (pageWidth - margin).toFloat(), top.toFloat(), linePaint)
+
+            values.forEachIndexed { i, v ->
+                val left = x
+                val right = x + colWidths[i]
+
+                canvas.drawLine(left.toFloat(), top.toFloat(), left.toFloat(), bottom.toFloat(), linePaint)
+
+                // proste obciecie tekstu (zeby nie wyjezdzalo)
+                val clipped = clipToWidth(v, colWidths[i] - 8, textPaint)
+                canvas.drawText(clipped, (left + 4).toFloat(), (top + 13).toFloat(), textPaint)
+
+                x = right
+            }
+
+            canvas.drawLine((pageWidth - margin).toFloat(), top.toFloat(), (pageWidth - margin).toFloat(), bottom.toFloat(), linePaint)
+            canvas.drawLine(margin.toFloat(), bottom.toFloat(), (pageWidth - margin).toFloat(), bottom.toFloat(), linePaint)
+
+            y += rowHeight
         }
 
-        header(table, "Name")
-        header(table, "Dose")
-        header(table, "From")
-        header(table, "To")
-        header(table, "Notes")
-
-        medications.sortedBy { it.from }.forEach { med ->
-            cell(table, med.name)
-            cell(table, med.dose ?: "-")
-            cell(table, med.from.toString())
-            cell(table, med.to.toString())
-            cell(table, med.notes ?: "")
-        }
-
-        document.add(table)
-        document.close()
+        doc.finishPage(page)
+        doc.writeTo(output)
+        doc.close()
 
         return output.toByteArray()
     }
 
-    private fun header(table: PdfPTable, text: String) {
-        table.addCell(
-            PdfPCell(Phrase(text))
-        )
-    }
-
-    private fun cell(table: PdfPTable, text: String) {
-        table.addCell(Phrase(text))
+    private fun clipToWidth(text: String, maxPx: Int, paint: Paint): String {
+        if (paint.measureText(text) <= maxPx) return text
+        val ell = "..."
+        var t = text
+        while (t.isNotEmpty() && paint.measureText(t + ell) > maxPx) {
+            t = t.dropLast(1)
+        }
+        return if (t.isEmpty()) ell else t + ell
     }
 }

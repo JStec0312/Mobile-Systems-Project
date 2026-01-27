@@ -43,28 +43,36 @@ class NotificationRepository(auth: FirebaseAuth, db: FirebaseFirestore) : INotif
         userId: String,
         newCategory: notificationCategoryEnum
     ) {
-        try{
+        try {
             val querySnapshot = col
                 .whereEqualTo("userId", userId)
                 .whereEqualTo("category", newCategory.name)
+                .limit(1)
                 .get()
                 .await()
-            if (querySnapshot.isEmpty){
-                throw GeneralFailure.NotificationSettingNotFound("Notification settings not found for user $userId and category $newCategory")
+
+            if (querySnapshot.isEmpty) {
+                // UPSERT: create
+                val newDocRef = col.document()
+                val newSetting = NotificationSettingFirestoreDto(
+                    id = newDocRef.id,
+                    userId = userId,
+                    category = newCategory,
+                    enabled = true
+                )
+                newDocRef.set(newSetting).await()
+                return
             }
-            val doc = querySnapshot.documents[0]
-            val currentSetting = doc.toObject(NotificationSettingFirestoreDto::class.java)
-            if (currentSetting == null){
-                throw GeneralFailure.NotificationSettingNotFound("Notification settings not found for user $userId and category $newCategory")
-            }
-            val updatedSetting = currentSetting.copy(
-                enabled = !currentSetting.enabled
-            )
-            col.document(currentSetting.id).set(updatedSetting).await()
-        } catch (t: Throwable){
+            val doc = querySnapshot.documents.first()
+            val current = doc.toObject(NotificationSettingFirestoreDto::class.java)
+
+            val currentEnabled = current?.enabled ?: false
+            doc.reference.update("enabled", !currentEnabled).await()
+        } catch (t: Throwable) {
             throw FirestoreThrowable.map(t, "toggleNotificationSettingsForUser")
         }
     }
+
 
     override suspend fun isCategoryEnabledForUser(
         userId: String,

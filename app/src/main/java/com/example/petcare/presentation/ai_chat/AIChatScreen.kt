@@ -140,16 +140,7 @@ fun AIChatScreen(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            painter = painterResource(id = android.R.drawable.ic_menu_gallery),
-                            contentDescription = "Gallery",
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
+                    // USUNIĘTO: Przycisk galerii i Spacer
 
                     TextField(
                         value = state.inputText,
@@ -195,8 +186,6 @@ fun ChatBubble(message: ChatMessage) {
     val bubbleColor = if (isUser) MaterialTheme.colorScheme.secondary else Color.White
     val textColor = if (isUser) Color.White else MaterialTheme.colorScheme.secondary
 
-    // ZMIANA: Wyrównanie całego wiersza do góry (Alignment.Top)
-    // Dzięki temu dymek zawsze zaczyna się na wysokości avatara
     val verticalAlignment = Alignment.Top
     val alignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
 
@@ -209,23 +198,21 @@ fun ChatBubble(message: ChatMessage) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.align(alignment),
-            verticalAlignment = verticalAlignment // Zastosowanie wyrównania do góry
+            verticalAlignment = verticalAlignment
         ) {
             // Awatar AI (tylko po lewej stronie)
             if (!isUser) {
-                // ZMIANA: Surface zamiast Boxa dla łatwiejszego cienia i tła
                 Surface(
                     shape = CircleShape,
-                    color = Color.White, // ZMIANA: Białe tło kółka
-                    shadowElevation = 1.dp, // Opcjonalny delikatny cień
+                    color = Color.White,
+                    shadowElevation = 1.dp,
                     modifier = Modifier.size(36.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        // ZMIANA: Icon zamiast Image pozwala na łatwe użycie tint (koloru)
                         Icon(
                             painter = painterResource(id = R.drawable.paw),
                             contentDescription = "AI Avatar",
-                            tint = MaterialTheme.colorScheme.secondary, // ZMIANA: Fioletowa łapka
+                            tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -248,7 +235,6 @@ fun ChatBubble(message: ChatMessage) {
                     )
                 }
 
-                // Godzina jest teraz w kolumnie, więc naturalnie spada POD dymek
                 Text(
                     text = message.timestamp,
                     fontSize = 10.sp,
@@ -262,10 +248,7 @@ fun ChatBubble(message: ChatMessage) {
 
 @Composable
 fun TypingIndicator() {
-    // ZMIANA: Wyrównanie do góry (Top), żeby pasowało do zwykłych wiadomości
     Row(verticalAlignment = Alignment.Top) {
-
-        // ZMIANA: Ten sam styl avatara co w ChatBubble (Białe tło, Fioletowa ikona)
         Surface(
             shape = CircleShape,
             color = Color.White,
@@ -284,7 +267,6 @@ fun TypingIndicator() {
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Dymek z kropkami
         Surface(
             color = Color.White,
             shape = RoundedCornerShape(topStart = 4.dp, topEnd = 16.dp, bottomEnd = 16.dp, bottomStart = 16.dp),
@@ -307,8 +289,6 @@ fun TypingIndicator() {
         }
     }
 }
-
-// --- PODGLĄD ---
 
 @Preview(showBackground = true)
 @Composable

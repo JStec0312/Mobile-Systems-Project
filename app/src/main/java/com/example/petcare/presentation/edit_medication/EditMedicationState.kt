@@ -18,13 +18,15 @@ data class EditMedicationState(
     val startDate: LocalDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
     val endDate: LocalDate? = null,
 
-    // Pola czasu i przypomnień (ujednolicone z AddMedication)
     val reminderTime: LocalTime? = null,
     val isReminderEnabled: Boolean = false,
 
     val isRecurring: Boolean = false,
     val recurrenceType: MedRecurrenceType = MedRecurrenceType.DAILY,
-    val repeatInterval: Int = 1,
+
+    // ZMIANA: String zamiast Int
+    val repeatInterval: String = "1",
+
     val selectedDays: Set<DayOfWeek> = emptySet(),
 
     val isLoading: Boolean = false,

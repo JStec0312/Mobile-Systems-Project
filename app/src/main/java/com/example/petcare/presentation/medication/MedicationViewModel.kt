@@ -1,5 +1,6 @@
 package com.example.petcare.presentation.medication
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.petcare.common.Resource
@@ -7,7 +8,9 @@ import com.example.petcare.domain.model.Medication
 import com.example.petcare.domain.providers.IPetProvider
 import com.example.petcare.domain.use_case.delete_medication.DeleteMedicationUseCase
 import com.example.petcare.domain.use_case.list_medications.ListMedicationsUseCase
+import com.example.petcare.domain.use_case.med_history_to_pdf.MedHistoryToPdfUseCase // <--- IMPORT
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext // <--- IMPORT
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,10 +20,12 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.io.File
 import javax.inject.Inject
 
 sealed class MedicationUiEvent {
-    data class ShareReport(val reportContent: String) : MedicationUiEvent()
+    // ZMIANA: Zamiast Stringa (CSV), przesyłamy Plik (PDF)
+    data class SharePdf(val file: File) : MedicationUiEvent()
     data class ShowMessage(val message: String) : MedicationUiEvent()
 }
 
@@ -28,7 +33,9 @@ sealed class MedicationUiEvent {
 class MedicationViewModel @Inject constructor(
     private val listMedicationsUseCase: ListMedicationsUseCase,
     private val deleteMedicationUseCase: DeleteMedicationUseCase,
-    private val petProvider: IPetProvider
+    private val medHistoryToPdfUseCase: MedHistoryToPdfUseCase, // <--- WSTRZYKUJEMY PDF USECASE
+    private val petProvider: IPetProvider,
+    @ApplicationContext private val context: Context // <--- POTRZEBNE DO ZAPISU PLIKU
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MedicationState())
@@ -76,7 +83,7 @@ class MedicationViewModel @Inject constructor(
                 val updatedList = currentState.medications.filter { it.id != medicationId }
                 currentState.copy(
                     medications = updatedList,
-                    upcomingDoses = calculateUpcomingDoses(updatedList) // Od razu przeliczamy dawki
+                    upcomingDoses = calculateUpcomingDoses(updatedList)
                 )
             }
 
@@ -94,33 +101,61 @@ class MedicationViewModel @Inject constructor(
                         }
                         _uiEvent.send(MedicationUiEvent.ShowMessage(result.message ?: "Failed to delete medication"))
                     }
-                    is Resource.Loading -> {
-
-                    }
+                    is Resource.Loading -> {}
                 }
             }
         }
     }
 
+    // --- LOGIKA EKSPORTU PDF ---
     fun onExportClick() {
         val meds = _state.value.medications
-        if (meds.isEmpty()) return
+        if (meds.isEmpty()) {
+            viewModelScope.launch {
+                _uiEvent.send(MedicationUiEvent.ShowMessage("No medications to export"))
+            }
+            return
+        }
 
         viewModelScope.launch {
-            val report = generateCsvReport(meds)
-            _uiEvent.send(MedicationUiEvent.ShareReport(report))
-        }
-    }
+            _state.update { it.copy(isLoading = true) }
 
-    private fun generateCsvReport(meds: List<Medication>): String {
-        val sb = StringBuilder()
-        sb.append("Name,Form,Dose,Status,Start Date,End Date,Notes\n")
-        meds.forEach { med ->
-            val cleanNotes = med.notes?.replace(",", " ") ?: ""
-            val status = if (med.active) "Active" else "Completed"
-            sb.append("${med.name},${med.form ?: ""},${med.dose ?: ""},$status,${med.from},${med.to ?: "Ongoing"},$cleanNotes\n")
+            // Przekazujemy null, null aby pobrać całą historię (bez filtrowania dat)
+            medHistoryToPdfUseCase(from = null, to = null).collect { result ->
+                when(result) {
+                    is Resource.Loading -> {
+                        // Już obsłużone wyżej
+                    }
+                    is Resource.Success -> {
+                        val pdfBytes = result.data
+                        if (pdfBytes != null) {
+                            try {
+                                // 1. Tworzymy plik w cache aplikacji
+                                val fileName = "MedicationHistory_${Clock.System.now().toEpochMilliseconds()}.pdf"
+                                val file = File(context.cacheDir, fileName)
+
+                                // 2. Zapisujemy bajty
+                                file.writeBytes(pdfBytes)
+
+                                // 3. Wysyłamy zdarzenie do UI
+                                _state.update { it.copy(isLoading = false) }
+                                _uiEvent.send(MedicationUiEvent.SharePdf(file))
+
+                            } catch (e: Exception) {
+                                _state.update { it.copy(isLoading = false) }
+                                _uiEvent.send(MedicationUiEvent.ShowMessage("Failed to save PDF: ${e.message}"))
+                            }
+                        } else {
+                            _state.update { it.copy(isLoading = false) }
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update { it.copy(isLoading = false) }
+                        _uiEvent.send(MedicationUiEvent.ShowMessage(result.message ?: "Failed to generate PDF"))
+                    }
+                }
+            }
         }
-        return sb.toString()
     }
 
     private fun calculateUpcomingDoses(meds: List<Medication>): List<UpcomingDoseUiModel> {

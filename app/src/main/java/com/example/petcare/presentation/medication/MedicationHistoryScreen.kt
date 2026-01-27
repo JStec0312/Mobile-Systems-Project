@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-// IMPORTUJEMY IKONĘ SHARE
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,8 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-// IMPORTUJEMY TEXT ALIGN
 import androidx.compose.ui.text.style.TextAlign
+import androidx.core.content.FileProvider // <--- IMPORT
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.petcare.R
 import com.example.petcare.domain.model.Medication
@@ -55,15 +54,28 @@ fun MedicationHistoryRoute(
     LaunchedEffect(true) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is MedicationUiEvent.ShareReport -> {
-                    val sendIntent: Intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, event.reportContent)
-                        putExtra(Intent.EXTRA_SUBJECT, "Pet Medication History")
-                        type = "text/plain"
+                is MedicationUiEvent.SharePdf -> {
+                    try {
+                        // Tworzymy URI za pomocą FileProvider (wymagane w Android 7+)
+                        val uri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.provider", // UWAGA: Musi pasować do AndroidManifest
+                            event.file
+                        )
+
+                        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "application/pdf"
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            putExtra(Intent.EXTRA_SUBJECT, "Medication History")
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, "Share PDF")
+                        context.startActivity(shareIntent)
+
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Error sharing file: ${e.message}", Toast.LENGTH_LONG).show()
                     }
-                    val shareIntent = Intent.createChooser(sendIntent, "Export History via")
-                    context.startActivity(shareIntent)
                 }
                 is MedicationUiEvent.ShowMessage -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
@@ -120,6 +132,9 @@ fun MedicationHistoryRoute(
         }
     )
 }
+
+// ... Reszta pliku MedicationHistoryScreen (funkcje Composable) bez zmian ...
+// Poniżej wklejam resztę, żeby plik był kompletny, ale zmiany były tylko w Route
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

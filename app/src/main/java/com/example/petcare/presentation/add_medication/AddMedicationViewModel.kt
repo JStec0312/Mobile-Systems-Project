@@ -9,14 +9,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,9 +35,10 @@ class AddMedicationViewModel @Inject constructor(
     fun onRecurrenceToggled(isEnabled: Boolean) { _state.update { it.copy(isRecurring = isEnabled) } }
     fun onRecurrenceTypeChange(newType: MedRecurrenceType) { _state.update { it.copy(recurrenceType = newType) } }
 
+    // ZMIANA: Przyjmujemy String i pozwalamy na pusty ciąg (filtracja cyfr)
     fun onIntervalChange(newInterval: String) {
-        val interval = newInterval.filter { it.isDigit() }.toIntOrNull() ?: 1
-        _state.update { it.copy(repeatInterval = interval) }
+        val cleaned = newInterval.filter { it.isDigit() }
+        _state.update { it.copy(repeatInterval = cleaned) }
     }
 
     fun onDaySelected(day: DayOfWeek) {
@@ -63,21 +61,18 @@ class AddMedicationViewModel @Inject constructor(
             return
         }
 
-        // Generowanie RRule dla backendu
         val rruleString = if (currentState.isRecurring) {
             buildRrule(currentState)
         } else {
-            "" // Pusty string dla braku powtarzania
+            ""
         }
 
-        // Backend oczekuje List<LocalTime>. UI ma jedno, więc pakujemy w listę.
         val timesList = if (currentState.isReminderEnabled && currentState.reminderTime != null) {
             listOf(currentState.reminderTime)
         } else {
             emptyList()
         }
 
-        // Backend UseCase wymaga daty 'to'. Jeśli user dał null (ongoing), dajemy +5 lat.
         val validEndDate = currentState.endDate ?: currentState.startDate.plus(5, DateTimeUnit.YEAR)
 
         viewModelScope.launch {
@@ -116,8 +111,11 @@ class AddMedicationViewModel @Inject constructor(
         val sb = StringBuilder()
         sb.append("FREQ=$freq")
 
-        if (state.repeatInterval > 1) {
-            sb.append(";INTERVAL=${state.repeatInterval}")
+        // ZMIANA: Konwersja String -> Int przy zapisie. Pusty lub 0 = 1.
+        val intervalInt = state.repeatInterval.toIntOrNull() ?: 1
+
+        if (intervalInt > 1) {
+            sb.append(";INTERVAL=$intervalInt")
         }
 
         if (state.recurrenceType == MedRecurrenceType.WEEKLY && state.selectedDays.isNotEmpty()) {

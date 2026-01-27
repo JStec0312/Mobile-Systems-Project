@@ -100,7 +100,6 @@ fun AddMedicationScreen(
     val scrollState = rememberScrollState()
     val calendar = Calendar.getInstance()
 
-    // --- SETUP KALENDARZA (Date Picker) ---
     var showDatePicker by remember { mutableStateOf(false) }
     var isSelectingStartDate by remember { mutableStateOf(true) }
     val datePickerState = rememberDatePickerState()
@@ -115,12 +114,7 @@ fun AddMedicationScreen(
                         if (selectedMillis != null) {
                             val date = Instant.fromEpochMilliseconds(selectedMillis)
                                 .toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-                            if (isSelectingStartDate) {
-                                onStartDateChange(date)
-                            } else {
-                                onEndDateChange(date)
-                            }
+                            if (isSelectingStartDate) onStartDateChange(date) else onEndDateChange(date)
                         }
                         showDatePicker = false
                     }
@@ -129,12 +123,9 @@ fun AddMedicationScreen(
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) { Text("Cancel", color = Color.Black) }
             }
-        ) {
-            DatePicker(state = datePickerState)
-        }
+        ) { DatePicker(state = datePickerState) }
     }
 
-    // --- SETUP ZEGARA (Nowy, ładny Material 3 Time Picker) ---
     var showTimePicker by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState(
         initialHour = calendar.get(Calendar.HOUR_OF_DAY),
@@ -156,17 +147,11 @@ fun AddMedicationScreen(
             dismissButton = {
                 TextButton(onClick = { showTimePicker = false }) { Text("Cancel", color = Color.Black) }
             },
-            text = {
-                // Wyśrodkowanie zegara
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    TimePicker(state = timePickerState)
-                }
-            },
-            containerColor = Color.White // Białe tło jak w kalendarzu
+            text = { Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { TimePicker(state = timePickerState) } },
+            containerColor = Color.White
         )
     }
 
-    // Dropdowny
     var formExpanded by remember { mutableStateOf(false) }
     var recurrenceExpanded by remember { mutableStateOf(false) }
 
@@ -193,19 +178,12 @@ fun AddMedicationScreen(
             Image(
                 painter = painterResource(id = R.drawable.paw_prints),
                 contentDescription = "",
-                modifier = Modifier
-                    .scale(scaleX = -1f, scaleY = -1f)
-                    .align(Alignment.TopStart)
-                    .offset(x = 120.dp, y = 150.dp)
-                    .size(500.dp)
+                modifier = Modifier.scale(scaleX = -1f, scaleY = -1f).align(Alignment.TopStart).offset(x = 120.dp, y = 150.dp).size(500.dp)
             )
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .verticalScroll(scrollState)
-                    .padding(bottom = 32.dp)
-                    .fillMaxSize()
+                modifier = Modifier.verticalScroll(scrollState).padding(bottom = 32.dp).fillMaxSize()
             ) {
                 Spacer(modifier = Modifier.height(80.dp))
 
@@ -261,7 +239,6 @@ fun AddMedicationScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // REPEAT MEDICATION CARD
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -311,7 +288,8 @@ fun AddMedicationScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text("Every", color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(end = 8.dp))
                                         TextField(
-                                            value = state.repeatInterval.toString(),
+                                            // ZMIANA: Usunięto .toString(), bo to już String
+                                            value = state.repeatInterval,
                                             onValueChange = onIntervalChange,
                                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                             singleLine = true,
@@ -425,7 +403,6 @@ fun AddMedicationScreen(
                                 HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
                                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text("Reminder time", color = MaterialTheme.colorScheme.secondary)
-                                    // Kliknięcie tutaj otwiera teraz nowy TimePicker
                                     Box(
                                         modifier = Modifier.background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)).clickable { showTimePicker = true }.padding(horizontal = 12.dp, vertical = 8.dp)
                                     ) {
@@ -480,7 +457,7 @@ fun AddMedicationScreen(
 fun AddMedicationPreview() {
     PetCareTheme {
         AddMedicationScreen(
-            state = AddMedicationState(),
+            state = AddMedicationState(repeatInterval = "1"),
             onNameChange = {}, onFormChange = {}, onDoseChange = {}, onNotesChange = {},
             onStartDateChange = {}, onEndDateChange = {}, onReminderTimeChange = {},
             onReminderEnabledChange = {}, onRecurrenceToggled = {}, onRecurrenceTypeChange = {},

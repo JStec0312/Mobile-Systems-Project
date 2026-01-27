@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.petcare.common.Resource
 import com.example.petcare.domain.use_case.edit_medication_use_case.EditMedicationUseCase
+import com.example.petcare.domain.use_case.get_medication_by_id.GetMedicationByIdUseCase
 import com.example.petcare.presentation.add_medication.MedRecurrenceType
 import com.example.petcare.presentation.add_medication.MedicationForm
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,18 +13,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class EditMedicationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val editMedicationUseCase: EditMedicationUseCase
+    private val editMedicationUseCase: EditMedicationUseCase,
+    private val getMedicationByIdUseCase: GetMedicationByIdUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EditMedicationState())
@@ -36,22 +35,65 @@ class EditMedicationViewModel @Inject constructor(
     }
 
     private fun loadMedicationData() {
-        if (medicationId != null) {
-            // Symulacja wczytania danych (bo brak GetMedicationById w UI)
-            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-            _state.update {
-                it.copy(
-                    medicationId = medicationId,
-                    name = "Simulated Med",
-                    form = MedicationForm.TABLET,
-                    dose = "1 pill",
-                    notes = "",
-                    startDate = today,
-                    // Ustawiamy czas (symulacja)
-                    reminderTime = LocalTime(8, 0),
-                    isReminderEnabled = true,
-                    isRecurring = true
-                )
+        if (medicationId == null) return
+
+        viewModelScope.launch {
+            getMedicationByIdUseCase(medicationId).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _state.update { it.copy(isLoading = true, error = null) }
+                    }
+                    is Resource.Success -> {
+                        result.data?.let { med ->
+                            val loadedForm = MedicationForm.values().find {
+                                it.name.equals(med.form, ignoreCase = true)
+                            }
+                            val firstTime = med.times.firstOrNull()
+
+                            val isRecurring = !med.reccurenceString.isNullOrBlank()
+
+                            // 1. NAPRAWA ODCZYTU: Parsowanie typu powtarzalności
+                            val recurrenceType = if (isRecurring) {
+                                MedRecurrenceType.values().find {
+                                    med.reccurenceString!!.contains(it.name, ignoreCase = true)
+                                } ?: MedRecurrenceType.DAILY
+                            } else {
+                                MedRecurrenceType.DAILY
+                            }
+
+                            // 2. NAPRAWA ODCZYTU: Parsowanie interwału ze stringa (np. "FREQ=DAILY;INTERVAL=5")
+                            var parsedInterval = "1"
+                            if (isRecurring && med.reccurenceString != null) {
+                                val parts = med.reccurenceString.split(";")
+                                val intervalPart = parts.find { it.startsWith("INTERVAL=") }
+                                if (intervalPart != null) {
+                                    parsedInterval = intervalPart.substringAfter("=")
+                                }
+                            }
+
+                            _state.update { currentState ->
+                                currentState.copy(
+                                    isLoading = false,
+                                    medicationId = med.id,
+                                    name = med.name,
+                                    form = loadedForm,
+                                    dose = med.dose ?: "",
+                                    notes = med.notes ?: "",
+                                    startDate = med.from,
+                                    endDate = med.to,
+                                    reminderTime = firstTime,
+                                    isReminderEnabled = firstTime != null,
+                                    isRecurring = isRecurring,
+                                    recurrenceType = recurrenceType,
+                                    repeatInterval = parsedInterval // Ustawiamy odczytaną wartość
+                                )
+                            }
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update { it.copy(isLoading = false, error = result.message) }
+                    }
+                }
             }
         }
     }
@@ -63,17 +105,15 @@ class EditMedicationViewModel @Inject constructor(
     fun onStartDateChange(newDate: LocalDate) { _state.update { it.copy(startDate = newDate) } }
     fun onEndDateChange(newDate: LocalDate?) { _state.update { it.copy(endDate = newDate) } }
 
-    // --- NAPRAWA: Poprawne nazwy funkcji czasu ---
     fun onReminderTimeChange(newTime: LocalTime) { _state.update { it.copy(reminderTime = newTime) } }
     fun onReminderEnabledChange(isEnabled: Boolean) { _state.update { it.copy(isReminderEnabled = isEnabled) } }
-    // ---------------------------------------------
 
     fun onRecurrenceToggled(isChecked: Boolean) { _state.update { it.copy(isRecurring = isChecked) } }
     fun onRecurrenceTypeChange(type: MedRecurrenceType) { _state.update { it.copy(recurrenceType = type) } }
 
     fun onIntervalChange(value: String) {
-        val intValue = value.filter { it.isDigit() }.toIntOrNull() ?: 1
-        _state.update { it.copy(repeatInterval = intValue) }
+        val cleaned = value.filter { it.isDigit() }
+        _state.update { it.copy(repeatInterval = cleaned) }
     }
 
     fun onDaySelected(day: DayOfWeek) {
@@ -90,11 +130,17 @@ class EditMedicationViewModel @Inject constructor(
         viewModelScope.launch {
             val currentState = _state.value
 
-            // Backend wymaga List<LocalTime>
             val timesList = if(currentState.isReminderEnabled && currentState.reminderTime != null) {
                 listOf(currentState.reminderTime)
             } else {
                 emptyList()
+            }
+
+            // 3. NAPRAWA ZAPISU: Używamy funkcji buildRrule, żeby zawrzeć INTERVAL w stringu
+            val recurrenceString = if (currentState.isRecurring) {
+                buildRrule(currentState)
+            } else {
+                null
             }
 
             editMedicationUseCase(
@@ -106,7 +152,7 @@ class EditMedicationViewModel @Inject constructor(
                 newFrom = currentState.startDate,
                 newTo = currentState.endDate,
                 newTimes = timesList,
-                reccurenceString = null,
+                reccurenceString = recurrenceString,
             ).collect { result ->
                 when(result) {
                     is Resource.Loading -> _state.update { it.copy(isLoading = true, error = null) }
@@ -115,6 +161,34 @@ class EditMedicationViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    // 4. NOWA FUNKCJA POMOCNICZA (Taka sama jak w AddMedicationViewModel)
+    private fun buildRrule(state: EditMedicationState): String {
+        val freq = when (state.recurrenceType) {
+            MedRecurrenceType.DAILY -> "DAILY"
+            MedRecurrenceType.WEEKLY -> "WEEKLY"
+            MedRecurrenceType.MONTHLY -> "MONTHLY"
+            MedRecurrenceType.AS_NEEDED -> "DAILY"
+        }
+        val sb = StringBuilder()
+        sb.append("FREQ=$freq")
+
+        val intervalInt = state.repeatInterval.toIntOrNull() ?: 1
+
+        if (intervalInt > 1) {
+            sb.append(";INTERVAL=$intervalInt")
+        }
+
+        if (state.recurrenceType == MedRecurrenceType.WEEKLY && state.selectedDays.isNotEmpty()) {
+            val daysString = state.selectedDays
+                .sorted()
+                .joinToString(",") { day ->
+                    day.name.take(2).uppercase()
+                }
+            sb.append(";BYDAY=$daysString")
+        }
+        return sb.toString()
     }
 
     fun onErrorShown() { _state.update { it.copy(error = null) } }

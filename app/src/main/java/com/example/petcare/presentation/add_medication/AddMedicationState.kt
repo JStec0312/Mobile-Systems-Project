@@ -20,7 +20,10 @@ data class AddMedicationState(
 
     val isRecurring: Boolean = false,
     val recurrenceType: MedRecurrenceType = MedRecurrenceType.DAILY,
-    val repeatInterval: Int = 1,
+
+    // ZMIANA: String zamiast Int
+    val repeatInterval: String = "1",
+
     val selectedDays: Set<DayOfWeek> = emptySet(),
 
     val isLoading: Boolean = false,

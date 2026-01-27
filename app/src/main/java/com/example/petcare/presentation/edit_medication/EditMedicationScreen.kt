@@ -1,7 +1,6 @@
 package com.example.petcare.presentation.edit_medication
 
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -73,7 +72,6 @@ fun EditMedicationRoute(
         onNotesChange = viewModel::onNotesChange,
         onStartDateChange = viewModel::onStartDateChange,
         onEndDateChange = viewModel::onEndDateChange,
-        // NAPRAWA: Używamy poprawnych nazw funkcji z VM
         onReminderTimeChange = viewModel::onReminderTimeChange,
         onReminderEnabledChange = viewModel::onReminderEnabledChange,
         onRecurrenceToggled = viewModel::onRecurrenceToggled,
@@ -95,7 +93,6 @@ fun EditMedicationScreen(
     onNotesChange: (String) -> Unit,
     onStartDateChange: (LocalDate) -> Unit,
     onEndDateChange: (LocalDate?) -> Unit,
-    // Poprawione parametry
     onReminderTimeChange: (LocalTime) -> Unit,
     onReminderEnabledChange: (Boolean) -> Unit,
     onRecurrenceToggled: (Boolean) -> Unit,
@@ -110,12 +107,10 @@ fun EditMedicationScreen(
     var formExpanded by remember { mutableStateOf(false) }
     var recurrenceExpanded by remember { mutableStateOf(false) }
 
-    // Date Picker
     var showDatePicker by remember { mutableStateOf(false) }
     var isSelectingStartDate by remember { mutableStateOf(true) }
     val datePickerState = rememberDatePickerState()
 
-    // Time Picker
     var showTimePicker by remember { mutableStateOf(false) }
     val calendar = Calendar.getInstance()
     val timePickerState = rememberTimePickerState(
@@ -301,7 +296,8 @@ fun EditMedicationScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text("Every", color = MaterialTheme.colorScheme.secondary, modifier = Modifier.padding(end = 8.dp))
                                     TextField(
-                                        value = state.repeatInterval.toString(),
+                                        // ZMIANA: Usunięto .toString(), bo to już String
+                                        value = state.repeatInterval,
                                         onValueChange = onIntervalChange,
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                         singleLine = true,
@@ -469,7 +465,8 @@ fun EditMedicationPreview() {
                 dose = "1 tab",
                 notes = "Take with water",
                 isRecurring = true,
-                recurrenceType = MedRecurrenceType.DAILY
+                recurrenceType = MedRecurrenceType.DAILY,
+                repeatInterval = "1"
             ),
             onNameChange = {}, onFormChange = {}, onDoseChange = {}, onNotesChange = {},
             onStartDateChange = {}, onEndDateChange = {},
